@@ -1,0 +1,30 @@
+Installing devDependencies:
+- @tailwindcss/postcss
+- @types/node
+- @types/react
+- @types/react-dom
+- eslint
+- eslint-config-next
+- tailwindcss
+- typescript
+
+
+added 362 packages, and audited 363 packages in 11s
+
+146 packages are looking for funding
+  run `npm fund` for details
+
+2 moderate severity vulnerabilities
+
+To address all issues (including breaking changes), run:
+  npm audit fix --force
+
+Run `npm audit` for details.
+
+Generating route types...
+✓ Types generated successfully
+
+Initialized a git repository.
+
+Success! Created quantum-research-archive at /private/tmp/next-scaffold/quantum-research-archive
+

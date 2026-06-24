@@ -1,0 +1,6 @@
+total 32
+drwxr-xr-x@  5 dakshjain  staff   160 Jun 24 19:00 .
+drwx------+ 13 dakshjain  staff   416 Jun 24 18:44 ..
+drwxr-xr-x@  7 dakshjain  staff   224 Jun 24 18:59 .stratum
+-rw-r--r--@  1 dakshjain  staff   869 Jun 24 18:44 codebase.md
+-rw-r--r--@  1 dakshjain  staff  9064 Jun 24 19:00 plan.md

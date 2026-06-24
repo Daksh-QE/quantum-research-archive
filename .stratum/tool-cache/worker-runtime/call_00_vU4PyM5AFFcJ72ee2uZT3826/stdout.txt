@@ -1,0 +1,19 @@
+total 544
+drwxr-xr-x@  18 dakshjain  wheel     576 Jun 24 19:02 .
+drwxr-xr-x@   3 dakshjain  wheel      96 Jun 24 19:02 ..
+drwxr-xr-x@  12 dakshjain  wheel     384 Jun 24 19:02 .git
+-rw-r--r--@   1 dakshjain  staff     480 Jun 24 19:02 .gitignore
+drwxr-xr-x@   3 dakshjain  wheel      96 Jun 24 19:02 .next
+-rw-r--r--@   1 dakshjain  wheel     327 Jun 24 19:02 AGENTS.md
+-rw-r--r--@   1 dakshjain  wheel      11 Jun 24 19:02 CLAUDE.md
+-rw-r--r--@   1 dakshjain  staff    1450 Jun 24 19:02 README.md
+-rw-r--r--@   1 dakshjain  staff     465 Jun 24 19:02 eslint.config.mjs
+-rw-r--r--@   1 dakshjain  staff     247 Jun 24 19:02 next-env.d.ts
+-rw-r--r--@   1 dakshjain  staff     133 Jun 24 19:02 next.config.ts
+drwxr-xr-x@ 294 dakshjain  wheel    9408 Jun 24 19:02 node_modules
+-rw-r--r--@   1 dakshjain  wheel  234162 Jun 24 19:02 package-lock.json
+-rw-r--r--@   1 dakshjain  wheel     546 Jun 24 19:02 package.json
+-rw-r--r--@   1 dakshjain  staff      94 Jun 24 19:02 postcss.config.mjs
+drwxr-xr-x@   7 dakshjain  wheel     224 Jun 24 19:02 public
+drwxr-xr-x@   3 dakshjain  wheel      96 Jun 24 19:02 src
+-rw-r--r--@   1 dakshjain  staff     670 Jun 24 19:02 tsconfig.json

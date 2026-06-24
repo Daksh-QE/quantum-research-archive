@@ -1,0 +1,26 @@
+# Codebase Map
+
+Created: 2026-06-24T22:44:40.666Z
+
+This file is maintained by the stratum manager and worker agents. It is the shared, up-to-date reference for understanding this project without repeatedly re-researching the same codebase.
+
+## Purpose
+- _Describe what this project does._
+
+## Architecture
+- _Summarize the main packages, apps, services, and runtime flow._
+
+## Important Files and Directories
+- _List important files and directories with short explanations._
+
+## Build, Test, and Run Commands
+- _Record verified commands._
+
+## Data Flow and Integrations
+- _Record important data flows, APIs, IPC, storage, auth, external services, or integrations._
+
+## Conventions and Patterns
+- _Record naming, style, testing, and implementation conventions that agents should follow._
+
+## Recent Agent Updates
+- 2026-06-24T22:44:40.666Z — Codebase map initialized.

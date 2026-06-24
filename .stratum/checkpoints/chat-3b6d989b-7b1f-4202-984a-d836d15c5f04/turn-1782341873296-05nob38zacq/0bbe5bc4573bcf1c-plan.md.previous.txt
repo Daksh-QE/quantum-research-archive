@@ -1,0 +1,32 @@
+# Project Plan
+
+Created: 2026-06-24T22:44:40.666Z
+
+This file is maintained by the stratum orchestrator. It logs manager decisions, worker assignments, worker summaries, checks, repairs, and phase notes.
+
+## Manager
+- 2026-06-24T22:44:40.672Z — **started** Desktop orchestrator session started
+  Selected project folder: /Users/dakshjain/Documents/Quantum Research Archive
+- [x] Plan initialized for this project.
+
+## Frontend
+- _No entries yet._
+
+## Backend / Runtime
+- _No entries yet._
+
+## Testing
+- _No entries yet._
+
+## Review
+- _No entries yet._
+
+## Workers
+- worker-frontend: Frontend Worker (frontend)
+- worker-runtime: Runtime Worker (runtime)
+- worker-tests: Test Worker (tester)
+- worker-review: Review Worker (reviewer)
+
+## Activity Log
+- 2026-06-24T22:44:40.673Z — Manager: Desktop orchestrator session started (started)
+- 2026-06-24T22:44:40.666Z — Plan created.

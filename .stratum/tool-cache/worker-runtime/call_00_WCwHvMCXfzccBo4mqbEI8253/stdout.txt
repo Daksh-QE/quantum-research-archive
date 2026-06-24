@@ -1,0 +1,16 @@
+total 552
+drwxr-xr-x@ 15 dakshjain  staff     480 Jun 24 19:02 .
+drwx------+ 13 dakshjain  staff     416 Jun 24 18:44 ..
+-rw-r--r--@  1 dakshjain  staff     480 Jun 24 19:02 .gitignore
+drwxr-xr-x@  7 dakshjain  staff     224 Jun 24 18:59 .stratum
+-rw-r--r--@  1 dakshjain  staff     869 Jun 24 18:44 codebase.md
+-rw-r--r--@  1 dakshjain  staff     465 Jun 24 19:02 eslint.config.mjs
+-rw-r--r--@  1 dakshjain  staff     247 Jun 24 19:02 next-env.d.ts
+-rw-r--r--@  1 dakshjain  staff     133 Jun 24 19:02 next.config.ts
+-rw-r--r--@  1 dakshjain  staff  234162 Jun 24 19:02 package-lock.json
+-rw-r--r--@  1 dakshjain  staff     546 Jun 24 19:02 package.json
+-rw-r--r--@  1 dakshjain  staff    9064 Jun 24 19:00 plan.md
+-rw-r--r--@  1 dakshjain  staff      94 Jun 24 19:02 postcss.config.mjs
+drwxr-xr-x@  7 dakshjain  staff     224 Jun 24 19:02 public
+drwxr-xr-x@  3 dakshjain  staff      96 Jun 24 19:02 src
+-rw-r--r--@  1 dakshjain  staff     670 Jun 24 19:02 tsconfig.json

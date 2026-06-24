@@ -1,0 +1,14 @@
+total 128360
+drwx------+ 13 dakshjain  staff       416 Jun 24 18:44 .
+drwxr-x---+ 50 dakshjain  staff      1600 Jun 24 15:09 ..
+-rw-r--r--@  1 dakshjain  staff      6148 Jun 19 22:10 .DS_Store
+-rw-r--r--   1 dakshjain  staff         0 Apr 17 19:23 .localized
+-rw-r--r--@  1 dakshjain  staff  65397688 Apr 22 01:53 AMH2020 Final Part.mov
+drwxr-xr-x@  2 dakshjain  staff        64 May 14 19:28 Arduino
+drwxr-xr-x@  7 dakshjain  staff       224 May 27 15:55 Codex
+-rw-r--r--@  1 dakshjain  staff     18005 May 19 11:24 College Essay Peer Editing Round 1.docx
+drwxr-xr-x@  5 dakshjain  staff       160 Jun 17 21:32 GitHub
+-rw-r--r--@  1 dakshjain  staff    290272 Jun  9 17:44 Photo on 6-9-26 at 2.44 PM.jpg
+drwxr-xr-x@  5 dakshjain  staff       160 Jun 24 19:00 Quantum Research Archive
+drwxr-xr-x@  2 dakshjain  staff        64 Jun 23 14:02 Stratum
+drwxr-xr-x@  6 dakshjain  staff       192 Jun 24 14:45 Stratum Testing
