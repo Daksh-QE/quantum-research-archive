@@ -1,6 +1,6 @@
 # Quantum Research Archive
 
-A comprehensive, free, ad-free quantum computing and quantum mechanics research archive. From mathematical foundations to cutting-edge research papers — everything you need to become a quantum expert.
+A comprehensive, free, ad-free quantum computing and quantum mechanics research archive. From mathematical foundations to cutting-edge research papers — everything I could find to pursue quantum as a field so far.
 
 **Live site:** https://quantum-research-archive.vercel.app
 
