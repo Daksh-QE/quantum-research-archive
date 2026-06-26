@@ -1,5 +1,5 @@
 1:"$Sreact.fragment"
-2:I[58860,["/_next/static/chunks/135g0ugy41nrb.js","/_next/static/chunks/2se9q2pt5qakz.js","/_next/static/chunks/0clp6is5fn6hf.js"],"default"]
-3:I[80131,["/_next/static/chunks/135g0ugy41nrb.js","/_next/static/chunks/2se9q2pt5qakz.js","/_next/static/chunks/0clp6is5fn6hf.js"],"default"]
+2:I[58860,["/quantum-research-archive/_next/static/chunks/135g0ugy41nrb.js","/quantum-research-archive/_next/static/chunks/2se9q2pt5qakz.js","/quantum-research-archive/_next/static/chunks/0clp6is5fn6hf.js"],"default"]
+3:I[80131,["/quantum-research-archive/_next/static/chunks/135g0ugy41nrb.js","/quantum-research-archive/_next/static/chunks/2se9q2pt5qakz.js","/quantum-research-archive/_next/static/chunks/0clp6is5fn6hf.js"],"default"]
 4:[]
-0:{"rsc":["$","$1","c",{"children":[null,["$","$L2",null,{"parallelRouterKey":"children","template":["$","$L3",null,{}]}]]}],"isPartial":false,"staleTime":300,"varyParams":"$W4","buildId":"YvfyTdCvqobjsrErqzgIR"}
+0:{"rsc":["$","$1","c",{"children":[null,["$","$L2",null,{"parallelRouterKey":"children","template":["$","$L3",null,{}]}]]}],"isPartial":false,"staleTime":300,"varyParams":"$W4","buildId":"IEYBx0jrrZq8KbytsLqgo"}

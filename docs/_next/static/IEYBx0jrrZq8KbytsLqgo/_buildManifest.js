@@ -1,7 +1,12 @@
 self.__BUILD_MANIFEST = {
   "__rewrites": {
     "afterFiles": [],
-    "beforeFiles": [],
+    "beforeFiles": [
+      {
+        "source": "/quantum-research-archive//_next/:path+",
+        "destination": "/quantum-research-archive/_next/:path+"
+      }
+    ],
     "fallback": []
   },
   "sortedPages": [
