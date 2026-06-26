@@ -55,6 +55,10 @@ Quantum Computing + Mechanics Research Archive — a comprehensive, free, ad-fre
 8. **No mobile sidebar toggle**: Fixed sidebar overlaps on small viewports
 
 ## Recent Agent Updates
+- 2026-06-26T10:37:01.104Z — Updated src/app/page.tsx. Review this entry and expand the relevant sections when the change affects architecture, commands, conventions, tests, or user-facing behavior.
+- 2026-06-26T10:36:56.027Z — Updated src/app/page.tsx. Review this entry and expand the relevant sections when the change affects architecture, commands, conventions, tests, or user-facing behavior.
+- 2026-06-26T10:36:32.054Z — Added .github/workflows/deploy.yml. Review this entry and expand the relevant sections when the change affects architecture, commands, conventions, tests, or user-facing behavior.
+- 2026-06-26T10:36:24.684Z — Updated next.config.ts. Review this entry and expand the relevant sections when the change affects architecture, commands, conventions, tests, or user-facing behavior.
 - 2026-06-26T10:35:53.976Z — Updated .gitignore. Review this entry and expand the relevant sections when the change affects architecture, commands, conventions, tests, or user-facing behavior.
 - 2026-06-26T10:30:22.205Z — Updated next.config.ts. Review this entry and expand the relevant sections when the change affects architecture, commands, conventions, tests, or user-facing behavior.
 - 2026-06-25T14:06:00.883Z — Updated src/app/glossary/page.tsx. Review this entry and expand the relevant sections when the change affects architecture, commands, conventions, tests, or user-facing behavior.
