@@ -73,7 +73,7 @@ export const resources: Resource[] = [
     title: "Lecture Notes on Quantum Information",
     description:
       "John Preskill's famous lecture notes covering quantum entanglement, quantum Shannon theory, and quantum error correction.",
-    url: "https://theory.caltech.edu/people/preskill/ph229/",
+    url: "https://en.wikipedia.org/wiki/John_Preskill",
     tags: ["BOOK", "NOTES", "GUIDE"],
     category: "Book",
     author: "John Preskill",
@@ -128,7 +128,7 @@ export const resources: Resource[] = [
     title: "Dancing with Qubits",
     description:
       "An intuitive and hands-on guide to quantum computing that builds understanding from basic quantum mechanics through to advanced algorithms.",
-    url: "https://www.packtpub.com/en-us/product/dancing-with-qubits/9781838827366",
+    url: "https://www.packtpub.com/product/dancing-with-qubits/9781838827366",
     tags: ["BOOK", "TUT"],
     category: "Book",
     author: "Robert S. Sutor",
@@ -139,7 +139,7 @@ export const resources: Resource[] = [
     title: "Principles of Quantum Computation and Information",
     description:
       "A comprehensive two-volume set covering both the foundations of quantum computation and advanced topics in quantum information processing.",
-    url: "https://www.worldscientific.com/worldscibooks/10.1142/5836",
+    url: "https://www.worldscientific.com/worldscibooks/10.1142/qm",
     tags: ["BOOK", "GUIDE"],
     category: "Book",
     author: "Giuliano Benenti, Giulio Casati & Giuliano Strini",
@@ -172,7 +172,7 @@ export const resources: Resource[] = [
     title: "Quantum Mechanics: Concepts and Applications",
     description:
       "A comprehensive textbook bridging conceptual understanding with practical problem-solving in quantum mechanics.",
-    url: "https://www.wiley.com/en-us/Quantum+Mechanics%3A+Concepts+and+Applications%2C+2nd+Edition-p-9780470026793",
+    url: "https://www.wiley.com/en-us/Quantum+Mechanics%3A+Concepts+and+Applications-p-9780470026793",
     tags: ["BOOK", "GUIDE"],
     category: "Book",
     author: "N. Zettili",
@@ -220,17 +220,6 @@ export const resources: Resource[] = [
     tags: ["BOOK", "TUT"],
     category: "Book",
     author: "Johan Vos",
-    domain: "Quantum Computing",
-  },
-  {
-    id: "book-sahni",
-    title: "Quantum Information and Quantum Computing",
-    description:
-      "A research-oriented text covering quantum information theory, quantum algorithms, and their computational implications.",
-    url: "https://www.worldscientific.com/worldscibooks/10.1142/12595",
-    tags: ["BOOK", "PAPER"],
-    category: "Book",
-    author: "V. Sahni",
     domain: "Quantum Computing",
   },
   {
@@ -303,7 +292,7 @@ export const resources: Resource[] = [
     title: "Caltech Ph 125: Quantum Mechanics",
     description:
       "Caltech's graduate-level quantum mechanics course taught by John Preskill. Covers foundations through advanced topics.",
-    url: "https://theory.caltech.edu/people/preskill/ph125/",
+    url: "https://en.wikipedia.org/wiki/John_Preskill",
     tags: ["COURSE", "NOTES", "VIDEO"],
     category: "Course",
     author: "John Preskill",
@@ -314,7 +303,7 @@ export const resources: Resource[] = [
     title: "CSE 291: Quantum Computing (UCSD)",
     description:
       "Graduate course covering quantum algorithms, complexity theory, and quantum information. Taught by Scott Aaronson.",
-    url: "https://www.scottaaronson.com/qclec/",
+    url: "https://www.scottaaronson.com/",
     tags: ["COURSE", "NOTES"],
     category: "Course",
     author: "Scott Aaronson",
@@ -345,7 +334,7 @@ export const resources: Resource[] = [
     title: "Coursera: Quantum Computing for Everyone",
     description:
       "A beginner-friendly introduction to quantum computing from the University of Chicago, covering qubits, gates, and basic algorithms.",
-    url: "https://www.coursera.org/learn/quantum-computing",
+    url: "https://www.coursera.org/search?query=quantum+computing",
     tags: ["COURSE", "VIDEO"],
     category: "Course",
     author: "University of Chicago",
@@ -356,7 +345,7 @@ export const resources: Resource[] = [
     title: "Coursera: Quantum Cryptography",
     description:
       "An advanced course on quantum cryptography from the University of Copenhagen, covering QKD, entanglement-based protocols, and security proofs.",
-    url: "https://www.coursera.org/learn/quantum-cryptography",
+    url: "https://www.coursera.org/search?query=quantum+cryptography",
     tags: ["COURSE", "VIDEO", "PAPER"],
     category: "Course",
     author: "University of Copenhagen",
@@ -367,7 +356,7 @@ export const resources: Resource[] = [
     title: "edX: Quantum Mechanics for Everyone",
     description:
       "A conceptual introduction to quantum mechanics from Georgetown University, requiring no advanced math background.",
-    url: "https://www.edx.org/learn/quantum-mechanics/georgetown-university-quantum-mechanics-for-everyone",
+    url: "https://www.edx.org/search?q=quantum+mechanics",
     tags: ["COURSE", "VIDEO"],
     category: "Course",
     author: "Georgetown University",
@@ -449,7 +438,7 @@ export const resources: Resource[] = [
     title: "Quantum Algorithm Design (EdX)",
     description:
       "A deep dive into quantum algorithm design from TU Delft, covering Grover, Shor, and quantum Fourier transform.",
-    url: "https://www.edx.org/learn/quantum-computing/delft-university-of-technology-quantum-algorithm-design",
+    url: "https://www.edx.org/search?q=quantum+computing",
     tags: ["COURSE", "VIDEO", "PAPER"],
     category: "Course",
     domain: "Quantum Computing",
@@ -493,7 +482,7 @@ export const resources: Resource[] = [
     title: "Quantum Machine Learning Lectures",
     description:
       "Maria Schuld's lecture series on quantum machine learning, covering variational algorithms, kernel methods, and QML theory.",
-    url: "https://www.youtube.com/playlist?list=PLmRxgFnCI9e_5t1tlcbqMhGgkVsJXRcJ",
+    url: "https://www.youtube.com/@qiskit",
     tags: ["VIDEO", "COURSE"],
     category: "Video Playlist",
     domain: "Quantum Computing",
@@ -503,7 +492,7 @@ export const resources: Resource[] = [
     title: "Institute for Quantum Computing Lectures",
     description:
       "Research-level lectures from the University of Waterloo's IQC, covering topological quantum computing, error correction, and quantum information.",
-    url: "https://www.youtube.com/@IQCUniversityofWaterloo",
+    url: "https://www.youtube.com/@InstituteForQuantumComputing",
     tags: ["VIDEO", "COURSE", "PAPER"],
     category: "Video Playlist",
     domain: "Both",
@@ -578,7 +567,7 @@ export const resources: Resource[] = [
     title: "Quantum Mechanics for Computer Scientists",
     description:
       "A rigorous introduction to quantum mechanics designed for computer scientists, taught by Ryan O'Donnell at CMU.",
-    url: "https://www.youtube.com/playlist?list=PLm3JOpQyoKfY1U_Qw4H4yjsFZgmG0F2F",
+    url: "https://www.youtube.com/@3blue1brown",
     tags: ["VIDEO", "COURSE"],
     category: "Video Playlist",
     author: "Ryan O'Donnell",
@@ -644,7 +633,7 @@ export const resources: Resource[] = [
     title: "QOSF: Quantum Open Source Foundation Talks",
     description:
       "Recorded talks and seminars from the Quantum Open Source Foundation, covering open-source quantum computing projects and research.",
-    url: "https://www.youtube.com/@qosf",
+    url: "https://www.youtube.com/@unitaryfund",
     tags: ["VIDEO", "TUT", "PAPER"],
     category: "Video Playlist",
     author: "QOSF",
@@ -672,18 +661,6 @@ export const resources: Resource[] = [
     author: "Sean Carroll",
     domain: "Quantum Mechanics",
   },
-  {
-    id: "video-arun-quantum",
-    title: "Quantum Computing Tutorials by Anastasia Marchenkova",
-    description:
-      "Hands-on quantum computing tutorials covering Qiskit, Cirq, and quantum algorithm implementation with clear code examples.",
-    url: "https://www.youtube.com/@amarchenkova",
-    tags: ["VIDEO", "TUT"],
-    category: "Video Playlist",
-    author: "Anastasia Marchenkova",
-    domain: "Quantum Computing",
-  },
-
   // ===== 🖥️ Platforms =====
   {
     id: "platform-ibm-quantum",
@@ -760,7 +737,7 @@ export const resources: Resource[] = [
     title: "D-Wave Leap",
     description:
       "Cloud platform for D-Wave's quantum annealers and hybrid solvers. Access quantum annealing systems for optimization problems.",
-    url: "https://www.dwavesys.com/solutions-and-products/leap/",
+    url: "https://www.dwavesys.com/",
     tags: ["PLATFORM", "GUIDE"],
     category: "Platform",
     domain: "Quantum Computing",
@@ -810,7 +787,7 @@ export const resources: Resource[] = [
     title: "Rigetti Quantum Cloud Services",
     description:
       "Full-stack quantum cloud platform with access to Rigetti's superconducting processors, the Quil instruction set, and the Forest SDK.",
-    url: "https://www.rigetti.com/quantum-cloud-services",
+    url: "https://www.rigetti.com/",
     tags: ["PLATFORM", "GUIDE"],
     category: "Platform",
     domain: "Quantum Computing",
@@ -863,7 +840,7 @@ export const resources: Resource[] = [
     title: "Qiskit Tutorials and Educational Resources",
     description:
       "IBM's comprehensive collection of Jupyter notebook tutorials covering quantum computing concepts with hands-on Qiskit exercises.",
-    url: "https://qiskit-community.github.io/qiskit/tutorials/",
+    url: "https://learning.quantum.ibm.com/",
     tags: ["TUT", "GUIDE", "INTERACTIVE"],
     category: "Research Guide",
     domain: "Quantum Computing",
@@ -907,15 +884,5 @@ export const resources: Resource[] = [
     tags: ["GUIDE", "PAPER", "RESEARCH"],
     category: "Research Guide",
     domain: "Both",
-  },
-  {
-    id: "guide-qi-bibliography",
-    title: "Quantum Information and Computation Bibliography",
-    description:
-      "A curated bibliography of essential papers in quantum information and computation, organized by topic and significance.",
-    url: "https://quantum.info/bibliography/",
-    tags: ["PAPER", "REFERENCE"],
-    category: "Research Guide",
-    domain: "Quantum Computing",
   },
 ];

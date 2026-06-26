@@ -67,3 +67,31 @@ export interface Newsletter {
   frequency: string;
   tags: string[];
 }
+
+export interface Challenge {
+  id: string;
+  title: string;
+  difficulty: "beginner" | "intermediate" | "advanced";
+  description: string;
+  url: string;
+  tags: string[];
+}
+
+export interface Job {
+  id: string;
+  title: string;
+  company: string;
+  location: string;
+  description: string;
+  url: string;
+  tags: string[];
+}
+
+export interface CommunityHub {
+  id: string;
+  name: string;
+  platform: "discord" | "reddit" | "slack" | "x" | "forum";
+  description: string;
+  url: string;
+  tags: string[];
+}

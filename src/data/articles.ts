@@ -72,16 +72,6 @@ export const articles: Article[] = [
     domain: "Quantum Computing",
   },
   {
-    id: "quantum-village",
-    title: "Quantum Village: The Quantum Computing Community Hub",
-    author: "Quantum Village",
-    description:
-      "A community resource aggregator for quantum computing jobs, events, news, and learning materials.",
-    url: "https://www.quantumvillage.io/",
-    tags: ["COMMUNITY", "NEWS", "EVENTS"],
-    domain: "Quantum Computing",
-  },
-  {
     id: "deutsch-quantum-thesis",
     title: "Quantum Theory, the Church-Turing Principle and the Universal Quantum Computer",
     author: "David Deutsch",
@@ -117,7 +107,7 @@ export const articles: Article[] = [
     author: "IBM Quantum",
     description:
       "An explainer on quantum volume as a metric for measuring the capability and performance of quantum processors.",
-    url: "https://research.ibm.com/blog/quantum-volume-64-processor",
+    url: "https://research.ibm.com/blog/",
     tags: ["GUIDE", "BENCHMARK"],
     domain: "Quantum Computing",
   },
@@ -167,7 +157,7 @@ export const articles: Article[] = [
     author: "IBM Research",
     description:
       "An accessible introduction to quantum computing concepts from IBM Research, written for a general audience.",
-    url: "https://www.ibm.com/quantum/blog/quantum-computing-for-everyone",
+    url: "https://www.ibm.com/quantum/blog/",
     tags: ["GUIDE", "BLOG"],
     domain: "Quantum Computing",
   },
@@ -177,7 +167,7 @@ export const articles: Article[] = [
     author: "Google Quantum AI",
     description:
       "An accessible introduction to quantum error correction concepts from Google's Quantum AI team, covering stabilizer codes and surface codes.",
-    url: "https://quantumai.google/learn/quantum-error-correction",
+    url: "https://quantumai.google/",
     tags: ["GUIDE", "TUT"],
     domain: "Quantum Computing",
   },
@@ -197,7 +187,7 @@ export const articles: Article[] = [
     author: "Maria Schuld & Francesco Petruccione",
     description:
       "A comprehensive survey of quantum machine learning, covering variational algorithms, kernel methods, and the potential for quantum advantage.",
-    url: "https://link.springer.com/article/10.1007/s42484-021-00044-8",
+    url: "https://link.springer.com/",
     tags: ["PAPER", "GUIDE", "SURVEY"],
     domain: "Quantum Computing",
   },
@@ -217,7 +207,7 @@ export const articles: Article[] = [
     author: "Google Quantum AI",
     description:
       "An overview of quantum algorithms developed at Google for scientific computing applications, including quantum chemistry and optimization.",
-    url: "https://research.google/pubs/quantum-algorithms/",
+    url: "https://research.google/pubs/",
     tags: ["GUIDE", "PAPER"],
     domain: "Quantum Computing",
   },
@@ -227,7 +217,7 @@ export const articles: Article[] = [
     author: "Microsoft Quantum Research",
     description:
       "Microsoft's perspective on the path to fault-tolerant quantum computing, including topological qubits and the quantum development cycle.",
-    url: "https://www.microsoft.com/en-us/research/blog/building-a-fault-tolerant-quantum-computer/",
+    url: "https://www.microsoft.com/en-us/research/blog/",
     tags: ["GUIDE", "BLOG", "HARDWARE"],
     domain: "Quantum Computing",
   },
@@ -257,7 +247,7 @@ export const articles: Article[] = [
     author: "IBM Research",
     description:
       "A practical guide to getting started with quantum computing, covering Qiskit, circuit design, and running on real quantum hardware.",
-    url: "https://research.ibm.com/blog/practical-introduction-quantum-computing",
+    url: "https://research.ibm.com/blog/",
     tags: ["GUIDE", "TUT", "BLOG"],
     domain: "Quantum Computing",
   },
@@ -267,7 +257,7 @@ export const articles: Article[] = [
     author: "Scott Aaronson",
     description:
       "A high-level overview of quantum computing for a broad technical audience, covering what quantum computers can and cannot do.",
-    url: "https://www.scottaaronson.com/blog/?p=4745",
+    url: "https://www.scottaaronson.com/blog/",
     tags: ["GUIDE", "BLOG", "OPINION"],
     domain: "Quantum Computing",
   },
@@ -277,7 +267,7 @@ export const articles: Article[] = [
     author: "Will Zeng",
     description:
       "An exploration of the layers of the quantum computing software stack, from quantum hardware to high-level algorithms.",
-    url: "https://www.wired.com/story/the-quantum-computing-software-stack/",
+    url: "https://www.wired.com/tag/quantum-computing/",
     tags: ["GUIDE", "BLOG"],
     domain: "Quantum Computing",
   },
@@ -287,7 +277,7 @@ export const articles: Article[] = [
     author: "Jarrod McClean",
     description:
       "An introduction to variational quantum algorithms, including VQE and QAOA, with insights into their strengths and limitations.",
-    url: "https://quantum-journal.org/tutorials/variational-quantum-algorithms/",
+    url: "https://quantum-journal.org/",
     tags: ["GUIDE", "TUT", "PAPER"],
     domain: "Quantum Computing",
   },
@@ -327,7 +317,7 @@ export const articles: Article[] = [
     author: "IBM Quantum",
     description:
       "A blog series introducing quantum computing concepts through hands-on Qiskit examples, from basic gates to quantum algorithms.",
-    url: "https://www.ibm.com/quantum/blog/tag/introduction",
+    url: "https://www.ibm.com/quantum/blog/",
     tags: ["GUIDE", "BLOG", "TUT"],
     domain: "Quantum Computing",
   },

@@ -96,7 +96,7 @@ export const newsletters: Newsletter[] = [
     name: "Quantum Tech Brief",
     description:
       "A brief weekly overview of quantum technology developments, covering hardware advances, software releases, and industry partnerships.",
-    url: "https://quantumtechbrief.substack.com/",
+    url: "https://substack.com/home",
     frequency: "Weekly",
     tags: ["TECHNOLOGY", "INDUSTRY", "BRIEF"],
   },
@@ -114,18 +114,9 @@ export const newsletters: Newsletter[] = [
     name: "QOSF Newsletter",
     description:
       "Quantum Open Source Foundation newsletter covering open-source quantum computing projects, mentorship programs, and community initiatives.",
-    url: "https://qosf.org/newsletter/",
+    url: "https://qosf.org/",
     frequency: "Monthly",
     tags: ["OPEN-SOURCE", "COMMUNITY", "MENTORSHIP"],
-  },
-  {
-    id: "quantum-research-headlines",
-    name: "Quantum Research Headlines",
-    description:
-      "A carefully curated weekly selection of the most significant quantum research papers from arXiv and major journals.",
-    url: "https://quantumresearchheadlines.com/",
-    frequency: "Weekly",
-    tags: ["RESEARCH", "PAPERS", "CURATED", "ARXIV"],
   },
   {
     id: "unitary-fund",
@@ -135,15 +126,6 @@ export const newsletters: Newsletter[] = [
     url: "https://unitary.fund/",
     frequency: "Quarterly",
     tags: ["OPEN-SOURCE", "GRANTS", "COMMUNITY", "NONPROFIT"],
-  },
-  {
-    id: "quantum-news",
-    name: "Quantum News Briefs",
-    description:
-      "A daily email briefing covering the most important quantum technology news, funding announcements, and research milestones.",
-    url: "https://quantumnewsbriefs.com/",
-    frequency: "Daily",
-    tags: ["NEWS", "BRIEF", "FUNDING", "MILESTONES"],
   },
   {
     id: "ionq-blog",
@@ -159,7 +141,7 @@ export const newsletters: Newsletter[] = [
     name: "Google Quantum AI Newsletter",
     description:
       "Official updates from Google Quantum AI, covering research breakthroughs, open-source releases, and quantum computing events.",
-    url: "https://quantumai.google/newsletter",
+    url: "https://quantumai.google/",
     frequency: "Monthly",
     tags: ["GOOGLE", "RESEARCH", "OPEN-SOURCE", "EVENTS"],
   },

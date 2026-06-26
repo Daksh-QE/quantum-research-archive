@@ -55,6 +55,44 @@ Quantum Computing + Mechanics Research Archive — a comprehensive, free, ad-fre
 8. **No mobile sidebar toggle**: Fixed sidebar overlaps on small viewports
 
 ## Recent Agent Updates
+- 2026-06-26T19:40:03.870Z — Updated src/app/(archive)/jobs/page.tsx. Review this entry and expand the relevant sections when the change affects architecture, commands, conventions, tests, or user-facing behavior.
+- 2026-06-26T19:39:50.441Z — Added src/app/api/jobs/route.ts. Review this entry and expand the relevant sections when the change affects architecture, commands, conventions, tests, or user-facing behavior.
+- 2026-06-26T12:53:40.371Z — Updated src/data/curriculum.ts. Review this entry and expand the relevant sections when the change affects architecture, commands, conventions, tests, or user-facing behavior.
+- 2026-06-26T12:53:36.797Z — Updated src/data/curriculum.ts. Review this entry and expand the relevant sections when the change affects architecture, commands, conventions, tests, or user-facing behavior.
+- 2026-06-26T12:53:11.011Z — Updated src/data/articles.ts. Review this entry and expand the relevant sections when the change affects architecture, commands, conventions, tests, or user-facing behavior.
+- 2026-06-26T12:52:54.262Z — Updated src/data/newsletters.ts. Review this entry and expand the relevant sections when the change affects architecture, commands, conventions, tests, or user-facing behavior.
+- 2026-06-26T12:52:41.115Z — Updated src/data/newsletters.ts. Review this entry and expand the relevant sections when the change affects architecture, commands, conventions, tests, or user-facing behavior.
+- 2026-06-26T12:52:37.332Z — Updated src/data/tools.ts. Review this entry and expand the relevant sections when the change affects architecture, commands, conventions, tests, or user-facing behavior.
+- 2026-06-26T12:52:33.903Z — Updated src/data/articles.ts. Review this entry and expand the relevant sections when the change affects architecture, commands, conventions, tests, or user-facing behavior.
+- 2026-06-26T12:52:29.848Z — Updated src/data/articles.ts. Review this entry and expand the relevant sections when the change affects architecture, commands, conventions, tests, or user-facing behavior.
+- 2026-06-26T12:52:25.688Z — Updated src/data/articles.ts. Review this entry and expand the relevant sections when the change affects architecture, commands, conventions, tests, or user-facing behavior.
+- 2026-06-26T12:52:10.630Z — Updated src/data/articles.ts. Review this entry and expand the relevant sections when the change affects architecture, commands, conventions, tests, or user-facing behavior.
+- 2026-06-26T12:52:06.598Z — Updated src/data/resources.ts. Review this entry and expand the relevant sections when the change affects architecture, commands, conventions, tests, or user-facing behavior.
+- 2026-06-26T12:51:53.933Z — Updated src/data/resources.ts. Review this entry and expand the relevant sections when the change affects architecture, commands, conventions, tests, or user-facing behavior.
+- 2026-06-26T12:51:46.806Z — Updated src/data/resources.ts. Review this entry and expand the relevant sections when the change affects architecture, commands, conventions, tests, or user-facing behavior.
+- 2026-06-26T12:51:43.282Z — Updated src/data/resources.ts. Review this entry and expand the relevant sections when the change affects architecture, commands, conventions, tests, or user-facing behavior.
+- 2026-06-26T12:51:39.172Z — Updated src/data/resources.ts. Review this entry and expand the relevant sections when the change affects architecture, commands, conventions, tests, or user-facing behavior.
+- 2026-06-26T12:51:27.642Z — Updated src/data/resources.ts. Review this entry and expand the relevant sections when the change affects architecture, commands, conventions, tests, or user-facing behavior.
+- 2026-06-26T12:51:23.261Z — Updated src/data/resources.ts. Review this entry and expand the relevant sections when the change affects architecture, commands, conventions, tests, or user-facing behavior.
+- 2026-06-26T12:51:18.769Z — Updated src/data/community.ts. Review this entry and expand the relevant sections when the change affects architecture, commands, conventions, tests, or user-facing behavior.
+- 2026-06-26T12:51:14.672Z — Updated src/data/communityHubs.ts. Review this entry and expand the relevant sections when the change affects architecture, commands, conventions, tests, or user-facing behavior.
+- 2026-06-26T12:51:11.367Z — Updated src/data/challenges.ts. Review this entry and expand the relevant sections when the change affects architecture, commands, conventions, tests, or user-facing behavior.
+- 2026-06-26T12:51:08.500Z — Updated src/data/jobs.ts. Review this entry and expand the relevant sections when the change affects architecture, commands, conventions, tests, or user-facing behavior.
+- 2026-06-26T12:35:04.621Z — Updated src/app/page.tsx. Review this entry and expand the relevant sections when the change affects architecture, commands, conventions, tests, or user-facing behavior.
+- 2026-06-26T12:27:26.880Z — Updated src/app/page.tsx. Review this entry and expand the relevant sections when the change affects architecture, commands, conventions, tests, or user-facing behavior.
+- 2026-06-26T12:27:20.777Z — Updated src/components/Sidebar.tsx. Review this entry and expand the relevant sections when the change affects architecture, commands, conventions, tests, or user-facing behavior.
+- 2026-06-26T12:27:09.365Z — Added src/app/(archive)/jobs/page.tsx. Review this entry and expand the relevant sections when the change affects architecture, commands, conventions, tests, or user-facing behavior.
+- 2026-06-26T12:27:01.737Z — Added src/app/(archive)/community-hubs/page.tsx. Review this entry and expand the relevant sections when the change affects architecture, commands, conventions, tests, or user-facing behavior.
+- 2026-06-26T12:26:53.313Z — Added src/app/(archive)/challenges/page.tsx. Review this entry and expand the relevant sections when the change affects architecture, commands, conventions, tests, or user-facing behavior.
+- 2026-06-26T12:19:53.498Z — Updated src/app/page.tsx. Review this entry and expand the relevant sections when the change affects architecture, commands, conventions, tests, or user-facing behavior.
+- 2026-06-26T12:19:28.308Z — Added src/data/communityHubs.ts. Review this entry and expand the relevant sections when the change affects architecture, commands, conventions, tests, or user-facing behavior.
+- 2026-06-26T12:19:14.862Z — Added src/data/jobs.ts. Review this entry and expand the relevant sections when the change affects architecture, commands, conventions, tests, or user-facing behavior.
+- 2026-06-26T12:18:59.633Z — Added src/data/challenges.ts. Review this entry and expand the relevant sections when the change affects architecture, commands, conventions, tests, or user-facing behavior.
+- 2026-06-26T12:18:38.958Z — Updated src/data/types.ts. Review this entry and expand the relevant sections when the change affects architecture, commands, conventions, tests, or user-facing behavior.
+- 2026-06-26T12:16:28.416Z — Updated src/app/page.tsx. Review this entry and expand the relevant sections when the change affects architecture, commands, conventions, tests, or user-facing behavior.
+- 2026-06-26T12:11:42.194Z — Updated src/app/page.tsx. Review this entry and expand the relevant sections when the change affects architecture, commands, conventions, tests, or user-facing behavior.
+- 2026-06-26T11:57:43.342Z — Updated src/app/page.tsx. Review this entry and expand the relevant sections when the change affects architecture, commands, conventions, tests, or user-facing behavior.
+- 2026-06-26T11:47:52.920Z — Updated src/app/page.tsx. Review this entry and expand the relevant sections when the change affects architecture, commands, conventions, tests, or user-facing behavior.
 - 2026-06-26T11:35:17.871Z — Updated src/app/page.tsx. Review this entry and expand the relevant sections when the change affects architecture, commands, conventions, tests, or user-facing behavior.
 - 2026-06-26T11:23:56.679Z — Updated src/app/page.tsx. Review this entry and expand the relevant sections when the change affects architecture, commands, conventions, tests, or user-facing behavior.
 - 2026-06-26T11:18:57.589Z — Updated src/app/page.tsx. Review this entry and expand the relevant sections when the change affects architecture, commands, conventions, tests, or user-facing behavior.

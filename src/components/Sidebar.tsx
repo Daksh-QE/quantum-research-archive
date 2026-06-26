@@ -24,10 +24,13 @@ const navItems = [
   { label: "Overview", href: "/overview", icon: LayoutDashboard },
   { label: "Resources", href: "/resources", icon: BookOpen },
   { label: "Community", href: "/community", icon: Users },
+  { label: "Community Hubs", href: "/community-hubs", icon: Users },
   { label: "Articles", href: "/articles", icon: Newspaper },
   { label: "Roadmap", href: "/roadmap", icon: Map },
   { label: "Tools & Practice", href: "/tools", icon: Wrench },
   { label: "Research Papers", href: "/papers", icon: FileText },
+  { label: "Challenges", href: "/challenges", icon: FileText },
+  { label: "Jobs", href: "/jobs", icon: Wrench },
   { label: "Glossary", href: "/glossary", icon: BookMarked },
   { label: "Newsletters", href: "/newsletters", icon: Mail },
 ];

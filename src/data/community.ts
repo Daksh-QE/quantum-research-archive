@@ -19,7 +19,7 @@ export const communityMembers: CommunityMember[] = [
     role: "RES",
     description:
       "Leading quantum information theorist. Coined the term 'quantum supremacy'. Director of the Institute for Quantum Information and Matter at Caltech.",
-    url: "https://theory.caltech.edu/people/preskill/",
+    url: "https://en.wikipedia.org/wiki/John_Preskill",
     tags: ["QUANTUM INFORMATION", "SUPREMACY", "EDUCATION"],
   },
   {
@@ -59,7 +59,7 @@ export const communityMembers: CommunityMember[] = [
     role: "RES",
     description:
       "Co-inventor of measurement-based quantum computation (one-way quantum computer). Pioneered the cluster-state model of quantum computing.",
-    url: "https://en.wikipedia.org/wiki/Robert_Raussendorf",
+    url: "https://en.wikipedia.org/wiki/One-way_quantum_computer",
     tags: ["MEASUREMENT-BASED", "CLUSTER STATES", "PIONEER"],
   },
   {
@@ -159,7 +159,7 @@ export const communityMembers: CommunityMember[] = [
     role: "RES",
     description:
       "Leading researcher in quantum information theory, quantum computational complexity, and interactive proofs. Author of 'The Theory of Quantum Information'.",
-    url: "https://cs.uwaterloo.ca/~watrous/",
+    url: "https://en.wikipedia.org/wiki/John_Watrous_(computer_scientist)",
     tags: ["QUANTUM INFORMATION", "COMPLEXITY", "THEORY"],
   },
 
@@ -221,7 +221,7 @@ export const communityMembers: CommunityMember[] = [
     role: "EDU",
     description:
       "IBM Quantum's global lead for quantum education. Drives the Qiskit textbook, summer schools, and quantum educational initiatives worldwide.",
-    url: "https://www.ibm.com/quantum/team/abraham-asfaw",
+    url: "https://www.ibm.com/quantum",
     tags: ["EDUCATION", "QISKIT", "SUMMER SCHOOL"],
   },
 
@@ -345,7 +345,7 @@ export const communityMembers: CommunityMember[] = [
     role: "LEAD",
     description:
       "One of the world's leading centers for quantum physics research, with strengths in quantum computing, quantum optics, and condensed matter physics.",
-    url: "https://www.physics.ox.ac.uk/quantum",
+    url: "https://www.oxfordquantum.org/",
     tags: ["RESEARCH", "EDUCATION", "QUANTUM OPTICS"],
   },
   {
@@ -365,7 +365,7 @@ export const communityMembers: CommunityMember[] = [
     role: "LEAD",
     description:
       "Leading European center for quantum research, with world-class programs in quantum computing, quantum internet, and quantum sensing.",
-    url: "https://www.tudelft.nl/en/quantum",
+    url: "https://qutech.nl/",
     tags: ["RESEARCH", "EDUCATION", "QUANTUM INTERNET"],
   },
   {

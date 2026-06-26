@@ -464,6 +464,147 @@ This file is maintained by the stratum orchestrator. It logs manager decisions, 
   - `codebase.md` — for project map
   
 ## Backend / Runtime
+- 2026-06-26T12:53:57.304Z — **done** Completed by Runtime Worker: Fix all broken URLs across data files
+  Build passes. Let me provide the final summary.
+  Build passes with 0 errors. Here's the structured summary.
+  
+  ---
+  
+  ## Structured Summary
+  
+  **Status:** ✅ Complete — All broken URLs fixed across 8 data files, build passes with 0 errors.
+  
+  ### Files changed and URLs fixed:
+  
+  | File | URLs Fixed | Details |
+  |------|-----------|---------|
+  | `src/data/jobs.ts` | 6 | `ibm.com/quantum/careers`→`/quantum`, `quantumai.google/careers`→`/`, `amazon.science/quantum-computing`→`/`, `classiq.io/careers`→`/`, `quantum.microsoft.com/careers`→Azure Quantum, `zapata.ai/careers`→IBM Quantum |
+  | `src/data/challenges.ts` | 1 | `pennylane.ai/qml/demos/tutorial_ising_model`→`/qml/demonstrations/` |
+  | `src/data/communityHubs.ts` | 1 | `x.com/nature_quantum`→`x.com/quantumtechbio` |
+  | `src/data/community.ts` | 6 | Preskill→Wikipedia, Raussendorf→One-way QC page, Watrous→Wikipedia, Asfaw→IBM Quantum, Oxford→oxfordquantum.org, TU Delft→qutech.nl |
+  | `src/data/resources.ts` | 17 | Preskill ph125/ph229→Wikipedia, Aaronson qclec→homepage, 2 Coursera→search pages, 2 edX→search pages, 4 YouTube playlists/channels→working ones, 2 platforms→homepages, removed `@amarchenkova` entry, removed `quantum.info/bibliography`, fixed 2 book URLs, removed Sahni book |
+  | `src/data/articles.ts` | 13 | Removed `quantumvillage.io` entry, 10 article URLs→parent sites (ibm blog, research.ibm blog, google quantum ai, springer, google pubs, microsoft research, aaronson blog, wired tag, quantum-journal) |
+  | `src/data/tools.ts` | 4 | `rigetti.com/forest`→`/`, `classiq.io/sdk`→`/`, QuantumOptics.jl→GitHub, Quipper→GitHub |
+  | `src/data/newsletters.ts` | 5 | `quantumtechbrief.substack.com`→substack.com, `qosf.org/newsletter`→`/`, `quantumai.google/newsletter`→`/`, removed `quantumresearchheadlines.com`, removed `quantumnewsbriefs.com` |
+  | `src/data/curriculum.ts` | 2 | `theory.caltech.edu/people/preskill/ph229/`→Preskill Wikipedia, `scottaaronson.com/qclec/`→Aaronson homepage |
+  
+  **Total: 55+ URL fixes across 9 files**
+  
+  **Build verification:**
+  - ✅ `npm run build` — Compiled successfully, TypeScript passed, all 16 pages static, **0 errors**
+- 2026-06-26T12:50:21.011Z — **assigned** Assigned to Runtime Worker: Fix all broken URLs across data files
+  ## TASK: Fix all broken URLs in Quantum Research Archive data files
+  
+  The project is at `/Users/dakshjain/Documents/Quantum Research Archive`. Every data file has broken URLs that need to be replaced with working alternatives.
+  
+  ### How to check a URL
+  Use this Python one-liner:
+  ```python
+  python3 -c "import urllib.request; r=urllib.request.urlopen(urllib.request.Request('URL', headers={'User-Agent':'Mozilla/5.0'})); print(r.status)"
+  ```
+  
+  ### Files to fix
+  
+  #### 1. `src/data/jobs.ts` — Replace these broken URLs:
+  - `https://www.ibm.com/quantum/careers` → `https://www.ibm.com/quantum`
+  - `https://quantumai.google/careers` → `https://quantumai.google/`
+  - `https://www.amazon.science/quantum-computing` → `https://www.amazon.science/`
+  - `https://www.classiq.io/careers` → `https://www.classiq.io/`
+  - `https://quantum.microsoft.com/careers` → `https://azure.microsoft.com/en-us/products/quantum/`
+  - `https://www.zapata.ai/careers` → `https://www.ibm.com/quantum`
+  
+  For each job, replace the job URL with a working link to the company's main careers page or about page.
+  
+  #### 2. `src/data/challenges.ts` — Fix:
+  - `https://pennylane.ai/qml/demos/tutorial_ising_model` → `https://pennylane.ai/qml/demonstrations/`
+  
+  #### 3. `src/data/communityHubs.ts` — Fix:
+  - `https://x.com/nature_quantum` → `https://x.com/quantumtechbio` (or remove this entry)
+  
+  #### 4. `src/data/community.ts` — Fix these member URLs:
+  - `https://theory.caltech.edu/people/preskill/` → `https://en.wikipedia.org/wiki/John_Preskill`
+  - `https://en.wikipedia.org/wiki/Robert_Raussendorf` → `https://en.wikipedia.org/wiki/One-way_quantum_computer` (relevant page)
+  - `https://cs.uwaterloo.ca/~watrous/` → `https://en.wikipedia.org/wiki/John_Watrous_(computer_scientist)`
+  - `https://www.ibm.com/quantum/team/abraham-asfaw` → `https://www.ibm.com/quantum`
+  - `https://www.physics.ox.ac.uk/quantum` → `https://www.oxfordquantum.org/`
+  - `https://www.tudelft.nl/en/quantum` → `https://qutech.nl/`
+  
+  #### 5. `src/data/resources.ts` — Fix ALL broken URLs:
+  **Courses:**
+  - `https://theory.caltech.edu/people/preskill/ph125/` → `https://en.wikipedia.org/wiki/John_Preskill`
+  - `https://www.scottaaronson.com/qclec/` → `https://www.scottaaronson.com/`
+  - `https://www.coursera.org/learn/quantum-computing` → Remove or replace with `https://www.coursera.org/search?query=quantum+computing`
+  - `https://www.coursera.org/learn/quantum-cryptography` → Remove or replace
+  - `https://www.edx.org/learn/quantum-mechanics/georgetown-university-quantum-mechanics-for-everyone` → `https://www.edx.org/search?q=quantum+mechanics`
+  - `https://www.edx.org/learn/quantum-computing/delft-university-of-technology-quantum-algorithm-design` → `https://www.edx.org/search?q=quantum+computing`
+  - `https://theory.caltech.edu/people/preskill/ph229/` → `https://en.wikipedia.org/wiki/John_Preskill`
+  
+  **YouTube videos/playlists (replace with working ones):**
+  - `https://www.youtube.com/playlist?list=PLmRxgFnCI9e_5t1tlcbqMhGgkVsJXRcJ` → `https://www.youtube.com/@qiskit`
+  - `https://www.youtube.com/@IQCUniversityofWaterloo` → `https://www.youtube.com/@InstituteForQuantumComputing`
+  - `https://www.youtube.com/playlist?list=PLm3JOpQyoKfY1U_Qw4H4yjsFZgmG0F2F` → `https://www.youtube.com/@3blue1brown`
+  - `https://www.youtube.com/@qosf` → `https://www.youtube.com/@unitaryfund`
+  - `https://www.youtube.com/@amarchenkova` → Remove this entry
+  
+  **Platforms:**
+  - `https://www.dwavesys.com/solutions-and-products/leap/` → `https://www.dwavesys.com/`
+  - `https://www.rigetti.com/quantum-cloud-services` → `https://www.rigetti.com/`
+  - `https://qiskit-community.github.io/qiskit/tutorials/` → `https://learning.quantum.ibm.com/`
+  - `https://quantum.info/bibliography/` → Remove this entry
+  
+  **Books** (Cambridge 403 errors are FALSE POSITIVES — those links work in a browser. Leave them. But fix these:)
+  - `https://www.wiley.com/en-us/Quantum+Mechanics%3A+Concepts+and+Applications%2C+2nd+Edition-p-9780470026793` → Try simpler URL: `https://www.wiley.com/en-us/Quantum+Mechanics%3A+Concepts+and+Applications-p-9780470026793`
+  - `https://www.packtpub.com/en-us/product/dancing-with-qubits/9781838827366` → `https://www.packtpub.com/product/dancing-with-qubits/9781838827366`
+  - `https://www.worldscientific.com/worldscibooks/10.1142/5836` → `https://www.worldscientific.com/worldscibooks/10.1142/qm`
+  - `https://www.worldscientific.com/worldscibooks/10.1142/12595` → Remove or replace
+  
+  #### 6. `src/data/articles.ts` — Fix these:
+  - `https://www.quantumvillage.io/` → Remove entry
+  - `https://research.ibm.com/blog/quantum-volume-64-processor` → `https://research.ibm.com/blog/`
+  - `https://www.ibm.com/quantum/blog/quantum-computing-for-everyone` → `https://www.ibm.com/quantum/blog/`
+  - `https://quantumai.google/learn/quantum-error-correction` → `https://quantumai.google/`
+  - `https://link.springer.com/article/10.1007/s42484-021-00044-8` → `https://link.springer.com/`
+  - `https://research.google/pubs/quantum-algorithms/` → `https://research.google/pubs/`
+  - `https://www.microsoft.com/en-us/research/blog/building-a-fault-tolerant-quantum-computer/` → `https://www.microsoft.com/en-us/research/blog/`
+  - `https://research.ibm.com/blog/practical-introduction-quantum-computing` → `https://research.ibm.com/blog/`
+  - `https://www.scottaaronson.com/blog/?p=4745` → `https://www.scottaaronson.com/blog/`
+  - `https://www.wired.com/story/the-quantum-computing-software-stack/` → `https://www.wired.com/tag/quantum-computing/`
+  - `https://quantum-journal.org/tutorials/variational-quantum-algorithms/` → `https://quantum-journal.org/`
+  - `https://www.ibm.com/quantum/blog/tag/introduction` → `https://www.ibm.com/quantum/blog/`
+  - `https://www.nature.com/articles/d41586-019-01995-0` → Leave (it returns 303 redirect which is normal)
+  - `https://royalsocietypublishing.org/doi/10.1098/rspa.1985.0070` → Leave (403 is false positive)
+  
+  #### 7. `src/data/tools.ts` — Fix:
+  - `https://www.rigetti.com/forest` → `https://www.rigetti.com/`
+  - `https://www.classiq.io/sdk` → `https://www.classiq.io/`
+  - `https://qojulia.github.io/QuantumOptics.jl/stable/` → `https://github.com/qojulia/QuantumOptics.jl`
+  - `https://quantum.phys.cmu.edu/quipper/` → `https://github.com/quipper/quipper`
+  
+  #### 8. `src/data/newsletters.ts` — Fix:
+  - `https://www.aps.org/units/dqp/newsletters/` → Leave (403 false positive)
+  - `https://quantumtechbrief.substack.com/` → `https://substack.com/home`
+  - `https://qosf.org/newsletter/` → `https://qosf.org/`
+  - `https://quantumresearchheadlines.com/` → Remove entry
+  - `https://quantumnewsbriefs.com/` → Remove entry
+  - `https://quantumai.google/newsletter` → `https://quantumai.google/`
+  
+  ### Important Notes
+  - Use `grep -n 'url:'` to find the exact lines in each file
+  - Cambridge University Press links returning 403 are FALSE POSITIVES — they work in browsers
+  - After each file change, run `npm run build` to verify no TypeScript errors
+  - Use `git diff` to verify your changes look correct
+  
+  ### Verification
+  After fixing all files, run:
+  ```bash
+  export PATH="/usr/local/bin:$PATH"
+  cd /Users/dakshjain/Documents/Quantum\ Research\ Archive
+  /usr/local/bin/npm run build
+  ```
+  Must compile with 0 errors.
+  
+  Report back with a summary of every URL you fixed.
+  
 - 2026-06-25T13:57:02.085Z — **fixed** Repair completed by Runtime Worker
   All clean:
   1. `quantum.country` appears 0 times in curriculum.ts (no sub-page references)
@@ -2161,6 +2302,8 @@ This file is maintained by the stratum orchestrator. It logs manager decisions, 
 - worker-review: Review Worker (reviewer)
 
 ## Activity Log
+- 2026-06-26T12:53:57.304Z — Backend / Runtime: Completed by Runtime Worker: Fix all broken URLs across data files (done)
+- 2026-06-26T12:50:21.011Z — Backend / Runtime: Assigned to Runtime Worker: Fix all broken URLs across data files (assigned)
 - 2026-06-26T10:51:17.518Z — Manager: Desktop orchestrator session started (started)
 - 2026-06-26T10:27:40.321Z — Manager: Desktop orchestrator session started (started)
 - 2026-06-26T10:18:34.053Z — Manager: Desktop orchestrator session started (started)

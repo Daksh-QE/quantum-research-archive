@@ -34,7 +34,7 @@ export const tools: Tool[] = [
     title: "Forest SDK (Rigetti)",
     description:
       "Rigetti's Quantum Cloud Services SDK featuring the Quil quantum instruction language and pyQuil library for hybrid quantum-classical computing.",
-    url: "https://www.rigetti.com/forest",
+    url: "https://www.rigetti.com/",
     category: "SDK",
     tags: ["RIGETTI", "QUIL", "PYTHON", "HYBRID"],
   },
@@ -79,7 +79,7 @@ export const tools: Tool[] = [
     title: "Classiq SDK",
     description:
       "A quantum algorithm design platform that automatically synthesizes and optimizes quantum circuits from high-level functional models.",
-    url: "https://www.classiq.io/sdk",
+    url: "https://www.classiq.io/",
     category: "SDK",
     tags: ["OPTIMIZATION", "AUTOMATION", "HIGH-LEVEL", "PYTHON"],
   },
@@ -117,7 +117,7 @@ export const tools: Tool[] = [
     title: "QuantumOptics.jl",
     description:
       "A Julia framework for simulating quantum optical systems and open quantum systems, including master equations and Monte Carlo simulations.",
-    url: "https://qojulia.github.io/QuantumOptics.jl/stable/",
+    url: "https://github.com/qojulia/QuantumOptics.jl",
     category: "FRAMEWORK",
     tags: ["OPEN-SOURCE", "JULIA", "SIMULATION", "OPEN-SYSTEMS"],
   },
@@ -146,7 +146,7 @@ export const tools: Tool[] = [
     title: "Quipper",
     description:
       "A scalable, functional programming language for quantum computing embedded in Haskell. Used for circuit description and verification.",
-    url: "https://quantum.phys.cmu.edu/quipper/",
+    url: "https://github.com/quipper/quipper",
     category: "LANGUAGE",
     tags: ["HASKELL", "FUNCTIONAL", "CIRCUITS", "VERIFICATION"],
   },

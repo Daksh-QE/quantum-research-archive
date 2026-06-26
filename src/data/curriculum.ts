@@ -625,7 +625,7 @@ export const curriculum: Module[] = [
         id: "11g-quantum-data-compression",
         title: "Quantum Data Compression and Schumacher's Theorem",
         type: "guide",
-        url: "https://theory.caltech.edu/people/preskill/ph229/",
+        url: "https://en.wikipedia.org/wiki/John_Preskill",
       },
       {
         id: "11h-shannon-vs-von-neumann",
@@ -766,7 +766,7 @@ export const curriculum: Module[] = [
         id: "14b-qma-complexity",
         title: "QMA: Quantum Merlin-Arthur Proofs",
         type: "notes",
-        url: "https://www.scottaaronson.com/qclec/",
+        url: "https://www.scottaaronson.com/",
       },
       {
         id: "14c-query-complexity",
