@@ -2,7 +2,7 @@
 
 A comprehensive, free, ad-free quantum computing and quantum mechanics research archive. From mathematical foundations to cutting-edge research papers — everything you need to become a quantum expert.
 
-**Live site:** https://daksh-qe.github.io/quantum-research-archive/
+**Live site:** https://quantum-research-archive.vercel.app
 
 ## Features
 
