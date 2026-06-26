@@ -1,6 +1,7 @@
 import { CommunityMember } from "./types";
 
 export const communityMembers: CommunityMember[] = [
+  // ===== Researchers (RES) =====
   {
     id: "peter-shor",
     name: "Peter Shor",
@@ -20,16 +21,6 @@ export const communityMembers: CommunityMember[] = [
       "Leading quantum information theorist. Coined the term 'quantum supremacy'. Director of the Institute for Quantum Information and Matter at Caltech.",
     url: "https://theory.caltech.edu/people/preskill/",
     tags: ["QUANTUM INFORMATION", "SUPREMACY", "EDUCATION"],
-  },
-  {
-    id: "scott-aaronson",
-    name: "Scott Aaronson",
-    initials: "SA",
-    role: "EDU",
-    description:
-      "Professor at UT Austin specializing in quantum complexity theory. Author of 'Quantum Computing Since Democritus'. Runs the Shtetl-Optimized blog.",
-    url: "https://www.scottaaronson.com/",
-    tags: ["COMPLEXITY THEORY", "BLOGGING", "EDUCATION"],
   },
   {
     id: "david-deutsch",
@@ -62,16 +53,6 @@ export const communityMembers: CommunityMember[] = [
     tags: ["CRYPTOGRAPHY", "COMMUNICATION", "PIONEER"],
   },
   {
-    id: "michael-nielsen",
-    name: "Michael A. Nielsen",
-    initials: "MN",
-    role: "EDU",
-    description:
-      "Co-author of the canonical textbook 'Quantum Computation and Quantum Information'. Pioneer of quantum computing education and interactive learning.",
-    url: "https://michaelnielsen.org/",
-    tags: ["EDUCATION", "BOOK", "LEARNING"],
-  },
-  {
     id: "robert-rausendorf",
     name: "Robert Raussendorf",
     initials: "RR",
@@ -92,6 +73,160 @@ export const communityMembers: CommunityMember[] = [
     tags: ["TOPOLOGICAL", "STABILIZER", "ALGORITHMS"],
   },
   {
+    id: "richard-feynman",
+    name: "Richard Feynman",
+    initials: "RF",
+    role: "RES",
+    description:
+      "Nobel laureate who first proposed the idea of quantum simulation. His visionary 1982 lecture laid the foundation for quantum computing.",
+    url: "https://en.wikipedia.org/wiki/Richard_Feynman",
+    tags: ["PIONEER", "SIMULATION", "THEORY"],
+  },
+  {
+    id: "daniel-gottesman",
+    name: "Daniel Gottesman",
+    initials: "DG",
+    role: "RES",
+    description:
+      "Developed the Gottesman-Knill theorem and stabilizer formalism. Leading researcher in quantum error correction and fault-tolerant quantum computation.",
+    url: "https://en.wikipedia.org/wiki/Daniel_Gottesman",
+    tags: ["ERROR CORRECTION", "STABILIZER", "FAULT TOLERANCE"],
+  },
+  {
+    id: "john-bell",
+    name: "John S. Bell",
+    initials: "JB",
+    role: "RES",
+    description:
+      "Derived Bell's theorem, proving that quantum mechanics is incompatible with local hidden variable theories. His work is fundamental to quantum information.",
+    url: "https://en.wikipedia.org/wiki/John_Stewart_Bell",
+    tags: ["FOUNDATIONS", "BELL INEQUALITIES", "PIONEER"],
+  },
+  {
+    id: "asher-peres",
+    name: "Asher Peres",
+    initials: "AP",
+    role: "RES",
+    description:
+      "Pioneering contributor to quantum information theory. Co-author of the teleportation paper and author of 'Quantum Theory: Concepts and Methods'.",
+    url: "https://en.wikipedia.org/wiki/Asher_Peres",
+    tags: ["QUANTUM INFORMATION", "TELEPORTATION", "EDUCATION"],
+  },
+  {
+    id: "anton-zeilinger",
+    name: "Anton Zeilinger",
+    initials: "AZ",
+    role: "RES",
+    description:
+      "Nobel laureate (2022) for experiments with entangled photons. Pioneered quantum teleportation and quantum communication experiments.",
+    url: "https://en.wikipedia.org/wiki/Anton_Zeilinger",
+    tags: ["EXPERIMENT", "ENTANGLEMENT", "TELEPORTATION", "NOBEL"],
+  },
+  {
+    id: "alon-kitaev",
+    name: "Alain Aspect",
+    initials: "AA",
+    role: "RES",
+    description:
+      "Nobel laureate (2022) for experimental tests of Bell inequalities. His work established the reality of quantum entanglement.",
+    url: "https://en.wikipedia.org/wiki/Alain_Aspect",
+    tags: ["EXPERIMENT", "BELL INEQUALITIES", "FOUNDATIONS", "NOBEL"],
+  },
+  {
+    id: "john-clauser",
+    name: "John F. Clauser",
+    initials: "JC",
+    role: "RES",
+    description:
+      "Nobel laureate (2022) for contributions to Bell inequality experiments. Co-author of the CHSH inequality, foundational to quantum information.",
+    url: "https://en.wikipedia.org/wiki/John_Clauser",
+    tags: ["EXPERIMENT", "BELL INEQUALITIES", "FOUNDATIONS", "NOBEL"],
+  },
+  {
+    id: "seth-lloyd",
+    name: "Seth Lloyd",
+    initials: "SL",
+    role: "RES",
+    description:
+      "Professor at MIT. Pioneered the first technologically feasible design for a quantum computer and contributed to quantum algorithms and quantum machine learning.",
+    url: "https://en.wikipedia.org/wiki/Seth_Lloyd",
+    tags: ["ALGORITHMS", "QML", "QUANTUM INFORMATION"],
+  },
+  {
+    id: "john-watrous",
+    name: "John Watrous",
+    initials: "JW",
+    role: "RES",
+    description:
+      "Leading researcher in quantum information theory, quantum computational complexity, and interactive proofs. Author of 'The Theory of Quantum Information'.",
+    url: "https://cs.uwaterloo.ca/~watrous/",
+    tags: ["QUANTUM INFORMATION", "COMPLEXITY", "THEORY"],
+  },
+
+  // ===== Educators (EDU) =====
+  {
+    id: "scott-aaronson",
+    name: "Scott Aaronson",
+    initials: "SA",
+    role: "EDU",
+    description:
+      "Professor at UT Austin specializing in quantum complexity theory. Author of 'Quantum Computing Since Democritus'. Runs the Shtetl-Optimized blog.",
+    url: "https://www.scottaaronson.com/",
+    tags: ["COMPLEXITY THEORY", "BLOGGING", "EDUCATION"],
+  },
+  {
+    id: "michael-nielsen",
+    name: "Michael A. Nielsen",
+    initials: "MN",
+    role: "EDU",
+    description:
+      "Co-author of the canonical textbook 'Quantum Computation and Quantum Information'. Pioneer of quantum computing education and interactive learning.",
+    url: "https://michaelnielsen.org/",
+    tags: ["EDUCATION", "BOOK", "LEARNING"],
+  },
+  {
+    id: "leonard-susskind",
+    name: "Leonard Susskind",
+    initials: "LS",
+    role: "EDU",
+    description:
+      "Stanford professor and author of 'Quantum Mechanics: The Theoretical Minimum'. Known for making quantum mechanics accessible through his lecture series.",
+    url: "https://en.wikipedia.org/wiki/Leonard_Susskind",
+    tags: ["EDUCATION", "THEORETICAL MINIMUM", "QM FOUNDATIONS"],
+  },
+  {
+    id: "andy-matuschak",
+    name: "Andy Matuschak",
+    initials: "AM",
+    role: "EDU",
+    description:
+      "Creator of quantum.country and pioneer of interactive quantum computing education using spaced repetition and mnemonic techniques.",
+    url: "https://andymatuschak.org/",
+    tags: ["EDUCATION", "INTERACTIVE", "QUANTUM COUNTRY"],
+  },
+  {
+    id: "shannon-sessions",
+    name: "Shannon Sessions",
+    initials: "SS",
+    role: "EDU",
+    description:
+      "Founder of Qubit by Qubit, a comprehensive quantum computing education program for high school and undergraduate students.",
+    url: "https://www.thecodingschool.com/qubitbyqubit",
+    tags: ["EDUCATION", "YOUTH", "CURRICULUM"],
+  },
+  {
+    id: "abraham-asfaw",
+    name: "Abraham Asfaw",
+    initials: "AA",
+    role: "EDU",
+    description:
+      "IBM Quantum's global lead for quantum education. Drives the Qiskit textbook, summer schools, and quantum educational initiatives worldwide.",
+    url: "https://www.ibm.com/quantum/team/abraham-asfaw",
+    tags: ["EDUCATION", "QISKIT", "SUMMER SCHOOL"],
+  },
+
+  // ===== Builders (BUILD) =====
+  {
     id: "ibm-quantum",
     name: "IBM Quantum",
     initials: "IBM",
@@ -111,6 +246,68 @@ export const communityMembers: CommunityMember[] = [
     url: "https://quantumai.google/",
     tags: ["INDUSTRY", "SUPREMACY", "SYCAMORE", "CIRQ"],
   },
+  {
+    id: "rigetti",
+    name: "Rigetti Computing",
+    initials: "RC",
+    role: "BUILD",
+    description:
+      "Pioneering hybrid quantum-classical computing. Builds superconducting quantum processors and develops the Forest SDK.",
+    url: "https://www.rigetti.com/",
+    tags: ["INDUSTRY", "SUPERCONDUCTING", "FOREST"],
+  },
+  {
+    id: "quantinuum",
+    name: "Quantinuum",
+    initials: "QN",
+    role: "BUILD",
+    description:
+      "Integrated quantum computing company formed from Honeywell Quantum Solutions and Cambridge Quantum. Develops trapped-ion processors and TKET SDK.",
+    url: "https://www.quantinuum.com/",
+    tags: ["INDUSTRY", "TRAPPED-ION", "TKET", "CYBERSECURITY"],
+  },
+  {
+    id: "ionq",
+    name: "IonQ",
+    initials: "IQ",
+    role: "BUILD",
+    description:
+      "Industry leader in trapped-ion quantum computing. Offers cloud-accessible quantum processors with industry-leading gate fidelities.",
+    url: "https://ionq.com/",
+    tags: ["INDUSTRY", "TRAPPED-ION", "CLOUD", "HIGH-FIDELITY"],
+  },
+  {
+    id: "xanadu",
+    name: "Xanadu",
+    initials: "XU",
+    role: "BUILD",
+    description:
+      "Develops photonic quantum computers and the PennyLane QML framework. Pioneer of continuous-variable quantum computing and quantum machine learning.",
+    url: "https://xanadu.ai/",
+    tags: ["INDUSTRY", "PHOTONIC", "PENNYLANE", "QML"],
+  },
+  {
+    id: "dwave",
+    name: "D-Wave Systems",
+    initials: "DW",
+    role: "BUILD",
+    description:
+      "First commercial quantum computing company. Specializes in quantum annealing systems and hybrid quantum-classical solvers for optimization.",
+    url: "https://www.dwavesys.com/",
+    tags: ["INDUSTRY", "ANNEALING", "OPTIMIZATION", "PIONEER"],
+  },
+  {
+    id: "psiquantum",
+    name: "PsiQuantum",
+    initials: "PQ",
+    role: "BUILD",
+    description:
+      "Developing fault-tolerant photonic quantum computers with a focus on million-qubit-scale systems using silicon photonics.",
+    url: "https://www.psiquantum.com/",
+    tags: ["INDUSTRY", "PHOTONIC", "FAULT-TOLERANT", "SCALE-UP"],
+  },
+
+  // ===== Institutes / Leaders (LEAD) =====
   {
     id: "mit-cqe",
     name: "MIT Center for Quantum Engineering",
@@ -142,13 +339,43 @@ export const communityMembers: CommunityMember[] = [
     tags: ["RESEARCH", "CRYPTOGRAPHY", "EXPERIMENTAL"],
   },
   {
-    id: "rigetti",
-    name: "Rigetti Computing",
-    initials: "RC",
-    role: "BUILD",
+    id: "oxford-quantum",
+    name: "Oxford University Department of Physics — Quantum",
+    initials: "OU",
+    role: "LEAD",
     description:
-      "Pioneering hybrid quantum-classical computing. Builds superconducting quantum processors and develops the Forest SDK.",
-    url: "https://www.rigetti.com/",
-    tags: ["INDUSTRY", "SUPERCONDUCTING", "FOREST"],
+      "One of the world's leading centers for quantum physics research, with strengths in quantum computing, quantum optics, and condensed matter physics.",
+    url: "https://www.physics.ox.ac.uk/quantum",
+    tags: ["RESEARCH", "EDUCATION", "QUANTUM OPTICS"],
+  },
+  {
+    id: "qutech",
+    name: "QuTech (TU Delft)",
+    initials: "QT",
+    role: "LEAD",
+    description:
+      "A premier Dutch research institute for quantum computing and quantum internet. Pioneering topological qubits and quantum network protocols.",
+    url: "https://qutech.nl/",
+    tags: ["RESEARCH", "QUANTUM INTERNET", "TOPOLOGICAL", "HARDWARE"],
+  },
+  {
+    id: "delft-qc",
+    name: "TU Delft Quantum Computing",
+    initials: "TD",
+    role: "LEAD",
+    description:
+      "Leading European center for quantum research, with world-class programs in quantum computing, quantum internet, and quantum sensing.",
+    url: "https://www.tudelft.nl/en/quantum",
+    tags: ["RESEARCH", "EDUCATION", "QUANTUM INTERNET"],
+  },
+  {
+    id: "nist-qis",
+    name: "NIST Quantum Information Science",
+    initials: "NQ",
+    role: "LEAD",
+    description:
+      "National Institute of Standards and Technology leading research in quantum metrology, quantum sensing, and post-quantum cryptography standards.",
+    url: "https://www.nist.gov/quantum-information-science",
+    tags: ["RESEARCH", "STANDARDS", "METROLOGY", "POST-QUANTUM"],
   },
 ];

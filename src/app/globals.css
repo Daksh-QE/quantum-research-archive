@@ -51,3 +51,25 @@ body {
   color: var(--foreground);
   font-family: var(--font-sans, Arial, Helvetica, sans-serif);
 }
+
+/* Tag badge colors */
+.tag-video { background: #dbeafe; color: #1d4ed8; }
+.tag-paper { background: #f3e8ff; color: #7c3aed; }
+.tag-tut, .tag-tutorial { background: #d1fae5; color: #065f46; }
+.tag-guide { background: #fef3c7; color: #92400e; }
+.tag-notes { background: #ffe4e6; color: #be123c; }
+.tag-book { background: #cffafe; color: #0e7490; }
+.tag-course { background: #f3e8ff; color: #7c3aed; }
+.tag-platform { background: #dbeafe; color: #1d4ed8; }
+.tag-simulator { background: #e0e7ff; color: #3730a3; }
+.tag-sdk { background: #ccfbf1; color: #0f766e; }
+.tag-framework { background: #ede9fe; color: #5b21b6; }
+.tag-language { background: #fce7f3; color: #9d174d; }
+.tag-research { background: #f3e8ff; color: #6b21a8; }
+.tag-newsletter { background: #fef9c3; color: #854d0e; }
+
+/* Role badge colors for community */
+.role-res { background: #dbeafe; color: #1d40af; }
+.role-edu { background: #d1fae5; color: #065f46; }
+.role-build { background: #fef3c7; color: #92400e; }
+.role-lead { background: #f3e8ff; color: #6b21a8; }

@@ -1,8 +1,60 @@
+"use client";
+
+import React, { useState, useMemo } from "react";
+import { tools } from "@/data/tools";
+import ToolCard from "@/components/ToolCard";
+import FilterBar from "@/components/FilterBar";
+
 export default function ToolsPage() {
+  const [activeCategory, setActiveCategory] = useState("All");
+
+  const categories = useMemo(() => {
+    const cats = new Set(tools.map((t) => t.category));
+    return Array.from(cats).sort();
+  }, []);
+
+  const filtered = useMemo(() => {
+    if (activeCategory === "All") return tools;
+    return tools.filter(
+      (t) => t.category.toLowerCase() === activeCategory.toLowerCase()
+    );
+  }, [activeCategory]);
+
   return (
-    <div className="p-8">
-      <h1 className="text-3xl font-bold text-slate-900">Tools</h1>
-      <p className="mt-2 text-slate-600">Tools, simulators, SDKs, and frameworks.</p>
+    <div className="space-y-8">
+      <div>
+        <h1 className="text-3xl font-bold text-slate-900">
+          Tools &amp; Practice
+        </h1>
+        <p className="text-slate-600 mt-1">
+          Quantum computing SDKs, simulators, frameworks, and languages
+        </p>
+      </div>
+
+      <div>
+        <FilterBar
+          categories={categories}
+          activeCategory={activeCategory}
+          onCategoryChange={setActiveCategory}
+        />
+      </div>
+
+      <div>
+        <p className="text-sm text-slate-500 mb-4">
+          Showing {filtered.length} of {tools.length} tools
+        </p>
+        {filtered.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 lg:gap-6">
+            {filtered.map((tool) => (
+              <ToolCard key={tool.id} tool={tool} />
+            ))}
+          </div>
+        ) : (
+          <p className="text-slate-500 text-center py-12">
+            No tools found in this category.
+          </p>
+        )}
+      </div>
     </div>
   );
 }

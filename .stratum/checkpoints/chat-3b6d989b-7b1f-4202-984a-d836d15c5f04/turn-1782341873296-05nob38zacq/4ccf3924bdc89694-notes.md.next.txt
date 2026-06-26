@@ -1,18 +1,24 @@
 # Project Notes
 
-Use this space for persistent project notes, requirements, decisions, reminders, and context that should stay available across the chat.
-
 ## Goals
-- _Add current project goals._
+Build a quantum computing + mechanics research archive website.
 
 ## Decisions
-- _Record decisions and rationale._
-
-## Open Questions
-- _Record unresolved questions._
+- Next.js 16 (App Router) with TypeScript and Tailwind CSS v4
+- CSS-first Tailwind configuration (v4 style, no tailwind.config.js)
+- Data layer uses TypeScript modules in src/data/
+- All pages are statically generated at build time
 
 ## Useful Commands
-- _Record commands the user or agents may reuse._
+- `npm run dev` — Start dev server at http://localhost:3000
+- `npm run build` — Production build (no errors)
+- `npm run start` — Start production server
+- `npx next build` — Build with output details
+
+## Open Questions
+- Deployment target (Vercel, GitHub Pages, etc.)
+- Need for search functionality (⌘K command palette)
 
 ## Agent Updates
-- 2026-06-24T22:59:19.943Z — Notes file initialized.
+- 2026-06-24T23:06:04.475Z — Phase 1 scaffold complete
+- 2026-06-24T19:05:00.000Z — Phase 1 complete: Next.js 16 + Tailwind CSS v4 + TypeScript + data layer + all routes scaffolded

@@ -55,4 +55,112 @@ export const newsletters: Newsletter[] = [
     frequency: "Weekly",
     tags: ["BUSINESS", "COMMERCIALIZATION", "INDUSTRY"],
   },
+  {
+    id: "quantum-bytes",
+    name: "Quantum Bytes",
+    description:
+      "A concise weekly digest of quantum computing news and research, designed for busy professionals and researchers.",
+    url: "https://quantumbytes.substack.com/",
+    frequency: "Weekly",
+    tags: ["NEWS", "DIGEST", "RESEARCH"],
+  },
+  {
+    id: "nature-quantum-info",
+    name: "Nature Quantum Information Update",
+    description:
+      "Monthly email alert from Nature covering the latest quantum information research published across Nature journals.",
+    url: "https://www.nature.com/subjects/quantum-information",
+    frequency: "Monthly",
+    tags: ["RESEARCH", "PAPERS", "JOURNAL"],
+  },
+  {
+    id: "quantum-engineering-news",
+    name: "Quantum Engineering Newsletter (IEEE)",
+    description:
+      "IEEE's newsletter covering advances in quantum engineering, including hardware, error correction, and quantum system design.",
+    url: "https://ieeexplore.ieee.org/community/newsletters/quantum",
+    frequency: "Monthly",
+    tags: ["ENGINEERING", "HARDWARE", "IEEE", "TECHNICAL"],
+  },
+  {
+    id: "aps-quantum",
+    name: "APS Quantum Physics Newsletter",
+    description:
+      "American Physical Society newsletter highlighting the latest quantum physics research, meetings, and funding opportunities.",
+    url: "https://www.aps.org/units/dqp/newsletters/",
+    frequency: "Quarterly",
+    tags: ["PHYSICS", "RESEARCH", "APS", "ACADEMIC"],
+  },
+  {
+    id: "quantum-tech-brief",
+    name: "Quantum Tech Brief",
+    description:
+      "A brief weekly overview of quantum technology developments, covering hardware advances, software releases, and industry partnerships.",
+    url: "https://quantumtechbrief.substack.com/",
+    frequency: "Weekly",
+    tags: ["TECHNOLOGY", "INDUSTRY", "BRIEF"],
+  },
+  {
+    id: "quantum-frontiers",
+    name: "Quantum Frontiers (Caltech IQIM)",
+    description:
+      "The blog and newsletter from Caltech's Institute for Quantum Information and Matter, featuring research stories and perspectives.",
+    url: "https://quantumfrontiers.com/",
+    frequency: "Monthly",
+    tags: ["RESEARCH", "BLOG", "IQIM", "CAL TECH"],
+  },
+  {
+    id: "qosf-newsletter",
+    name: "QOSF Newsletter",
+    description:
+      "Quantum Open Source Foundation newsletter covering open-source quantum computing projects, mentorship programs, and community initiatives.",
+    url: "https://qosf.org/newsletter/",
+    frequency: "Monthly",
+    tags: ["OPEN-SOURCE", "COMMUNITY", "MENTORSHIP"],
+  },
+  {
+    id: "quantum-research-headlines",
+    name: "Quantum Research Headlines",
+    description:
+      "A carefully curated weekly selection of the most significant quantum research papers from arXiv and major journals.",
+    url: "https://quantumresearchheadlines.com/",
+    frequency: "Weekly",
+    tags: ["RESEARCH", "PAPERS", "CURATED", "ARXIV"],
+  },
+  {
+    id: "unitary-fund",
+    name: "Unitary Fund Quarterly Update",
+    description:
+      "Updates from the Unitary Fund, a non-profit supporting open-source quantum computing projects through micro-grants and community building.",
+    url: "https://unitary.fund/",
+    frequency: "Quarterly",
+    tags: ["OPEN-SOURCE", "GRANTS", "COMMUNITY", "NONPROFIT"],
+  },
+  {
+    id: "quantum-news",
+    name: "Quantum News Briefs",
+    description:
+      "A daily email briefing covering the most important quantum technology news, funding announcements, and research milestones.",
+    url: "https://quantumnewsbriefs.com/",
+    frequency: "Daily",
+    tags: ["NEWS", "BRIEF", "FUNDING", "MILESTONES"],
+  },
+  {
+    id: "ionq-blog",
+    name: "IonQ Blog and Newsletter",
+    description:
+      "Updates from IonQ on trapped-ion quantum computing, product releases, benchmark results, and customer success stories.",
+    url: "https://ionq.com/blog",
+    frequency: "Monthly",
+    tags: ["INDUSTRY", "TRAPPED-ION", "PRODUCT", "BENCHMARKS"],
+  },
+  {
+    id: "google-ai-quantum",
+    name: "Google Quantum AI Newsletter",
+    description:
+      "Official updates from Google Quantum AI, covering research breakthroughs, open-source releases, and quantum computing events.",
+    url: "https://quantumai.google/newsletter",
+    frequency: "Monthly",
+    tags: ["GOOGLE", "RESEARCH", "OPEN-SOURCE", "EVENTS"],
+  },
 ];

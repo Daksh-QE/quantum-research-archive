@@ -1,7 +1,7 @@
 import { Resource } from "./types";
 
 export const resources: Resource[] = [
-  // 📚 Books
+  // ===== 📚 Books =====
   {
     id: "book-nielsen-chuang",
     title: "Quantum Computation and Quantum Information",
@@ -101,7 +101,173 @@ export const resources: Resource[] = [
     author: "Mark M. Wilde",
     domain: "Both",
   },
-  // 🎓 Courses
+  {
+    id: "book-nakahara",
+    title: "Quantum Computing: From Linear Algebra to Physical Realizations",
+    description:
+      "A comprehensive text bridging mathematical foundations with practical quantum computing implementations and physical realizations.",
+    url: "https://www.crcpress.com/9780750309837",
+    tags: ["BOOK", "GUIDE"],
+    category: "Book",
+    author: "Mikio Nakahara",
+    domain: "Quantum Computing",
+  },
+  {
+    id: "book-rieffel-polak",
+    title: "Quantum Computing: A Gentle Introduction",
+    description:
+      "A thorough yet accessible introduction to quantum computing requiring minimal physics background. Covers circuits, algorithms, and quantum information theory.",
+    url: "https://mitpress.mit.edu/9780262526678/",
+    tags: ["BOOK", "TUT"],
+    category: "Book",
+    author: "Eleanor Rieffel & Wolfgang Polak",
+    domain: "Quantum Computing",
+  },
+  {
+    id: "book-sutor",
+    title: "Dancing with Qubits",
+    description:
+      "An intuitive and hands-on guide to quantum computing that builds understanding from basic quantum mechanics through to advanced algorithms.",
+    url: "https://www.packtpub.com/en-us/product/dancing-with-qubits/9781838827366",
+    tags: ["BOOK", "TUT"],
+    category: "Book",
+    author: "Robert S. Sutor",
+    domain: "Quantum Computing",
+  },
+  {
+    id: "book-benenti",
+    title: "Principles of Quantum Computation and Information",
+    description:
+      "A comprehensive two-volume set covering both the foundations of quantum computation and advanced topics in quantum information processing.",
+    url: "https://www.worldscientific.com/worldscibooks/10.1142/5836",
+    tags: ["BOOK", "GUIDE"],
+    category: "Book",
+    author: "Giuliano Benenti, Giulio Casati & Giuliano Strini",
+    domain: "Quantum Computing",
+  },
+  {
+    id: "book-mcmahon",
+    title: "Quantum Computing Explained",
+    description:
+      "A clear, self-contained introduction to quantum computing that explains key concepts with minimal mathematics.",
+    url: "https://www.wiley.com/en-us/Quantum+Computing+Explained-p-9780470096994",
+    tags: ["BOOK", "TUT"],
+    category: "Book",
+    author: "David McMahon",
+    domain: "Quantum Computing",
+  },
+  {
+    id: "book-desurvire",
+    title: "Classical and Quantum Information Theory",
+    description:
+      "A comprehensive treatment of information theory covering both classical Shannon theory and quantum information theory.",
+    url: "https://www.cambridge.org/9780521881715",
+    tags: ["BOOK", "GUIDE", "PAPER"],
+    category: "Book",
+    author: "Emmanuel Desurvire",
+    domain: "Both",
+  },
+  {
+    id: "book-zettili",
+    title: "Quantum Mechanics: Concepts and Applications",
+    description:
+      "A comprehensive textbook bridging conceptual understanding with practical problem-solving in quantum mechanics.",
+    url: "https://www.wiley.com/en-us/Quantum+Mechanics%3A+Concepts+and+Applications%2C+2nd+Edition-p-9780470026793",
+    tags: ["BOOK", "GUIDE"],
+    category: "Book",
+    author: "N. Zettili",
+    domain: "Quantum Mechanics",
+  },
+  {
+    id: "book-mcintosh",
+    title: "Quantum Mechanics: A Paradigms Approach",
+    description:
+      "A modern approach to teaching quantum mechanics using a paradigms-based methodology, emphasizing conceptual understanding.",
+    url: "https://www.cambridge.org/9780521897839",
+    tags: ["BOOK", "GUIDE"],
+    category: "Book",
+    author: "David K. Ferry",
+    domain: "Quantum Mechanics",
+  },
+  {
+    id: "book-hidary",
+    title: "Quantum Computing: An Applied Approach",
+    description:
+      "A practical guide to quantum computing covering both theory and hands-on implementation with modern quantum computing frameworks.",
+    url: "https://link.springer.com/book/10.1007/978-3-030-23922-0",
+    tags: ["BOOK", "TUT", "GUIDE"],
+    category: "Book",
+    author: "Jack D. Hidary",
+    domain: "Quantum Computing",
+  },
+  {
+    id: "book-kaiser-granade",
+    title: "Learn Quantum Computing with Python and Q#",
+    description:
+      "A hands-on introduction to quantum computing using Python and Microsoft's Q# language, with practical examples and exercises.",
+    url: "https://www.manning.com/books/learn-quantum-computing-with-python-and-q-sharp",
+    tags: ["BOOK", "TUT"],
+    category: "Book",
+    author: "Sarah C. Kaiser & Cassandra Granade",
+    domain: "Quantum Computing",
+  },
+  {
+    id: "book-vos",
+    title: "Quantum Computing in Action",
+    description:
+      "A practical guide to implementing quantum algorithms using Java and the Strangeworks platform, focusing on real-world applications.",
+    url: "https://www.manning.com/books/quantum-computing-in-action",
+    tags: ["BOOK", "TUT"],
+    category: "Book",
+    author: "Johan Vos",
+    domain: "Quantum Computing",
+  },
+  {
+    id: "book-sahni",
+    title: "Quantum Information and Quantum Computing",
+    description:
+      "A research-oriented text covering quantum information theory, quantum algorithms, and their computational implications.",
+    url: "https://www.worldscientific.com/worldscibooks/10.1142/12595",
+    tags: ["BOOK", "PAPER"],
+    category: "Book",
+    author: "V. Sahni",
+    domain: "Quantum Computing",
+  },
+  {
+    id: "book-lalooe",
+    title: "Do We Really Understand Quantum Mechanics?",
+    description:
+      "A critical examination of the foundations and interpretations of quantum mechanics, exploring conceptual puzzles and paradoxes.",
+    url: "https://www.cambridge.org/9781108417068",
+    tags: ["BOOK", "GUIDE"],
+    category: "Book",
+    author: "Franck Laloë",
+    domain: "Quantum Mechanics",
+  },
+  {
+    id: "book-wong",
+    title: "Introduction to Classical and Quantum Computing",
+    description:
+      "A textbook designed for undergraduate computer science students, covering both classical and quantum computing paradigms.",
+    url: "https://www.thomaswong.net/introduction-to-classical-and-quantum-computing/",
+    tags: ["BOOK", "TUT"],
+    category: "Book",
+    author: "Thomas G. Wong",
+    domain: "Quantum Computing",
+  },
+  {
+    id: "book-williams",
+    title: "Explorations in Quantum Computing",
+    description:
+      "A project-based introduction to quantum computing with exercises in quantum algorithms, cryptography, and error correction.",
+    url: "https://link.springer.com/book/10.1007/978-1-84628-887-6",
+    tags: ["BOOK", "TUT"],
+    category: "Book",
+    author: "Colin P. Williams",
+    domain: "Quantum Computing",
+  },
+
+  // ===== 🎓 Courses =====
   {
     id: "course-qiskit-summer-school",
     title: "Qiskit Summer School",
@@ -174,7 +340,122 @@ export const resources: Resource[] = [
     category: "Course",
     domain: "Quantum Mechanics",
   },
-  // 📺 Video Playlists
+  {
+    id: "course-coursera-quantum-computing",
+    title: "Coursera: Quantum Computing for Everyone",
+    description:
+      "A beginner-friendly introduction to quantum computing from the University of Chicago, covering qubits, gates, and basic algorithms.",
+    url: "https://www.coursera.org/learn/quantum-computing",
+    tags: ["COURSE", "VIDEO"],
+    category: "Course",
+    author: "University of Chicago",
+    domain: "Quantum Computing",
+  },
+  {
+    id: "course-coursera-quantum-cryptography",
+    title: "Coursera: Quantum Cryptography",
+    description:
+      "An advanced course on quantum cryptography from the University of Copenhagen, covering QKD, entanglement-based protocols, and security proofs.",
+    url: "https://www.coursera.org/learn/quantum-cryptography",
+    tags: ["COURSE", "VIDEO", "PAPER"],
+    category: "Course",
+    author: "University of Copenhagen",
+    domain: "Quantum Computing",
+  },
+  {
+    id: "course-edx-quantum-fundamentals",
+    title: "edX: Quantum Mechanics for Everyone",
+    description:
+      "A conceptual introduction to quantum mechanics from Georgetown University, requiring no advanced math background.",
+    url: "https://www.edx.org/learn/quantum-mechanics/georgetown-university-quantum-mechanics-for-everyone",
+    tags: ["COURSE", "VIDEO"],
+    category: "Course",
+    author: "Georgetown University",
+    domain: "Quantum Mechanics",
+  },
+  {
+    id: "course-stanford-susskind-qm",
+    title: "Stanford: The Theoretical Minimum — Quantum Mechanics",
+    description:
+      "Leonard Susskind's acclaimed lecture series on quantum mechanics from Stanford, part of the Theoretical Minimum program.",
+    url: "https://theoreticalminimum.com/courses/quantum-mechanics/2012/winter",
+    tags: ["COURSE", "VIDEO"],
+    category: "Course",
+    author: "Leonard Susskind",
+    domain: "Quantum Mechanics",
+  },
+  {
+    id: "course-qiskit-summer-school-2023",
+    title: "Qiskit Global Summer School 2023: Quantum Computing",
+    description:
+      "IBM's 2023 global summer school covering quantum algorithms, error mitigation, and hands-on Qiskit exercises.",
+    url: "https://qiskit.org/learn/summer-school/2023/",
+    tags: ["COURSE", "VIDEO"],
+    category: "Course",
+    domain: "Quantum Computing",
+  },
+  {
+    id: "course-brilliant-qc",
+    title: "Brilliant: Quantum Computing Track",
+    description:
+      "An interactive, hands-on introduction to quantum computing concepts through puzzles, visualizations, and guided exercises.",
+    url: "https://brilliant.org/courses/quantum-computing/",
+    tags: ["COURSE", "TUT", "INTERACTIVE"],
+    category: "Course",
+    domain: "Quantum Computing",
+  },
+  {
+    id: "course-qubit-by-qubit",
+    title: "Qubit by Qubit: Introduction to Quantum Computing",
+    description:
+      "A comprehensive year-long quantum computing course by The Coding School, covering foundations through advanced topics with live instruction.",
+    url: "https://www.thecodingschool.com/qubitbyqubit",
+    tags: ["COURSE", "VIDEO", "TUT"],
+    category: "Course",
+    domain: "Quantum Computing",
+  },
+  {
+    id: "course-nptel-quantum-computing",
+    title: "NPTEL: Quantum Computing — Theory to Simulation",
+    description:
+      "A comprehensive course from IIT on quantum computing covering quantum gates, algorithms, and quantum simulation techniques.",
+    url: "https://nptel.ac.in/courses/115101092",
+    tags: ["COURSE", "NOTES", "VIDEO"],
+    category: "Course",
+    domain: "Quantum Computing",
+  },
+  {
+    id: "course-mit-806",
+    title: "MIT 8.06: Quantum Physics III",
+    description:
+      "MIT's third undergraduate quantum course covering perturbation theory, scattering, and relativistic quantum mechanics.",
+    url: "https://ocw.mit.edu/courses/8-06-quantum-physics-iii-spring-2018/",
+    tags: ["COURSE", "VIDEO"],
+    category: "Course",
+    domain: "Quantum Mechanics",
+  },
+  {
+    id: "course-ibm-quantum-learning",
+    title: "IBM Quantum Learning",
+    description:
+      "IBM Quantum's official learning platform with interactive courses, tutorials, and certification paths for quantum computing.",
+    url: "https://learning.quantum.ibm.com/",
+    tags: ["COURSE", "TUT", "GUIDE"],
+    category: "Course",
+    domain: "Quantum Computing",
+  },
+  {
+    id: "course-grovers-algorithm-course",
+    title: "Quantum Algorithm Design (EdX)",
+    description:
+      "A deep dive into quantum algorithm design from TU Delft, covering Grover, Shor, and quantum Fourier transform.",
+    url: "https://www.edx.org/learn/quantum-computing/delft-university-of-technology-quantum-algorithm-design",
+    tags: ["COURSE", "VIDEO", "PAPER"],
+    category: "Course",
+    domain: "Quantum Computing",
+  },
+
+  // ===== 📺 Video Playlists =====
   {
     id: "video-3b1b-qc",
     title: "Quantum Computing Playlist",
@@ -237,7 +518,173 @@ export const resources: Resource[] = [
     category: "Video Playlist",
     domain: "Quantum Computing",
   },
-  // 🖥️ Platforms
+  {
+    id: "video-prof-m-does-science-qm",
+    title: "Quantum Mechanics by Professor M does Science",
+    description:
+      "A thorough series on quantum mechanics fundamentals, from wavefunctions to perturbation theory, with clear mathematical derivations.",
+    url: "https://www.youtube.com/playlist?list=PL8W2boV7Hf1qVwWJYn0uT1DBzNmvI8I8p",
+    tags: ["VIDEO", "COURSE"],
+    category: "Video Playlist",
+    author: "Professor M does Science",
+    domain: "Quantum Mechanics",
+  },
+  {
+    id: "video-pbs-space-time-qm",
+    title: "PBS Space Time: Quantum Physics Playlist",
+    description:
+      "In-depth explorations of quantum physics concepts from the PBS Space Time channel, covering black holes, entanglement, and quantum fields.",
+    url: "https://www.youtube.com/playlist?list=PLsPUh22kYmNCGAQx7tB9wH3cTq0o0o3hF",
+    tags: ["VIDEO", "GUIDE"],
+    category: "Video Playlist",
+    author: "PBS Space Time",
+    domain: "Both",
+  },
+  {
+    id: "video-sabine-hossenfelder",
+    title: "Sabine Hossenfelder: Quantum Physics Explained",
+    description:
+      "Clear, critical explanations of quantum mechanics and quantum computing by physicist Sabine Hossenfelder, making complex topics accessible.",
+    url: "https://www.youtube.com/@SabineHossenfelder",
+    tags: ["VIDEO", "GUIDE"],
+    category: "Video Playlist",
+    author: "Sabine Hossenfelder",
+    domain: "Both",
+  },
+  {
+    id: "video-looking-glass-universe",
+    title: "Looking Glass Universe: Quantum Mechanics",
+    description:
+      "Friendly, visual explanations of quantum mechanics concepts aimed at making quantum physics intuitive and accessible.",
+    url: "https://www.youtube.com/@LookingGlassUniverse",
+    tags: ["VIDEO", "TUT"],
+    category: "Video Playlist",
+    author: "Looking Glass Universe",
+    domain: "Quantum Mechanics",
+  },
+  {
+    id: "video-domain-of-science-quantum",
+    title: "Quantum Computing Explained by Domain of Science",
+    description:
+      "The famous quantum computing explainer video and follow-ups from Domain of Science, covering QC fundamentals visually.",
+    url: "https://www.youtube.com/watch?v=JhHMJCUmq28",
+    tags: ["VIDEO", "TUT", "GUIDE"],
+    category: "Video Playlist",
+    author: "Domain of Science (Kurt Hugo Schneider)",
+    domain: "Both",
+  },
+  {
+    id: "video-ryan-odonnell-qm",
+    title: "Quantum Mechanics for Computer Scientists",
+    description:
+      "A rigorous introduction to quantum mechanics designed for computer scientists, taught by Ryan O'Donnell at CMU.",
+    url: "https://www.youtube.com/playlist?list=PLm3JOpQyoKfY1U_Qw4H4yjsFZgmG0F2F",
+    tags: ["VIDEO", "COURSE"],
+    category: "Video Playlist",
+    author: "Ryan O'Donnell",
+    domain: "Both",
+  },
+  {
+    id: "video-john-watrous-qis",
+    title: "John Watrous: Introduction to Quantum Information Science",
+    description:
+      "Graduate-level lecture series on quantum information theory by John Watrous, covering quantum channels, entropy, and capacity.",
+    url: "https://www.youtube.com/watch?v=k0P6l0nQD5A",
+    tags: ["VIDEO", "COURSE", "PAPER"],
+    category: "Video Lecture",
+    author: "John Watrous",
+    domain: "Quantum Computing",
+  },
+  {
+    id: "video-microsoft-quantum",
+    title: "Microsoft Quantum Development Kit Tutorials",
+    description:
+      "Official tutorials from Microsoft on quantum programming with Q#, including quantum algorithms and Azure Quantum.",
+    url: "https://learn.microsoft.com/en-us/azure/quantum/",
+    tags: ["GUIDE", "TUT"],
+    category: "Video Playlist",
+    author: "Microsoft Quantum",
+    domain: "Quantum Computing",
+  },
+  {
+    id: "video-eugene-k-quantum",
+    title: "Physics Videos by Eugene K",
+    description:
+      "Clear and detailed video explanations of quantum mechanics concepts, from basic principles to advanced topics.",
+    url: "https://www.youtube.com/@EugeneK",
+    tags: ["VIDEO", "TUT"],
+    category: "Video Playlist",
+    author: "Eugene Khutoryansky",
+    domain: "Quantum Mechanics",
+  },
+  {
+    id: "video-veritasium-quantum",
+    title: "Veritasium: Quantum Physics Videos",
+    description:
+      "Popular science videos exploring quantum mechanics phenomena, including quantum entanglement, measurement, and quantum computing.",
+    url: "https://www.youtube.com/@veritasium",
+    tags: ["VIDEO", "GUIDE"],
+    category: "Video Playlist",
+    author: "Veritasium (Derek Muller)",
+    domain: "Both",
+  },
+  {
+    id: "video-qutech-academy",
+    title: "QuTech Academy: Quantum Computing Lectures",
+    description:
+      "Educational video series from QuTech in the Netherlands, covering quantum computing fundamentals and quantum internet concepts.",
+    url: "https://www.youtube.com/@QuTechAcademy",
+    tags: ["VIDEO", "COURSE"],
+    category: "Video Playlist",
+    author: "QuTech Academy",
+    domain: "Quantum Computing",
+  },
+  {
+    id: "video-qosf-seminars",
+    title: "QOSF: Quantum Open Source Foundation Talks",
+    description:
+      "Recorded talks and seminars from the Quantum Open Source Foundation, covering open-source quantum computing projects and research.",
+    url: "https://www.youtube.com/@qosf",
+    tags: ["VIDEO", "TUT", "PAPER"],
+    category: "Video Playlist",
+    author: "QOSF",
+    domain: "Quantum Computing",
+  },
+  {
+    id: "video-cirq-tutorials",
+    title: "Google Cirq: Quantum Programming Tutorials",
+    description:
+      "Official Google Cirq tutorials covering quantum circuit design, noise simulation, and running circuits on quantum processors.",
+    url: "https://www.youtube.com/playlist?list=PLFZ2DvU9e1DEZ-J-Qqbs5b8iL8zlNrlzR",
+    tags: ["VIDEO", "TUT"],
+    category: "Video Playlist",
+    author: "Google Quantum AI",
+    domain: "Quantum Computing",
+  },
+  {
+    id: "video-sean-carroll-qm",
+    title: "Sean Carroll's Biggest Ideas: Quantum Mechanics",
+    description:
+      "Sean Carroll's comprehensive lecture series on quantum mechanics, covering the foundations, interpretations, and modern developments.",
+    url: "https://www.youtube.com/playlist?list=PLrxfgDEc2NxZJcWZgMMUx-aUFqBq6M5hB",
+    tags: ["VIDEO", "COURSE", "GUIDE"],
+    category: "Video Playlist",
+    author: "Sean Carroll",
+    domain: "Quantum Mechanics",
+  },
+  {
+    id: "video-arun-quantum",
+    title: "Quantum Computing Tutorials by Anastasia Marchenkova",
+    description:
+      "Hands-on quantum computing tutorials covering Qiskit, Cirq, and quantum algorithm implementation with clear code examples.",
+    url: "https://www.youtube.com/@amarchenkova",
+    tags: ["VIDEO", "TUT"],
+    category: "Video Playlist",
+    author: "Anastasia Marchenkova",
+    domain: "Quantum Computing",
+  },
+
+  // ===== 🖥️ Platforms =====
   {
     id: "platform-ibm-quantum",
     title: "IBM Quantum Experience",
@@ -286,6 +733,189 @@ export const resources: Resource[] = [
     url: "https://pennylane.ai/",
     tags: ["PLATFORM", "GUIDE", "TUT"],
     category: "Platform",
+    domain: "Quantum Computing",
+  },
+  {
+    id: "platform-xanadu-cloud",
+    title: "Xanadu Quantum Cloud",
+    description:
+      "Cloud access to Xanadu's photonic quantum computers via the PennyLane framework. Specializes in continuous-variable quantum computing and QML.",
+    url: "https://cloud.xanadu.ai/",
+    tags: ["PLATFORM", "GUIDE"],
+    category: "Platform",
+    domain: "Quantum Computing",
+  },
+  {
+    id: "platform-ionq-cloud",
+    title: "IonQ Quantum Cloud",
+    description:
+      "Cloud access to IonQ's trapped-ion quantum computers, available through AWS Braket, Azure Quantum, and direct API access.",
+    url: "https://ionq.com/quantum-cloud",
+    tags: ["PLATFORM", "GUIDE"],
+    category: "Platform",
+    domain: "Quantum Computing",
+  },
+  {
+    id: "platform-dwave-leap",
+    title: "D-Wave Leap",
+    description:
+      "Cloud platform for D-Wave's quantum annealers and hybrid solvers. Access quantum annealing systems for optimization problems.",
+    url: "https://www.dwavesys.com/solutions-and-products/leap/",
+    tags: ["PLATFORM", "GUIDE"],
+    category: "Platform",
+    domain: "Quantum Computing",
+  },
+  {
+    id: "platform-strangeworks",
+    title: "Strangeworks QC Platform",
+    description:
+      "A cloud-agnostic quantum computing platform that provides access to multiple hardware backends through a unified interface.",
+    url: "https://strangeworks.com/",
+    tags: ["PLATFORM", "GUIDE"],
+    category: "Platform",
+    domain: "Quantum Computing",
+  },
+  {
+    id: "platform-classiq",
+    title: "Classiq Quantum Platform",
+    description:
+      "A quantum algorithm design platform that automatically optimizes quantum circuits from high-level functional descriptions.",
+    url: "https://www.classiq.io/",
+    tags: ["PLATFORM", "GUIDE", "TUT"],
+    category: "Platform",
+    domain: "Quantum Computing",
+  },
+  {
+    id: "platform-quantinuum",
+    title: "Quantinuum (Honeywell Quantum Solutions)",
+    description:
+      "Integrated quantum computing platform featuring Honeywell's trapped-ion hardware and the TKET quantum SDK for circuit optimization.",
+    url: "https://www.quantinuum.com/",
+    tags: ["PLATFORM", "GUIDE", "PAPER"],
+    category: "Platform",
+    domain: "Quantum Computing",
+  },
+  {
+    id: "platform-oxford-quantum",
+    title: "Oxford Quantum Circuits (OQC)",
+    description:
+      "UK-based quantum cloud platform providing access to superconducting quantum computers via OQC's Coaxmon architecture.",
+    url: "https://oxfordquantumcircuits.com/",
+    tags: ["PLATFORM", "GUIDE"],
+    category: "Platform",
+    domain: "Quantum Computing",
+  },
+  {
+    id: "platform-quilc-rigetti",
+    title: "Rigetti Quantum Cloud Services",
+    description:
+      "Full-stack quantum cloud platform with access to Rigetti's superconducting processors, the Quil instruction set, and the Forest SDK.",
+    url: "https://www.rigetti.com/quantum-cloud-services",
+    tags: ["PLATFORM", "GUIDE"],
+    category: "Platform",
+    domain: "Quantum Computing",
+  },
+
+  // ===== 🔬 Research Guides & References =====
+  {
+    id: "guide-quantum-algorithm-zoo",
+    title: "Quantum Algorithm Zoo",
+    description:
+      "A comprehensive catalog of quantum algorithms maintained by Stephen Jordan, organized by problem domain with references and speedups.",
+    url: "https://quantumalgorithmzoo.org/",
+    tags: ["GUIDE", "PAPER", "REFERENCE"],
+    category: "Research Guide",
+    author: "Stephen Jordan",
+    domain: "Quantum Computing",
+  },
+  {
+    id: "guide-quantiki",
+    title: "Quantiki — Quantum Information Wiki",
+    description:
+      "A community-maintained wiki for quantum information science, covering concepts, people, institutions, and research topics.",
+    url: "https://www.quantiki.org/",
+    tags: ["GUIDE", "REFERENCE"],
+    category: "Research Guide",
+    domain: "Both",
+  },
+  {
+    id: "guide-arxiv-quant-ph",
+    title: "arXiv: Quantum Physics (quant-ph)",
+    description:
+      "The primary preprint repository for quantum physics and quantum computing research. Access the latest papers and foundational works.",
+    url: "https://arxiv.org/list/quant-ph/recent",
+    tags: ["PAPER", "REFERENCE", "RESEARCH"],
+    category: "Research Guide",
+    domain: "Both",
+  },
+  {
+    id: "guide-quantum-computing-report",
+    title: "Quantum Computing Report",
+    description:
+      "A curated directory and news source tracking the quantum computing industry, including hardware, software, and company profiles.",
+    url: "https://quantumcomputingreport.com/",
+    tags: ["GUIDE", "NEWS", "REFERENCE"],
+    category: "Research Guide",
+    domain: "Quantum Computing",
+  },
+  {
+    id: "guide-qiskit-tutorials",
+    title: "Qiskit Tutorials and Educational Resources",
+    description:
+      "IBM's comprehensive collection of Jupyter notebook tutorials covering quantum computing concepts with hands-on Qiskit exercises.",
+    url: "https://qiskit-community.github.io/qiskit/tutorials/",
+    tags: ["TUT", "GUIDE", "INTERACTIVE"],
+    category: "Research Guide",
+    domain: "Quantum Computing",
+  },
+  {
+    id: "guide-quantum-internet",
+    title: "Quantum Internet and Quantum Networks Resource Guide",
+    description:
+      "A collection of resources on quantum networking, quantum repeaters, and the emerging quantum internet from QuTech.",
+    url: "https://www.qutech.nl/quantum-internet/",
+    tags: ["GUIDE", "PAPER", "RESEARCH"],
+    category: "Research Guide",
+    domain: "Quantum Computing",
+  },
+  {
+    id: "guide-qworld",
+    title: "QWorld: Quantum Computing Educational Resources",
+    description:
+      "A global community-driven platform offering quantum computing workshops, tutorials, and educational materials in multiple languages.",
+    url: "https://qworld.net/",
+    tags: ["GUIDE", "TUT", "INTERACTIVE"],
+    category: "Research Guide",
+    domain: "Quantum Computing",
+  },
+  {
+    id: "guide-quantum-quest",
+    title: "Quantum Quest: Interactive Quantum Computing",
+    description:
+      "An interactive platform for learning quantum computing through visual circuit builders, challenges, and guided tutorials.",
+    url: "https://quantum-quest.nl/",
+    tags: ["GUIDE", "TUT", "INTERACTIVE"],
+    category: "Research Guide",
+    domain: "Quantum Computing",
+  },
+  {
+    id: "guide-nist-qc",
+    title: "NIST: Quantum Computing Standards and Research",
+    description:
+      "National Institute of Standards and Technology resources on quantum computing standards, post-quantum cryptography, and quantum metrology.",
+    url: "https://www.nist.gov/quantum-information-science",
+    tags: ["GUIDE", "PAPER", "RESEARCH"],
+    category: "Research Guide",
+    domain: "Both",
+  },
+  {
+    id: "guide-qi-bibliography",
+    title: "Quantum Information and Computation Bibliography",
+    description:
+      "A curated bibliography of essential papers in quantum information and computation, organized by topic and significance.",
+    url: "https://quantum.info/bibliography/",
+    tags: ["PAPER", "REFERENCE"],
+    category: "Research Guide",
     domain: "Quantum Computing",
   },
 ];
