@@ -3,6 +3,7 @@
 A comprehensive, free, ad-free quantum computing and quantum mechanics research archive. From mathematical foundations to cutting-edge research papers — everything you need to become a quantum expert.
 
 **Live site:** https://quantum-research-archive.vercel.app
+
 **Credits for Inspiration & Modeling:** https://github.com/suraj-xd/ai-research-archive/tree/main
 
 ## Features
