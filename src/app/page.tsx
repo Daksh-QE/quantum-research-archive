@@ -1,324 +1,306 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useMemo, useRef, useState, useCallback } from "react";
 import Link from "next/link";
-import { ArrowRight, Atom, Sparkles, BookOpen, Users, Newspaper, Wrench, FileText, BookMarked, Mail, GraduationCap, Github, ExternalLink } from "lucide-react";
+import { ArrowRight, Github, ExternalLink } from "lucide-react";
 import { resources } from "@/data/resources";
 import { articles } from "@/data/articles";
 import { tools } from "@/data/tools";
 import { communityMembers } from "@/data/community";
-import { glossaryTerms } from "@/data/glossary";
-import { newsletters } from "@/data/newsletters";
 import { curriculum } from "@/data/curriculum";
-import TagBadge from "@/components/TagBadge";
 
-const categories = [
-  { id: "all", label: "All", icon: Sparkles },
-  { id: "papers", label: "Papers", icon: FileText },
-  { id: "resources", label: "Resources", icon: BookOpen },
-  { id: "articles", label: "Articles", icon: Newspaper },
-  { id: "tools", label: "Tools", icon: Wrench },
-  { id: "community", label: "Community", icon: Users },
-];
+/* ── helpers ── */
 
-interface CardItem {
-  id: string;
-  title: string;
-  subtitle?: string;
-  description: string;
-  url: string;
-  type: string;
-  tags?: string[];
-  category: string;
+function ytId(url: string): string | null {
+  try {
+    const u = new URL(url);
+    if (u.hostname.includes("youtube") || u.hostname.includes("youtu.be")) {
+      return u.searchParams.get("v") || u.pathname.slice(1) || null;
+    }
+  } catch {}
+  return null;
 }
 
-export default function HomePage() {
-  const [activeCategory, setActiveCategory] = useState("all");
+function getDomain(url: string): string {
+  try { return new URL(url).hostname.replace(/^www\./, ""); } catch { return ""; }
+}
 
-  // Build cards from all data sources
-  const allCards: CardItem[] = useMemo(() => {
-    const cards: CardItem[] = [];
+function seededRand(seed: number): number {
+  let s = (seed * 16807 + 0) % 2147483647;
+  return (s & 0x7fffffff) / 0x7fffffff;
+}
 
-    // Resources as cards
-    resources.slice(0, 20).forEach((r) => {
-      cards.push({
-        id: `res-${r.id}`,
-        title: r.title,
-        subtitle: r.author,
-        description: r.description,
-        url: r.url,
-        type: r.category,
-        tags: r.tags,
-        category: "resources",
-      });
-    });
+function shuffle<T>(arr: T[], seed: number): T[] {
+  const r = [...arr];
+  for (let i = r.length - 1; i > 0; i--) {
+    const j = Math.floor(seededRand(seed + i) * (i + 1));
+    [r[i], r[j]] = [r[j], r[i]];
+  }
+  return r;
+}
 
-    // Articles as cards
-    articles.slice(0, 15).forEach((a) => {
-      cards.push({
-        id: `art-${a.id}`,
-        title: a.title,
-        subtitle: a.author,
-        description: a.description,
-        url: a.url,
-        type: "Article",
-        tags: a.tags,
-        category: "articles",
-      });
-    });
+/* ── tile types ── */
 
-    // Tools as cards
-    tools.slice(0, 15).forEach((t) => {
-      cards.push({
-        id: `tool-${t.id}`,
-        title: t.title,
-        subtitle: t.category,
-        description: t.description,
-        url: t.url,
-        type: t.category,
-        tags: t.tags,
-        category: "tools",
-      });
-    });
+interface TileData {
+  id: string;
+  url: string;
+  type: "yt" | "paper" | "book" | "person" | "tool" | "article" | "module";
+  title: string;
+  subtitle?: string;
+  img?: string;
+  initials?: string;
+  color: string;
+}
 
-    // Community as cards
-    communityMembers.slice(0, 15).forEach((m) => {
-      cards.push({
-        id: `comm-${m.id}`,
-        title: m.name,
-        subtitle: m.role,
-        description: m.description,
-        url: m.url,
-        type: m.role,
-        tags: m.tags,
-        category: "community",
-      });
-    });
+/* ── build tiles from real data ── */
 
-    return cards;
+function buildTiles(): TileData[] {
+  const tiles: TileData[] = [];
+  const colors = ["#6366f1", "#22c55e", "#f59e0b", "#ec4899", "#06b6d4", "#8b5cf6", "#14b8a6", "#f97316", "#e11d48", "#84cc16"];
+
+  const rc = () => colors[Math.floor(seededRand(tiles.length + 1) * colors.length)];
+
+  // YouTube resources
+  for (const r of resources) {
+    const vid = ytId(r.url);
+    if (vid) {
+      tiles.push({ id: r.id, url: r.url, type: "yt", title: r.title, subtitle: r.author, img: `https://i.ytimg.com/vi/${vid}/hqdefault.jpg`, color: "#ff0000" });
+    }
+  }
+  // YouTube from curriculum
+  for (const m of curriculum) {
+    for (const l of m.lessons) {
+      const vid = ytId(l.url);
+      if (vid && seededRand(tiles.length + 50) > 0.2)
+        tiles.push({ id: l.id, url: l.url, type: "yt", title: l.title, img: `https://i.ytimg.com/vi/${vid}/hqdefault.jpg`, color: "#ff0000" });
+    }
+  }
+
+  // Paper-like entries from our papers data + curated
+  const paperEntries = [
+    ["Quantum theory, the Church–Turing principle", "David Deutsch", "https://royalsocietypublishing.org/doi/10.1098/rspa.1985.0070"],
+    ["A fast quantum mechanical algorithm for database search", "Lov Grover", "https://arxiv.org/abs/quant-ph/9605043"],
+    ["Polynomial-time algorithms for prime factorization", "Peter Shor", "https://arxiv.org/abs/quant-ph/9508027"],
+    ["Teleporting an unknown quantum state", "Bennett et al.", "https://journals.aps.org/prl/abstract/10.1103/PhysRevLett.70.1895"],
+    ["Quantum computational complexity", "Bernstein & Vazirani", "https://arxiv.org/abs/quant-ph/9701008"],
+    ["Fault-tolerant quantum computation by anyons", "Alexei Kitaev", "https://arxiv.org/abs/quant-ph/9707021"],
+    ["Quantum supremacy using a programmable superconducting processor", "Arute et al.", "https://www.nature.com/articles/s41586-019-1666-5"],
+    ["Error correcting codes in quantum theory", "Andrew Steane", "https://arxiv.org/abs/quant-ph/9608021"],
+    ["Superdense coding", "Bennett & Wiesner", "https://journals.aps.org/prl/abstract/10.1103/PhysRevLett.69.2881"],
+  ];
+  for (const [title, author, url] of paperEntries)
+    tiles.push({ id: `p-${tiles.length}`, url, type: "paper", title, subtitle: author, color: "#6366f1" });
+
+  // People — link to their Wikipedia or known URL
+  for (const m of communityMembers)
+    tiles.push({ id: m.id, url: m.url, type: "person", title: m.name, subtitle: m.role, initials: m.initials, color: m.role === "RES" ? "#6366f1" : m.role === "EDU" ? "#22c55e" : m.role === "BUILD" ? "#f59e0b" : "#8b5cf6" });
+
+  // Books — link to their purchase page
+  for (const r of resources.filter((x) => x.category === "Book"))
+    tiles.push({ id: r.id, url: r.url, type: "book", title: r.title, subtitle: r.author, color: "#06b6d4" });
+
+  // Tools
+  for (const t of tools)
+    tiles.push({ id: t.id, url: t.url, type: "tool", title: t.title, color: "#22c55e" });
+
+  // Articles
+  for (const a of articles)
+    tiles.push({ id: a.id, url: a.url, type: "article", title: a.title, subtitle: a.author, color: "#ec4899" });
+
+  // Modules
+  for (const m of curriculum)
+    tiles.push({ id: m.id, url: "/overview#" + m.id, type: "module", title: m.title.replace(/^\d+[\.\s]*/, ""), subtitle: `${m.lessons.length} lessons`, color: "#8b5cf6" });
+
+  // Shuffle and duplicate heavily for density
+  const s = shuffle(tiles, 7);
+  return shuffle([...s, ...shuffle(tiles, 13), ...shuffle(tiles, 42), ...shuffle(tiles, 99), ...shuffle(tiles, 777)], 42);
+}
+
+/* ── GitHub icon (matches original style) ── */
+function GitHubIcon({ size = 20 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor">
+      <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z" />
+    </svg>
+  );
+}
+
+/* ── component ── */
+
+export default function LandingPage() {
+  const tiles = useMemo(() => buildTiles(), []);
+  const gridRef = useRef<HTMLDivElement>(null);
+  const [imgErrors, setImgErrors] = useState<Set<string>>(new Set());
+
+  const onImgError = useCallback((id: string) => {
+    setImgErrors((prev) => new Set(prev).add(id));
   }, []);
 
-  const filteredCards = useMemo(() => {
-    if (activeCategory === "all") return allCards;
-    return allCards.filter((c) => c.category === activeCategory);
-  }, [activeCategory, allCards]);
-
-  // Stats
-  const totalLessons = curriculum.reduce((s, m) => s + m.lessons.length, 0);
-  const stats = [
-    { label: "Curriculum Modules", value: curriculum.length, icon: GraduationCap },
-    { label: "Curated Resources", value: resources.length, icon: BookOpen },
-    { label: "Research Tools", value: tools.length, icon: Wrench },
-    { label: "Glossary Terms", value: glossaryTerms.length, icon: BookMarked },
-  ];
+  // Distribute into 6 columns for density
+  const cols = 6;
+  const colArrays: TileData[][] = Array.from({ length: cols }, () => []);
+  tiles.forEach((t, i) => colArrays[i % cols].push(t));
 
   return (
-    <div className="min-h-screen bg-slate-950">
-      {/* ===== HERO SECTION ===== */}
-      <section className="relative overflow-hidden bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 pt-20 pb-16 sm:pt-28 sm:pb-20">
-        {/* Animated quantum particles background */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute top-1/4 left-1/4 w-72 h-72 bg-blue-500/10 rounded-full blur-[120px] animate-pulse" />
-          <div className="absolute top-1/3 right-1/4 w-96 h-96 bg-purple-500/8 rounded-full blur-[140px] animate-pulse" style={{ animationDelay: "1s" }} />
-          <div className="absolute bottom-1/4 left-1/3 w-64 h-64 bg-cyan-500/10 rounded-full blur-[100px] animate-pulse" style={{ animationDelay: "2s" }} />
+    <div className="min-h-screen bg-white relative overflow-hidden">
+      {/* ── infinite scrollable background canvas ── */}
+      <div
+        ref={gridRef}
+        className="absolute inset-0 overflow-auto cursor-grab active:cursor-grabbing select-none"
+        style={{ WebkitOverflowScrolling: "touch" }}
+      >
+        {/* Repeat columns 3x vertically so scrolling reveals more tiles */}
+        <div className="flex gap-2 p-2 w-max" style={{ minHeight: "200vh" }}>
+          {colArrays.map((col, ci) => (
+            <div key={ci} className="flex flex-col gap-2 w-48 shrink-0">
+              {[...col, ...col, ...col].map((tile, ti) => {
+                const key = `${tile.id}-${ci}-${ti}`;
+                const hasImgErr = imgErrors.has(key);
 
-          {/* Orbiting quantum rings */}
-          <svg className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] opacity-[0.04]" viewBox="0 0 500 500">
-            <ellipse cx="250" cy="250" rx="200" ry="80" fill="none" stroke="#60a5fa" strokeWidth="1">
-              <animateTransform attributeName="transform" type="rotate" from="0 250 250" to="360 250 250" dur="20s" repeatCount="indefinite" />
-            </ellipse>
-            <ellipse cx="250" cy="250" rx="200" ry="80" fill="none" stroke="#a78bfa" strokeWidth="1" transform="rotate(60 250 250)">
-              <animateTransform attributeName="transform" type="rotate" from="60 250 250" to="420 250 250" dur="25s" repeatCount="indefinite" />
-            </ellipse>
-            <ellipse cx="250" cy="250" rx="200" ry="80" fill="none" stroke="#22d3ee" strokeWidth="1" transform="rotate(120 250 250)">
-              <animateTransform attributeName="transform" type="rotate" from="120 250 250" to="480 250 250" dur="30s" repeatCount="indefinite" />
-            </ellipse>
-          </svg>
-
-          {/* Floating dots */}
-          {[...Array(20)].map((_, i) => (
-            <div
-              key={i}
-              className="absolute w-1 h-1 bg-blue-400/30 rounded-full"
-              style={{
-                left: `${5 + Math.random() * 90}%`,
-                top: `${5 + Math.random() * 90}%`,
-                animation: `float ${4 + Math.random() * 6}s ease-in-out infinite`,
-                animationDelay: `${Math.random() * 3}s`,
-              }}
-            />
+                return (
+                  <a
+                    key={key}
+                    href={tile.url}
+                    target={tile.url.startsWith("http") ? "_blank" : undefined}
+                    rel={tile.url.startsWith("http") ? "noopener noreferrer" : undefined}
+                    className="block rounded-lg overflow-hidden border border-slate-100 shadow-sm hover:shadow-md transition-shadow bg-white"
+                    style={{ borderLeft: `3px solid ${tile.color}`, cursor: "pointer" }}
+                    onClick={(e) => {
+                      // Don't prevent default — let the link open normally
+                    }}
+                  >
+                    {tile.type === "yt" && tile.img && !hasImgErr ? (
+                      <div className="aspect-video bg-slate-100 relative">
+                        <img
+                          src={tile.img}
+                          alt=""
+                          loading="lazy"
+                          className="w-full h-full object-cover"
+                          onError={() => onImgError(key)}
+                        />
+                        <div className="absolute bottom-1 right-1 bg-black/70 text-white text-[9px] px-1.5 py-0.5 rounded font-medium">
+                          ▶ VIDEO
+                        </div>
+                      </div>
+                    ) : tile.type === "person" ? (
+                      <div className="flex items-center gap-2.5 p-2.5">
+                        <div
+                          className="w-8 h-8 rounded-full flex items-center justify-center text-[10px] font-bold text-white shrink-0"
+                          style={{ backgroundColor: tile.color }}
+                        >
+                          {tile.initials}
+                        </div>
+                        <div className="min-w-0">
+                          <div className="text-[11px] font-medium text-slate-800 truncate">{tile.title}</div>
+                          <div className="text-[9px] text-slate-400">@{tile.subtitle}</div>
+                        </div>
+                      </div>
+                    ) : tile.type === "paper" ? (
+                      <div className="p-2.5">
+                        <div className="flex items-start gap-2">
+                          <div className="w-1.5 h-1.5 rounded-full shrink-0 mt-1" style={{ backgroundColor: tile.color }} />
+                          <div className="min-w-0">
+                            <div className="text-[11px] font-medium text-slate-800 leading-tight line-clamp-2">{tile.title}</div>
+                            <div className="text-[9px] text-slate-400 mt-0.5 truncate">{tile.subtitle}</div>
+                          </div>
+                        </div>
+                      </div>
+                    ) : tile.type === "book" ? (
+                      <div className="p-2.5 flex items-center gap-2">
+                        <div className="w-7 h-7 rounded flex items-center justify-center text-xs font-bold text-white shrink-0" style={{ backgroundColor: tile.color }}>
+                          B
+                        </div>
+                        <div className="min-w-0">
+                          <div className="text-[11px] font-medium text-slate-800 line-clamp-1">{tile.title}</div>
+                          {tile.subtitle && <div className="text-[9px] text-slate-400 truncate">{tile.subtitle}</div>}
+                        </div>
+                      </div>
+                    ) : tile.type === "tool" ? (
+                      <div className="p-2.5 flex items-center gap-2">
+                        <div className="w-6 h-6 rounded flex items-center justify-center text-[10px] font-bold text-white shrink-0" style={{ backgroundColor: tile.color }}>
+                          T
+                        </div>
+                        <span className="text-[11px] font-medium text-slate-800 truncate">{tile.title}</span>
+                      </div>
+                    ) : tile.type === "article" ? (
+                      <div className="p-2.5">
+                        <div className="flex items-center gap-1.5 mb-0.5">
+                          <span className="text-[9px] text-slate-400 truncate">{tile.subtitle || getDomain(tile.url)}</span>
+                        </div>
+                        <div className="text-[11px] text-slate-700 line-clamp-2 leading-tight font-medium">{tile.title}</div>
+                      </div>
+                    ) : tile.type === "module" ? (
+                      <div className="p-2.5 flex items-center gap-2">
+                        <div className="w-6 h-6 rounded flex items-center justify-center text-[9px] font-bold text-white shrink-0" style={{ backgroundColor: tile.color }}>
+                          M
+                        </div>
+                        <div className="min-w-0">
+                          <div className="text-[11px] text-slate-700 line-clamp-1 font-medium">{tile.title}</div>
+                          <div className="text-[9px] text-slate-400">{tile.subtitle}</div>
+                        </div>
+                      </div>
+                    ) : null}
+                  </a>
+                );
+              })}
+            </div>
           ))}
         </div>
+      </div>
 
-        <div className="relative z-10 max-w-5xl mx-auto px-6 text-center">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 mb-6 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-300 text-xs font-medium">
-            <Sparkles className="w-3.5 h-3.5" />
-            Free &bull; Curated &bull; Ad-Free
-          </div>
-
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white leading-tight mb-4">
-            Quantum{" "}
-            <span className="bg-gradient-to-r from-blue-400 via-purple-400 to-cyan-400 text-transparent bg-clip-text">
-              Research Archive
-            </span>
+      {/* ── hero overlay (75% opacity box) ── */}
+      <div className="absolute inset-0 z-10 flex flex-col items-center justify-center pointer-events-none">
+        {/* Semi-transparent hero card */}
+        <div className="pointer-events-auto bg-white/75 backdrop-blur-[2px] rounded-2xl shadow-xl border border-slate-200/60 px-8 py-10 sm:px-10 sm:py-10 max-w-md mx-4 text-center">
+          <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 leading-tight">
+            quantum research archive
           </h1>
-
-          <p className="text-lg sm:text-xl text-slate-400 max-w-2xl mx-auto mb-8 leading-relaxed">
-            A comprehensive, curated research archive for quantum computing and quantum mechanics.
-            <br className="hidden sm:block" />
-            From mathematical foundations to cutting-edge research — <span className="text-blue-300">free, calm, ad-free</span>.
+          <p className="mt-2 text-sm text-slate-500">
+            the biggest quantum research archive on the internet. free, calm, ad-free.
           </p>
+        </div>
 
-          <div className="flex flex-wrap items-center justify-center gap-4">
+        {/* Buttons + GitHub links — below the box, left-aligned */}
+        <div className="pointer-events-auto w-full max-w-md mx-4 mt-5 space-y-3">
+          <div className="flex items-center gap-2">
             <Link
               href="/overview"
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-medium transition-all hover:shadow-lg hover:shadow-blue-600/25"
+              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-slate-900 text-white text-xs font-semibold hover:bg-slate-800 transition-colors shadow-sm"
             >
               Get Started
-              <ArrowRight className="w-4 h-4" />
+              <ArrowRight className="w-3 h-3" />
             </Link>
             <Link
               href="/resources"
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 font-medium border border-slate-700 transition-all"
+              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-white/90 text-slate-700 text-xs font-medium hover:bg-white transition-colors border border-slate-200"
             >
-              Browse Resources
+              Browse Archive
             </Link>
+          </div>
+
+          {/* GitHub boxes — 2 mini boxes like the original */}
+          <div className="flex items-center gap-2">
             <a
               href="https://github.com/Daksh-QE/quantum-research-archive"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-slate-800/50 hover:bg-slate-700/50 text-slate-400 font-medium border border-slate-700/50 transition-all text-sm"
+              className="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg bg-white/90 text-slate-600 text-xs font-medium hover:bg-white transition-colors border border-slate-200 shadow-sm"
             >
-              <Github className="w-4 h-4" />
-              GitHub
+              <GitHubIcon size={16} />
+              Star on GitHub
             </a>
-          </div>
-
-          {/* Stats row */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-12 max-w-3xl mx-auto">
-            {stats.map((stat) => {
-              const Icon = stat.icon;
-              return (
-                <div
-                  key={stat.label}
-                  className="bg-slate-800/40 backdrop-blur-sm rounded-xl border border-slate-700/30 px-4 py-3 flex items-center gap-3"
-                >
-                  <div className="w-9 h-9 rounded-lg bg-blue-500/10 flex items-center justify-center shrink-0">
-                    <Icon className="w-4 h-4 text-blue-400" />
-                  </div>
-                  <div className="text-left">
-                    <p className="text-lg font-bold text-white">{stat.value}</p>
-                    <p className="text-[11px] text-slate-500 leading-tight">{stat.label}</p>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      </section>
-
-      {/* ===== EXPLORE SECTION (Mosaic) ===== */}
-      <section className="py-12 px-6 max-w-7xl mx-auto">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
-          <div>
-            <h2 className="text-2xl font-bold text-white">Explore the Archive</h2>
-            <p className="text-slate-400 text-sm mt-1">
-              {filteredCards.length} curated items across {allCards.length} picks
-            </p>
-          </div>
-
-          {/* Category pills */}
-          <div className="flex flex-wrap gap-2">
-            {categories.map((cat) => {
-              const Icon = cat.icon;
-              const isActive = activeCategory === cat.id;
-              return (
-                <button
-                  key={cat.id}
-                  onClick={() => setActiveCategory(cat.id)}
-                  className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 text-sm font-medium rounded-full transition-all ${
-                    isActive
-                      ? "bg-blue-600 text-white shadow-lg shadow-blue-600/20"
-                      : "bg-slate-800 text-slate-400 hover:text-slate-200 hover:bg-slate-700 border border-slate-700/50"
-                  }`}
-                >
-                  <Icon className="w-3.5 h-3.5" />
-                  {cat.label}
-                </button>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Mosaic grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
-          {filteredCards.map((card) => (
             <a
-              key={card.id}
-              href={card.url}
+              href="https://github.com/Daksh-QE/quantum-research-archive"
               target="_blank"
               rel="noopener noreferrer"
-              className="group bg-slate-800/40 backdrop-blur-sm rounded-xl border border-slate-700/30 p-4 hover:bg-slate-800/60 hover:border-blue-500/30 transition-all hover:shadow-lg hover:shadow-blue-500/5"
+              className="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg bg-white/90 text-slate-600 text-xs font-medium hover:bg-white transition-colors border border-slate-200 shadow-sm"
             >
-              <div className="flex items-start justify-between gap-2 mb-1.5">
-                <span className="text-[11px] font-medium text-slate-500 uppercase tracking-wider shrink-0">
-                  {card.subtitle || card.type}
-                </span>
-                <ExternalLink className="w-3 h-3 text-slate-600 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity" />
-              </div>
-              <h3 className="text-sm font-semibold text-slate-200 group-hover:text-white transition-colors line-clamp-2 leading-snug">
-                {card.title}
-              </h3>
-              {card.description && (
-                <p className="text-xs text-slate-500 mt-1.5 line-clamp-2 leading-relaxed">
-                  {card.description}
-                </p>
-              )}
-              {card.tags && card.tags.length > 0 && (
-                <div className="flex flex-wrap gap-1 mt-2">
-                  {card.tags.slice(0, 3).map((tag) => (
-                    <TagBadge key={tag} tag={tag} />
-                  ))}
-                </div>
-              )}
+              <ExternalLink className="w-3.5 h-3.5" />
+              Contribute
             </a>
-          ))}
-        </div>
-
-        {filteredCards.length === 0 && (
-          <div className="text-center py-16">
-            <p className="text-slate-500">No items found in this category.</p>
-          </div>
-        )}
-
-        {/* CTA */}
-        <div className="mt-12 text-center">
-          <Link
-            href="/overview"
-            className="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium border border-slate-700 transition-all"
-          >
-            View Full Curriculum
-            <ArrowRight className="w-4 h-4" />
-          </Link>
-        </div>
-      </section>
-
-      {/* ===== FOOTER ===== */}
-      <footer className="border-t border-slate-800 py-8 px-6">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="text-xs text-slate-600">
-            Quantum Research Archive &mdash; Free, curated, ad-free.
-          </p>
-          <div className="flex items-center gap-4">
-            <a href="https://github.com/Daksh-QE/quantum-research-archive" target="_blank" rel="noopener noreferrer" className="text-xs text-slate-600 hover:text-slate-400 transition-colors">
-              <Github className="w-4 h-4 inline" /> GitHub
-            </a>
-            <span className="text-xs text-slate-700">Content gets updated with time.</span>
           </div>
         </div>
-      </footer>
-
-
+      </div>
     </div>
   );
 }
