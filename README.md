@@ -23,7 +23,7 @@ A comprehensive, free, ad-free quantum computing and quantum mechanics research 
 - **Icons:** lucide-react
 - **Content:** TypeScript data modules (zero runtime dependencies)
 - **Build:** Static site generation
-- **Hosting:** GitHub Pages
+- **Hosting:** Vercel App
 
 ## Getting Started
 
@@ -92,4 +92,4 @@ git push
 
 ## License
 
-MIT
+n/a for now
