@@ -1,2 +1,2 @@
-:HL["/quantum-research-archive/_next/static/chunks/25yfuywj351_i.css","style"]
-0:{"tree":{"name":"","param":null,"prefetchHints":16,"slots":{"children":{"name":"/_not-found","param":null,"prefetchHints":0,"slots":{"children":{"name":"__PAGE__","param":null,"prefetchHints":0,"slots":null}}}}},"staleTime":300,"buildId":"IEYBx0jrrZq8KbytsLqgo"}
+:HL["/quantum-research-archive/_next/static/chunks/3k4d4wrq-97uh.css","style"]
+0:{"tree":{"name":"","param":null,"prefetchHints":16,"slots":{"children":{"name":"/_not-found","param":null,"prefetchHints":0,"slots":{"children":{"name":"__PAGE__","param":null,"prefetchHints":0,"slots":null}}}}},"staleTime":300,"buildId":"gHvnBg_5TRD9Y1rj5iEpt"}
