@@ -3,6 +3,90 @@ import { GlossaryTerm } from "./types";
 export const glossaryTerms: GlossaryTerm[] = [
   // ===== Fundamentals =====
   {
+    id: "ancilla-qubit",
+    term: "Ancilla Qubit",
+    definition:
+      "An auxiliary qubit used in quantum error correction to mediate interactions. Ancilla qubits are measured to extract syndrome information without disturbing the logical qubits they protect.",
+    category: "Fundamentals",
+  },
+  {
+    id: "logical-qubit",
+    term: "Logical Qubit",
+    definition:
+      "A qubit encoded across multiple physical qubits using a quantum error-correcting code. Logical qubits are protected from noise and enable fault-tolerant quantum computation. A distance-d code uses d physical qubits per logical qubit.",
+    category: "Fundamentals",
+  },
+  {
+    id: "t1-t2-coherence",
+    term: "T\u2081 and T\u2082 Coherence Times",
+    definition:
+      "T\u2081 (energy relaxation time) is the time for a qubit to decay from |1\u27e9 to |0\u27e9. T\u2082 (dephasing time) is the time for phase information to be lost. Together they characterize qubit coherence and gate fidelity limits.",
+    category: "Hardware",
+  },
+  {
+    id: "fault-tolerance-threshold",
+    term: "Fault-Tolerance Threshold",
+    definition:
+      "The maximum physical error rate below which a quantum error-correcting code can suppress errors arbitrarily by increasing code distance. For surface codes the threshold is approximately 1% per gate.",
+    category: "Hardware",
+  },
+  {
+    id: "magic-state",
+    term: "Magic State",
+    definition:
+      "A specific non-stabilizer quantum state that enables universal quantum computation when injected into a stabilizer circuit. Magic state distillation purifies many noisy magic states into a single high-fidelity one.",
+    category: "Gates & Circuits",
+  },
+  {
+    id: "transversal-gate",
+    term: "Transversal Gate",
+    definition:
+      "A fault-tolerant gate where each physical qubit in a code block interacts only with the corresponding qubit in another block. Transversal gates don't propagate errors within a block.",
+    category: "Gates & Circuits",
+  },
+  {
+    id: "barren-plateau",
+    term: "Barren Plateau",
+    definition:
+      "A phenomenon where the gradient of a variational quantum algorithm's cost function vanishes exponentially with qubit count, making optimization impossible. A key challenge in quantum machine learning.",
+    category: "Algorithms",
+  },
+  {
+    id: "trotterization",
+    term: "Trotterization",
+    definition:
+      "A technique for approximating quantum time evolution by breaking the Hamiltonian into non-commuting parts and applying short-time slices in alternating order. Essential for quantum simulation on digital computers.",
+    category: "Algorithms",
+  },
+  {
+    id: "jordan-wigner",
+    term: "Jordan-Wigner Transformation",
+    definition:
+      "A mapping between fermionic operators and Pauli spin operators that lets quantum computers simulate electrons in molecules and materials. Essential for quantum chemistry.",
+    category: "Algorithms",
+  },
+  {
+    id: "quantum-volume",
+    term: "Quantum Volume",
+    definition:
+      "A metric measuring quantum computer capability, combining qubit count, gate fidelity, connectivity, and coherence. Quantum volume 2\u207f means the system can run all 2\u207f random circuits of width n and depth n.",
+    category: "Hardware",
+  },
+  {
+    id: "ansatz",
+    term: "Ansatz",
+    definition:
+      "A parameterized quantum circuit optimized to solve a problem. The ansatz choice (hardware-efficient, UCCSD, QAOA) strongly affects variational algorithm performance like VQE and QAOA.",
+    category: "Algorithms",
+  },
+  {
+    id: "swap-network",
+    term: "SWAP Network",
+    definition:
+      "A sequence of SWAP gates routing qubits on limited-connectivity hardware, enabling multi-qubit gates between non-adjacent qubits.",
+    category: "Gates & Circuits",
+  },
+  {
     id: "qubit",
     term: "Qubit",
     definition:

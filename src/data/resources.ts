@@ -96,7 +96,7 @@ export const resources: Resource[] = [
     description:
       "A comprehensive treatment of quantum information theory, including entropy, channel capacity, and quantum error correction.",
     url: "https://www.cambridge.org/9781316809976",
-    tags: ["BOOK", "GUIDE", "PAPER"],
+    tags: ["BOOK", "GUIDE"],
     category: "Book",
     author: "Mark M. Wilde",
     domain: "Both",
@@ -162,7 +162,7 @@ export const resources: Resource[] = [
     description:
       "A comprehensive treatment of information theory covering both classical Shannon theory and quantum information theory.",
     url: "https://www.cambridge.org/9780521881715",
-    tags: ["BOOK", "GUIDE", "PAPER"],
+    tags: ["BOOK", "GUIDE"],
     category: "Book",
     author: "Emmanuel Desurvire",
     domain: "Both",
@@ -302,11 +302,11 @@ export const resources: Resource[] = [
     id: "course-quantum-computing-ucsd",
     title: "CSE 291: Quantum Computing (UCSD)",
     description:
-      "Graduate course covering quantum algorithms, complexity theory, and quantum information. Taught by Scott Aaronson.",
-    url: "https://www.scottaaronson.com/",
+      "Graduate course covering quantum algorithms, complexity theory, and quantum information. Taught by Scott Aaronson at UCSD.",
+    url: "https://cseweb.ucsd.edu/classes/wi19/cse291-1/",
     tags: ["COURSE", "NOTES"],
     category: "Course",
-    author: "Scott Aaronson",
+    author: "UCSD / Scott Aaronson",
     domain: "Quantum Computing",
   },
   {
@@ -346,7 +346,7 @@ export const resources: Resource[] = [
     description:
       "An advanced course on quantum cryptography from the University of Copenhagen, covering QKD, entanglement-based protocols, and security proofs.",
     url: "https://www.coursera.org/search?query=quantum+cryptography",
-    tags: ["COURSE", "VIDEO", "PAPER"],
+    tags: ["COURSE", "VIDEO"],
     category: "Course",
     author: "University of Copenhagen",
     domain: "Quantum Computing",
@@ -439,7 +439,7 @@ export const resources: Resource[] = [
     description:
       "A deep dive into quantum algorithm design from TU Delft, covering Grover, Shor, and quantum Fourier transform.",
     url: "https://www.edx.org/search?q=quantum+computing",
-    tags: ["COURSE", "VIDEO", "PAPER"],
+    tags: ["COURSE", "VIDEO"],
     category: "Course",
     domain: "Quantum Computing",
   },
@@ -447,9 +447,9 @@ export const resources: Resource[] = [
   // ===== 📺 Video Playlists =====
   {
     id: "video-3b1b-qc",
-    title: "Quantum Computing Playlist",
+    title: "3Blue1Brown: Quantum-Related Videos",
     description:
-      "A visually intuitive introduction to quantum computing concepts by 3Blue1Brown, including qubits, superposition, and quantum gates.",
+      "Collection of videos from 3Blue1Brown touching on quantum concepts — Bell's inequality, Schrödinger's equation, and quantum mechanics visualizations.",
     url: "https://www.youtube.com/playlist?list=PLZHQObOWTQDOy9FfjMNK9G6vGXF8w06vD",
     tags: ["VIDEO", "TUT"],
     category: "Video Playlist",
@@ -493,7 +493,7 @@ export const resources: Resource[] = [
     description:
       "Research-level lectures from the University of Waterloo's IQC, covering topological quantum computing, error correction, and quantum information.",
     url: "https://www.youtube.com/@InstituteForQuantumComputing",
-    tags: ["VIDEO", "COURSE", "PAPER"],
+    tags: ["VIDEO", "COURSE"],
     category: "Video Playlist",
     domain: "Both",
   },

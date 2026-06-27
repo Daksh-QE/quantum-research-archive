@@ -92,15 +92,6 @@ export const newsletters: Newsletter[] = [
     tags: ["PHYSICS", "RESEARCH", "APS", "ACADEMIC"],
   },
   {
-    id: "quantum-tech-brief",
-    name: "Quantum Tech Brief",
-    description:
-      "A brief weekly overview of quantum technology developments, covering hardware advances, software releases, and industry partnerships.",
-    url: "https://substack.com/home",
-    frequency: "Weekly",
-    tags: ["TECHNOLOGY", "INDUSTRY", "BRIEF"],
-  },
-  {
     id: "quantum-frontiers",
     name: "Quantum Frontiers (Caltech IQIM)",
     description:

@@ -83,19 +83,21 @@ export default function RoadmapPage() {
                   <ul className="space-y-1.5">
                     {mod.lessons.map((lesson) => (
                       <li key={lesson.id} className="flex items-start gap-2">
-                        <span
-                          className={`shrink-0 mt-0.5 w-5 h-5 rounded flex items-center justify-center ${lessonTypeColor(
-                            lesson.type
-                          )}`}
-                        >
-                          {lessonTypeIcon(lesson.type)}
-                        </span>
-                        <span className="text-sm text-slate-700">
-                          {lesson.title}
-                        </span>
-                        <span className="shrink-0 text-xs text-slate-400 capitalize">
-                          {lesson.type}
-                        </span>
+                        <a href={lesson.url} target="_blank" rel="noopener noreferrer" className="flex items-start gap-2 flex-1 min-w-0 group">
+                          <span
+                            className={`shrink-0 mt-0.5 w-5 h-5 rounded flex items-center justify-center ${lessonTypeColor(
+                              lesson.type
+                            )}`}
+                          >
+                            {lessonTypeIcon(lesson.type)}
+                          </span>
+                          <span className="text-sm text-slate-700 group-hover:text-blue-600 transition-colors">
+                            {lesson.title}
+                          </span>
+                          <span className="shrink-0 text-xs text-slate-400 capitalize group-hover:text-blue-500 transition-colors">
+                            {lesson.type}
+                          </span>
+                        </a>
                       </li>
                     ))}
                   </ul>

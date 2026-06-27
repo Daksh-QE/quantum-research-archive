@@ -58,19 +58,11 @@ export const communityHubs: CommunityHub[] = [
     tags: ["X", "QUANTUM INFO", "SUPREMACY", "CAL TECH"],
   },
   {
-    id: "hub-x-kitaev",
-    name: "Alexei Kitaev (@kitaev)",
-    platform: "x",
-    description: "Pioneer of topological quantum computing and the stabilizer formalism. Posts on quantum algorithms and mathematical physics.",
-    url: "https://x.com/kitaev",
-    tags: ["X", "TOPOLOGICAL", "ALGORITHMS", "PIONEER"],
-  },
-  {
     id: "hub-discord-qosf",
     name: "QOSF (Quantum Open Source Foundation) Slack",
     platform: "slack",
     description: "Community for quantum open-source development. Mentorship programs, collaborative projects, and job postings.",
-    url: "https://qosf.org/",
+    url: "https://qosf.org/join/",
     tags: ["SLACK", "OPEN SOURCE", "MENTORSHIP", "JOBS"],
   },
   {
@@ -83,9 +75,9 @@ export const communityHubs: CommunityHub[] = [
   },
   {
     id: "hub-x-quantum-journal",
-    name: "Nature Quantum Info (@nature_quantum)",
+    name: "Nature Quantum Info (@quantumtechbio)",
     platform: "x",
-    description: "Official X account for Nature's quantum information publications. Stay updated on the latest quantum research papers.",
+    description: "Quantum tech and biology at the intersection of quantum information and life sciences.",
     url: "https://x.com/quantumtechbio",
     tags: ["X", "JOURNAL", "PAPERS", "RESEARCH"],
   },

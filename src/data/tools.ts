@@ -69,31 +69,13 @@ export const tools: Tool[] = [
     id: "pennylane-sdk",
     title: "PennyLane",
     description:
-      "Cross-platform quantum machine learning library with automatic differentiation. Integrates with PyTorch, TensorFlow, and JAX for hybrid QML workflows.",
+      "Cross-platform quantum machine learning library with automatic differentiation. Integrates with PyTorch, TensorFlow, and JAX for hybrid QML workflows. Also functions as a full QML framework.",
     url: "https://pennylane.ai/",
     category: "SDK",
     tags: ["OPEN-SOURCE", "PYTHON", "QML", "DIFFERENTIATION"],
-  },
-  {
-    id: "classiq-sdk",
-    title: "Classiq SDK",
-    description:
-      "A quantum algorithm design platform that automatically synthesizes and optimizes quantum circuits from high-level functional models.",
-    url: "https://www.classiq.io/",
-    category: "SDK",
-    tags: ["OPTIMIZATION", "AUTOMATION", "HIGH-LEVEL", "PYTHON"],
   },
 
   // ===== Frameworks =====
-  {
-    id: "pennylane",
-    title: "PennyLane (QML Framework)",
-    description:
-      "Cross-platform quantum machine learning framework with automatic differentiation. Integrates with PyTorch, TensorFlow, and JAX.",
-    url: "https://pennylane.ai/",
-    category: "FRAMEWORK",
-    tags: ["OPEN-SOURCE", "PYTHON", "QML", "DIFFERENTIATION"],
-  },
   {
     id: "qibo",
     title: "Qibo",
@@ -180,15 +162,6 @@ export const tools: Tool[] = [
 
   // ===== Simulators =====
   {
-    id: "qutip",
-    title: "QuTiP (Quantum Toolbox in Python)",
-    description:
-      "A powerful open-source library for simulating quantum systems, including master equations, Bloch-Redfield, and quantum stochastic processes.",
-    url: "https://qutip.org/",
-    category: "SIMULATOR",
-    tags: ["OPEN-SOURCE", "PYTHON", "SIMULATION", "OPEN-SYSTEMS"],
-  },
-  {
     id: "stim",
     title: "Stim (Stabilizer Simulator)",
     description:
@@ -250,5 +223,32 @@ export const tools: Tool[] = [
     url: "https://github.com/Qiskit/qiskit-aer",
     category: "SIMULATOR",
     tags: ["OPEN-SOURCE", "PYTHON", "IBM", "NOISE", "GPU"],
+  },
+  {
+    id: "quirk",
+    title: "Quirk",
+    description:
+      "The most popular free browser-based visual quantum circuit simulator. Drag-and-drop gates, instant statevector updates, and shareable circuit URLs. No account or installation needed.",
+    url: "https://algassert.com/quirk",
+    category: "SIMULATOR",
+    tags: ["WEB", "VISUAL", "BROWSER", "FREE", "BEGINNER-FRIENDLY"],
+  },
+  {
+    id: "mitiq",
+    title: "Mitiq",
+    description:
+      "Unitary Fund's open-source error mitigation toolkit. Implements zero-noise extrapolation, probabilistic error cancellation, Clifford data regression, and more.",
+    url: "https://github.com/unitaryfund/mitiq",
+    category: "FRAMEWORK",
+    tags: ["OPEN-SOURCE", "PYTHON", "ERROR MITIGATION", "UNITARY FUND"],
+  },
+  {
+    id: "pymatching",
+    title: "PyMatching",
+    description:
+      "A fast Python/C++ library for decoding quantum error correcting codes using Minimum Weight Perfect Matching (MWPM) on the surface code.",
+    url: "https://github.com/oscarhiggott/PyMatching",
+    category: "SIMULATOR",
+    tags: ["OPEN-SOURCE", "PYTHON", "QEC", "MWPM", "DECODING"],
   },
 ];

@@ -17,14 +17,18 @@ import {
   ChevronDown,
   ChevronRight,
   ExternalLink,
+  Sparkles,
 } from "lucide-react";
 import { curriculum } from "@/data/curriculum";
 
 const navItems = [
+  { label: "Research Copilot", href: "/research-copilot", icon: Sparkles },
+  { label: "Quantum Sandbox", href: "/quantum-sandbox", icon: Wrench },
+  { label: "QEC Dashboard", href: "/qec-dashboard", icon: FileText },
   { label: "Overview", href: "/overview", icon: LayoutDashboard },
   { label: "Resources", href: "/resources", icon: BookOpen },
   { label: "Community", href: "/community", icon: Users },
-  { label: "Community Hubs", href: "/community-hubs", icon: Users },
+  { label: "Hubs", href: "/hubs", icon: Users },
   { label: "Articles", href: "/articles", icon: Newspaper },
   { label: "Roadmap", href: "/roadmap", icon: Map },
   { label: "Tools & Practice", href: "/tools", icon: Wrench },
@@ -57,7 +61,7 @@ const lessonTypeColor = (type: string) => {
 export default function Sidebar() {
   const pathname = usePathname();
   const [expandedModule, setExpandedModule] = useState<string | null>(null);
-  const [activeDomain, setActiveDomain] = useState<string | null>(null);
+
 
   const toggleModule = (id: string) => {
     setExpandedModule(expandedModule === id ? null : id);
@@ -95,35 +99,7 @@ export default function Sidebar() {
         })}
       </nav>
 
-      {/* Separator */}
-      <div className="border-t border-slate-700/50" />
 
-      {/* Domain filters */}
-      <div className="px-4 py-3">
-        <h3 className="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-2">
-          Filter by Domain
-        </h3>
-        <div className="flex flex-wrap gap-1.5">
-          {domainFilters.map((domain) => (
-            <button
-              key={domain}
-              onClick={() =>
-                setActiveDomain(activeDomain === domain ? null : domain)
-              }
-              className={`px-2.5 py-1 text-xs rounded-full transition-colors ${
-                activeDomain === domain
-                  ? "bg-blue-600 text-white"
-                  : "bg-slate-800 text-slate-400 hover:text-slate-200 hover:bg-slate-700"
-              }`}
-            >
-              {domain}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Separator */}
-      <div className="border-t border-slate-700/50" />
 
       {/* Curriculum tree */}
       <div className="py-2">
@@ -182,7 +158,7 @@ export default function Sidebar() {
           Follow @quantum_research
         </a>
         <a
-          href="https://github.com/quantum-research-archive"
+          href="https://github.com/Daksh-QE/quantum-research-archive"
           target="_blank"
           rel="noopener noreferrer"
           className="flex items-center gap-2 text-xs text-slate-500 hover:text-slate-300 transition-colors"

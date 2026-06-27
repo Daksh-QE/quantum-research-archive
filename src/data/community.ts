@@ -143,6 +143,26 @@ export const communityMembers: CommunityMember[] = [
     tags: ["EXPERIMENT", "BELL INEQUALITIES", "FOUNDATIONS", "NOBEL"],
   },
   {
+    id: "lov-grover",
+    name: "Lov Grover",
+    initials: "LG",
+    role: "RES",
+    description:
+      "Inventor of Grover's search algorithm, one of the most important quantum algorithms. His work demonstrated that quantum computers can provide provable speedups for unstructured search.",
+    url: "https://en.wikipedia.org/wiki/Lov_Grover",
+    tags: ["ALGORITHMS", "SEARCH", "PIONEER"],
+  },
+  {
+    id: "andrew-steane",
+    name: "Andrew Steane",
+    initials: "AS",
+    role: "RES",
+    description:
+      "Inventor of the Steane [[7,1,3]] quantum error correcting code. Professor at Oxford University, contributing to quantum error correction and atomic physics.",
+    url: "https://en.wikipedia.org/wiki/Andrew_Steane",
+    tags: ["QEC", "ERROR CORRECTION", "OXFORD"],
+  },
+  {
     id: "seth-lloyd",
     name: "Seth Lloyd",
     initials: "SL",
@@ -221,7 +241,7 @@ export const communityMembers: CommunityMember[] = [
     role: "EDU",
     description:
       "IBM Quantum's global lead for quantum education. Drives the Qiskit textbook, summer schools, and quantum educational initiatives worldwide.",
-    url: "https://www.ibm.com/quantum",
+    url: "https://en.wikipedia.org/wiki/Abraham_Asfaw",
     tags: ["EDUCATION", "QISKIT", "SUMMER SCHOOL"],
   },
 
@@ -357,16 +377,6 @@ export const communityMembers: CommunityMember[] = [
       "A premier Dutch research institute for quantum computing and quantum internet. Pioneering topological qubits and quantum network protocols.",
     url: "https://qutech.nl/",
     tags: ["RESEARCH", "QUANTUM INTERNET", "TOPOLOGICAL", "HARDWARE"],
-  },
-  {
-    id: "delft-qc",
-    name: "TU Delft Quantum Computing",
-    initials: "TD",
-    role: "LEAD",
-    description:
-      "Leading European center for quantum research, with world-class programs in quantum computing, quantum internet, and quantum sensing.",
-    url: "https://qutech.nl/",
-    tags: ["RESEARCH", "EDUCATION", "QUANTUM INTERNET"],
   },
   {
     id: "nist-qis",
