@@ -18,13 +18,18 @@ import {
   ChevronRight,
   ExternalLink,
   Sparkles,
+  Bot,
+  Sigma,
 } from "lucide-react";
 import { curriculum } from "@/data/curriculum";
 
-const navItems = [
+const toolItems = [
   { label: "Research Copilot", href: "/research-copilot", icon: Sparkles },
   { label: "Quantum Sandbox", href: "/quantum-sandbox", icon: Wrench },
-  { label: "QEC Dashboard", href: "/qec-dashboard", icon: FileText },
+  { label: "Error Correction", href: "/error-correction", icon: Sigma },
+];
+
+const archiveItems = [
   { label: "Overview", href: "/overview", icon: LayoutDashboard },
   { label: "Resources", href: "/resources", icon: BookOpen },
   { label: "Community", href: "/community", icon: Users },
@@ -38,8 +43,6 @@ const navItems = [
   { label: "Glossary", href: "/glossary", icon: BookMarked },
   { label: "Newsletters", href: "/newsletters", icon: Mail },
 ];
-
-const domainFilters = ["Quantum Computing", "Quantum Mechanics", "Both"];
 
 const lessonTypeColor = (type: string) => {
   switch (type) {
@@ -62,9 +65,26 @@ export default function Sidebar() {
   const pathname = usePathname();
   const [expandedModule, setExpandedModule] = useState<string | null>(null);
 
-
   const toggleModule = (id: string) => {
     setExpandedModule(expandedModule === id ? null : id);
+  };
+
+  const NavLink = ({ item }: { item: { label: string; href: string; icon: any } }) => {
+    const isActive = pathname === item.href;
+    const Icon = item.icon;
+    return (
+      <Link
+        href={item.href}
+        className={`flex items-center gap-3 px-4 py-1.5 text-sm transition-colors ${
+          isActive
+            ? "text-white bg-slate-800 border-r-2 border-blue-400"
+            : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/50"
+        }`}
+      >
+        <Icon className="w-4 h-4 shrink-0" />
+        <span>{item.label}</span>
+      </Link>
+    );
   };
 
   return (
@@ -77,35 +97,27 @@ export default function Sidebar() {
         </span>
       </div>
 
-      {/* Navigation */}
-      <nav className="flex-1 py-2 space-y-0.5">
-        {navItems.map((item) => {
-          const isActive = pathname === item.href;
-          const Icon = item.icon;
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={`flex items-center gap-3 px-4 py-2 text-sm transition-colors ${
-                isActive
-                  ? "text-white bg-slate-800 border-r-2 border-blue-400"
-                  : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/50"
-              }`}
-            >
-              <Icon className="w-4 h-4 shrink-0" />
-              <span>{item.label}</span>
-            </Link>
-          );
-        })}
-      </nav>
+      <nav className="flex-1 py-2 space-y-0.5 overflow-y-auto">
+        {/* ===== Key Tools ===== */}
+        <div className="px-4 py-1.5">
+          <h3 className="text-xs font-semibold uppercase tracking-wider text-slate-500">Key Tools</h3>
+        </div>
+        {toolItems.map((item) => (
+          <NavLink key={item.href} item={item} />
+        ))}
 
+        {/* ===== Archive ===== */}
+        <div className="pt-3 px-4 pb-1.5">
+          <h3 className="text-xs font-semibold uppercase tracking-wider text-slate-500">Archive</h3>
+        </div>
+        {archiveItems.map((item) => (
+          <NavLink key={item.href} item={item} />
+        ))}
 
-
-      {/* Curriculum tree */}
-      <div className="py-2">
-        <h3 className="text-xs font-semibold uppercase tracking-wider text-slate-500 px-4 mb-1">
-          Curriculum
-        </h3>
+        {/* ===== Curriculum ===== */}
+        <div className="pt-3 px-4 pb-1">
+          <h3 className="text-xs font-semibold uppercase tracking-wider text-slate-500">Curriculum</h3>
+        </div>
         {curriculum.map((mod) => (
           <div key={mod.id}>
             <button
@@ -141,21 +153,18 @@ export default function Sidebar() {
             )}
           </div>
         ))}
-      </div>
-
-      {/* Separator */}
-      <div className="border-t border-slate-700/50" />
+      </nav>
 
       {/* Bottom social links */}
-      <div className="px-4 py-4 space-y-2">
+      <div className="border-t border-slate-700/50 px-4 py-3 space-y-1.5 shrink-0">
         <a
-          href="https://x.com/quantum_research"
+          href="https://linkedin.com/in/dakshjain26"
           target="_blank"
           rel="noopener noreferrer"
           className="flex items-center gap-2 text-xs text-slate-500 hover:text-slate-300 transition-colors"
         >
           <ExternalLink className="w-3 h-3" />
-          Follow @quantum_research
+          Connect
         </a>
         <a
           href="https://github.com/Daksh-QE/quantum-research-archive"

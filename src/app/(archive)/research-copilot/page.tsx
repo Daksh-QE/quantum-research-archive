@@ -67,17 +67,73 @@ const PRESET_PAPERS: PaperData[] = [
     categories: ["PIONEER", "SIMULATION", "THEORY"],
   },
   {
-    id: "qv-64",
-    title: "Quantum advantage and the IBM Quantum roadmap",
-    authors: "IBM Quantum Team",
-    abstract: "IBM Quantum has developed a roadmap for building a million-qubit quantum computer by 2030. Key milestones include the 127-qubit Eagle processor, the 433-qubit Osprey, and the 1121-qubit Condor. Each generation improves gate fidelities and coherence times, paving the way toward fault-tolerant quantum computation.",
-    url: "https://research.ibm.com/blog/",
+    id: "bb84-1984",
+    title: "Quantum cryptography: Public key distribution and coin tossing",
+    authors: "Charles H. Bennett, Gilles Brassard",
+    abstract: "A new method for secure communication is proposed, based on the principles of quantum mechanics. The method, now known as BB84, allows two parties to generate a shared random secret key known only to them, which can then be used to encrypt and decrypt messages. The security of the protocol relies on the fundamental quantum mechanical properties of non-cloning and measurement disturbance.",
+    // BB84 (1984) predates arXiv. Link to the canonical published version
+    // (Theoretical Computer Science 560, 2014 reprint) via its stable DOI.
+    url: "https://doi.org/10.1016/j.tcs.2014.05.025",
+    year: "1984",
+    categories: ["CRYPTOGRAPHY", "PIONEER", "COMMUNICATION"],
+  },
+  {
+    id: "no-cloning-1982",
+    title: "A single quantum cannot be cloned",
+    authors: "William K. Wootters, Wojciech H. Zurek",
+    abstract: "If an unknown quantum state could be cloned perfectly, then many fundamental quantum phenomena would be impossible. This paper proves that it is impossible to create an identical copy of an arbitrary unknown quantum state. The no-cloning theorem is a cornerstone of quantum cryptography and quantum information theory.",
+    url: "https://www.nature.com/articles/299802a0",
+    year: "1982",
+    categories: ["FOUNDATIONS", "CRYPTOGRAPHY", "THEORY"],
+  },
+  {
+    id: "chsh-1969",
+    title: "Proposed experiment to test local hidden-variable theories",
+    authors: "John F. Clauser, Michael A. Horne, Abner Shimony, Richard A. Holt",
+    abstract: "A generalized Bell inequality is derived that can be tested experimentally. The CHSH inequality provides a practical test to distinguish between quantum mechanics and local hidden-variable theories. Violation of the inequality would confirm the predictions of quantum mechanics and rule out local realism.",
+    url: "https://journals.aps.org/prl/abstract/10.1103/PhysRevLett.23.880",
+    year: "1969",
+    categories: ["FOUNDATIONS", "PIONEER", "BELL INEQUALITIES"],
+  },
+  {
+    id: "hhl-2009",
+    title: "Quantum algorithm for linear systems of equations",
+    authors: "Aram W. Harrow, Avinatan Hassidim, Seth Lloyd",
+    abstract: "Solving linear systems of equations is a fundamental problem in science and engineering. This paper presents a quantum algorithm that solves linear systems exponentially faster than classical methods for certain well-conditioned matrices. The HHL algorithm has become a cornerstone of quantum machine learning and quantum data analysis.",
+    url: "https://arxiv.org/abs/0811.3171",
+    year: "2009",
+    categories: ["ALGORITHMS", "QML", "LINEAR SYSTEMS"],
+  },
+  {
+    id: "qaoa-2014",
+    title: "A quantum approximate optimization algorithm",
+    authors: "Edward Farhi, Jeffrey Goldstone, Sam Gutmann",
+    abstract: "We introduce a quantum algorithm that produces approximate solutions for combinatorial optimization problems. The algorithm depends on a positive integer p and the quality of the approximation improves as p increases. The quantum circuit that implements the algorithm is shallow, making it suitable for near-term quantum devices.",
+    url: "https://arxiv.org/abs/1411.4028",
+    year: "2014",
+    categories: ["ALGORITHMS", "OPTIMIZATION", "VARIATIONAL"],
+  },
+  {
+    id: "vqe-2014",
+    title: "A variational eigenvalue solver on a photonic quantum processor",
+    authors: "Alberto Peruzzo, Jarrod McClean, Peter Shadbolt, Man-Hong Yung, Xiao-Qi Zhou, Peter J. Love, Alán Aspuru-Guzik, Jeremy L. O'Brien",
+    abstract: "We propose and experimentally demonstrate a variational quantum eigensolver (VQE) that uses a photonic quantum processor to find the eigenvalues of the Heisenberg and hydrogen molecular Hamiltonians. VQE combines a classical optimization routine with a quantum state preparation circuit, enabling the computation of ground state energies on near-term quantum hardware.",
+    url: "https://arxiv.org/abs/1304.3061",
+    year: "2014",
+    categories: ["ALGORITHMS", "CHEMISTRY", "VARIATIONAL"],
+  },
+  {
+    id: "google-surface-2023",
+    title: "Suppressing quantum errors by scaling a surface code logical qubit",
+    authors: "Google Quantum AI",
+    abstract: "A major milestone in quantum error correction is demonstrated: a surface code logical qubit on Google's Sycamore processor where increasing the code distance from d=3 to d=5 reduces the logical error rate below the physical error rate. This below-threshold demonstration is a key step toward building a fault-tolerant quantum computer.",
+    url: "https://www.nature.com/articles/s41586-022-05434-1",
     year: "2023",
-    categories: ["HARDWARE", "ROADMAP", "SUPERCONDUCTING"],
+    categories: ["QEC", "HARDWARE", "SURFACE CODE"],
   },
 ];
 
-/* ── Extract highlighted terms from text ── */
+/* ── Extract highlighted terms from text (case-insensitive substring match) ── */
 function findTerms(text: string): string[] {
   const found = new Set<string>();
   const lower = text.toLowerCase();
@@ -87,6 +143,57 @@ function findTerms(text: string): string[] {
     }
   }
   return Array.from(found).slice(0, 8);
+}
+
+/* ── Escape a string for safe use inside a RegExp ── */
+function escapeRegExp(s: string): string {
+  return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+/*
+ * Render an abstract, wrapping any matched glossary term (including multi-word
+ * and capitalized terms) with a highlight + hover tooltip. We build a single
+ * case-insensitive regex from the matched term strings, sorted longest-first so
+ * that e.g. "quantum error correction" wins over "error". Word boundaries keep
+ * us from highlighting inside larger words.
+ */
+function renderHighlightedAbstract(
+  abstract: string,
+  terms: string[],
+  glossary: { term: string; definition: string }[]
+): React.ReactNode {
+  if (terms.length === 0) return abstract;
+  const sorted = [...terms].sort((a, b) => b.length - a.length);
+  const pattern = sorted.map((t) => escapeRegExp(t)).join("|");
+  const regex = new RegExp(`\\b(${pattern})\\b`, "gi");
+  const lookup = new Map(glossary.map((g) => [g.term.toLowerCase(), g.definition]));
+
+  const out: React.ReactNode[] = [];
+  let last = 0;
+  let m: RegExpExecArray | null;
+  let key = 0;
+  while ((m = regex.exec(abstract)) !== null) {
+    if (m.index > last) out.push(abstract.slice(last, m.index));
+    const matched = m[0];
+    const def = lookup.get(matched.toLowerCase());
+    out.push(
+      <span
+        key={`hl-${key++}`}
+        className="border-b border-dotted border-violet-400 text-violet-700 cursor-help relative group"
+      >
+        {matched}
+        {def && (
+          <span className="absolute bottom-full left-0 mb-1 hidden group-hover:block bg-slate-900 text-white text-[10px] p-2 rounded-lg w-48 z-10 font-normal">
+            {def}
+          </span>
+        )}
+      </span>
+    );
+    last = m.index + matched.length;
+    if (m.index === regex.lastIndex) regex.lastIndex++; // guard zero-length
+  }
+  if (last < abstract.length) out.push(abstract.slice(last));
+  return out;
 }
 
 /* ── Simple markdown renderer ── */
@@ -103,23 +210,52 @@ function renderMarkdown(text: string): React.ReactNode {
   });
 }
 
-/* ── Generate quiz questions based on paper content ── */
+/* ── Seeded shuffle for quiz option randomization ── */
+function shuffleArray<T>(arr: T[], seed: number): T[] {
+  const r = [...arr];
+  for (let i = r.length - 1; i > 0; i--) {
+    let s = (seed * 16807 + (i * 17239)) % 2147483647;
+    const j = s % (i + 1);
+    [r[i], r[j]] = [r[j], r[i]];
+  }
+  return r;
+}
+
+/* ── Deterministic string hash → seed (so quiz is stable per paper) ── */
+function hashSeed(str: string): number {
+  let h = 2166136261;
+  for (let i = 0; i < str.length; i++) {
+    h ^= str.charCodeAt(i);
+    h = Math.imul(h, 16777619);
+  }
+  return (h >>> 0) % 2147483647 || 1;
+}
+
+/* ── Generate quiz questions based on paper content (deterministic per paper) ── */
 function generateQuiz(paper: PaperData, selectedTerms: string[]): QuizQuestion[] {
   const questions: QuizQuestion[] = [];
+  let qi = 0;
+  const seed = hashSeed(paper.id);
 
   // Paper content question
   const sentences = paper.abstract.split(".").filter((s) => s.trim().length > 20);
   if (sentences.length > 2) {
-    const q = sentences[Math.floor(Math.random() * sentences.length)].trim();
+    // Deterministic sentence pick (no Math.random inside useMemo).
+    const q = sentences[seed % sentences.length].trim();
+    const rawOptions = [
+      q.substring(0, Math.min(q.length, 80)) + "...",
+      "This claim is not supported by the paper.",
+      "The paper argues the opposite.",
+    ];
+    const shuffledOptions = shuffleArray([...rawOptions], seed + qi * 7 + 42);
+    const correctAnswer = rawOptions[0];
+    const newCorrect = shuffledOptions.indexOf(correctAnswer);
     questions.push({
       question: `According to the paper, which of the following is true?`,
-      options: [
-        q.substring(0, Math.min(q.length, 80)) + "...",
-        "This claim is not supported by the paper.",
-        "The paper argues the opposite.",
-      ],
-      correct: 0,
+      options: shuffledOptions,
+      correct: newCorrect,
     });
+    qi++;
   }
 
   // Term definitions
@@ -129,24 +265,36 @@ function generateQuiz(paper: PaperData, selectedTerms: string[]): QuizQuestion[]
     const def1 = glossaryTerms.find((t) => t.term === term1);
     const def2 = glossaryTerms.find((t) => t.term === term2);
     if (def1 && def2) {
+      const rawOptions = [
+        def1.definition.substring(0, 120) + "...",
+        def2.definition.substring(0, 120) + "...",
+        "Neither of the above",
+      ];
+      const shuffledOptions = shuffleArray([...rawOptions], seed + qi * 7 + 13);
+      const correctAnswer = rawOptions[0];
+      const newCorrect = shuffledOptions.indexOf(correctAnswer);
       questions.push({
         question: `In quantum computing, what is "${term1}"?`,
-        options: [
-          def1.definition.substring(0, 120) + "...",
-          def2.definition.substring(0, 120) + "...",
-          "Neither of the above",
-        ],
-        correct: 0,
+        options: shuffledOptions,
+        correct: newCorrect,
       });
+      qi++;
     }
   }
 
-  // Year / milestone question
-  questions.push({
-    question: `When was this paper published?`,
-    options: [paper.year, String(parseInt(paper.year) + 2), String(parseInt(paper.year) - 3)],
-    correct: 0,
-  });
+  // Year / milestone question — only when the year is a valid number.
+  const yearNum = parseInt(paper.year, 10);
+  if (!Number.isNaN(yearNum) && /^\d{4}$/.test(paper.year.trim())) {
+    const rawOptions = [String(yearNum), String(yearNum + 2), String(yearNum - 3)];
+    const shuffledOptions = shuffleArray([...rawOptions], seed + qi * 7 + 99);
+    const correctAnswer = rawOptions[0];
+    const newCorrect = shuffledOptions.indexOf(correctAnswer);
+    questions.push({
+      question: `When was this paper published?`,
+      options: shuffledOptions,
+      correct: newCorrect,
+    });
+  }
 
   return questions;
 }
@@ -212,7 +360,7 @@ export default function ResearchCopilotPage() {
   }, [searchQuery, allPapers]);
 
   const highlightedTerms = useMemo(
-    () => (selectedPaper ? findTerms(selectedPaper.abstract) : []),
+    () => (selectedPaper ? findTerms(selectedPaper.abstract + " " + selectedPaper.title + " " + (selectedPaper.categories?.join(" ") || "")) : []),
     [selectedPaper]
   );
 
@@ -225,6 +373,30 @@ export default function ResearchCopilotPage() {
     () => (selectedPaper ? generateQuiz(selectedPaper, highlightedTerms) : []),
     [selectedPaper, highlightedTerms]
   );
+
+  const quizScore = useMemo(() => {
+    if (!quizSubmitted) return 0;
+    return quiz.reduce((s, q, i) => s + (quizAnswers[i] === q.correct ? 1 : 0), 0);
+  }, [quizSubmitted, quizAnswers, quiz]);
+
+  const [completedPapers, setCompletedPapers] = useState<string[]>(() => {
+    if (typeof window !== "undefined") {
+      try {
+        return JSON.parse(localStorage.getItem("qra-completed-papers") || "[]");
+      } catch {}
+    }
+    return [];
+  });
+  useEffect(() => {
+    localStorage.setItem("qra-completed-papers", JSON.stringify(completedPapers));
+  }, [completedPapers]);
+
+  // When quiz is passed, mark paper as completed
+  useEffect(() => {
+    if (quizSubmitted && quiz.length > 0 && quizScore === quiz.length && selectedPaper && !completedPapers.includes(selectedPaper.id)) {
+      setCompletedPapers((prev) => [...prev, selectedPaper.id]);
+    }
+  }, [quizSubmitted, quizScore, quiz.length, selectedPaper, completedPapers]);
 
   const handleSelectPaper = useCallback((paper: PaperData) => {
     setSelectedPaper(paper);
@@ -245,10 +417,12 @@ export default function ResearchCopilotPage() {
     setQuizSubmitted(true);
   };
 
-  const handleChatSend = async () => {
-    if (!chatInput.trim() || !selectedPaperRef.current) return;
-    const msg = chatInput.trim();
+  const handleChatSend = (rawMessage: string) => {
+    // Read the captured submitted value, not a mutable ref, so rapid
+    // successive sends each produce their own reliable reply.
+    const msg = rawMessage.trim();
     const paper = selectedPaperRef.current;
+    if (!msg || !paper) return;
     setChatInput("");
     setChatMessages((prev) => [...prev, { role: "user", content: msg }]);
     setChatLoading(true);
@@ -267,11 +441,6 @@ export default function ResearchCopilotPage() {
     }, 800);
   };
 
-  const quizScore = useMemo(() => {
-    if (!quizSubmitted) return 0;
-    return quiz.reduce((s, q, i) => s + (quizAnswers[i] === q.correct ? 1 : 0), 0);
-  }, [quizSubmitted, quizAnswers, quiz]);
-
   return (
     <div className="space-y-6 pb-8">
       {/* ── Header ── */}
@@ -279,10 +448,18 @@ export default function ResearchCopilotPage() {
         <div className="w-10 h-10 rounded-xl bg-violet-100 flex items-center justify-center">
           <Sparkles className="w-5 h-5 text-violet-600" />
         </div>
-        <div>
+        <div className="flex-1">
           <h1 className="text-2xl font-bold text-slate-900">Paper Reader</h1>
           <p className="text-sm text-slate-500">Read and understand quantum papers.</p>
         </div>
+        {completedPapers.length > 0 && (
+          <div className="text-right">
+            <p className="text-xs font-semibold text-violet-700">{completedPapers.length} paper{completedPapers.length !== 1 ? "s" : ""} completed</p>
+            <div className="w-20 h-1.5 rounded-full bg-slate-200 mt-0.5 ml-auto overflow-hidden">
+              <div className="h-full bg-violet-500 rounded-full" style={{ width: `${Math.min(completedPapers.length / 20 * 100, 100)}%` }} />
+            </div>
+          </div>
+        )}
       </div>
 
       {!selectedPaper ? (
@@ -311,27 +488,36 @@ export default function ResearchCopilotPage() {
             <button
               onClick={() => {
                 if (arxivInput.trim()) {
-                  const match = arxivInput.match(/arxiv\.org\/abs\/(\d{4}\.\d{4,5}|(?:quant-ph|cond-mat|hep-th|math|cs|gr-qc|nucl-th|physics|astro-ph|stat|eess|q-bio|q-fin)\/\d{7})/);
+                  const match = arxivInput.match(/arxiv\.org\/abs\/(\d{4}\.\d{4,5}|[a-z-]+(?:\.[a-z-]+)*\/\d{7})(v\d+)?/i);
                   if (match) {
-                    fetch(`https://export.arxiv.org/api/query?id_list=${match[1]}`)
+                    // Strip any trailing version suffix (v1/v2/...) so the API
+                    // fetch uses the base ID. arXiv returns the latest version.
+                    const id = match[1];
+                    setSearchQuery("");
+                    fetch(`https://export.arxiv.org/api/query?id_list=${id}`)
                       .then((r) => r.text())
                       .then((xml) => {
-                        const title = xml.match(/<title>(.+?)<\/title>/)?.[1] || "Untitled";
-                        const abstract = xml.match(/<summary>(.+?)<\/summary>/)?.[1]?.replace(/<[^>]+>/g, "").trim() || "";
-                        const authors = xml.match(/<author><name>(.+?)<\/name><\/author>/)?.[1] || "Unknown";
+                        const title = (xml.match(/<title>(.+?)<\/title>/)?.[1] || "Untitled").replace(/^arXiv:\S+\s*/, "").trim();
+                        const abstract = (xml.match(/<summary>(.+?)<\/summary>/)?.[1] || "").replace(/<[^>]+>/g, "").trim();
+                        const authorMatches = [...xml.matchAll(/<author><name>(.+?)<\/name><\/author>/g)];
+                        const authors = authorMatches.map((m) => m[1]).join(", ") || "Unknown";
                         handleSelectPaper({
-                          id: match[1],
-                          title: title.replace(/^arXiv:\d+\.\d+\s*/, ""),
+                          id,
+                          title: title.replace(/^[a-z-]+\/\d{7}\s*/i, ""),
                           authors,
                           abstract,
                           url: arxivInput.trim(),
                           year: new Date().getFullYear().toString(),
                         });
                       })
-                      .catch(() => alert("Could not fetch paper. Try a different URL."));
+                      .catch(() => {
+                        alert("Could not fetch paper from arXiv. Check the URL and try again.");
+                      });
                   } else {
                     alert("Please enter a valid arXiv URL (e.g., https://arxiv.org/abs/quant-ph/9508027)");
                   }
+                } else {
+                  alert("Please paste an arXiv URL first.");
                 }
               }}
               className="px-4 py-2 rounded-xl bg-violet-600 text-white text-sm font-medium hover:bg-violet-500 transition-colors shrink-0"
@@ -381,24 +567,7 @@ export default function ResearchCopilotPage() {
             <div className="bg-white rounded-xl border border-slate-200 p-5">
               <h3 className="text-sm font-semibold text-slate-900 mb-2">Abstract</h3>
               <p className="text-sm text-slate-700 leading-relaxed">
-                {selectedPaper.abstract.split(" ").map((word, i) => {
-                  const clean = word.replace(/[^a-zA-Z0-9-]/g, "");
-                  if (highlightedTerms.includes(clean)) {
-                    const def = glossaryTerms.find((t) => t.term === clean);
-                    return (
-                      <span
-                        key={i}
-                        className="inline-block border-b border-dotted border-violet-400 text-violet-700 cursor-help relative group"
-                      >
-                        {word}{" "}
-                        <span className="absolute bottom-full left-0 mb-1 hidden group-hover:block bg-slate-900 text-white text-[10px] p-2 rounded-lg w-48 z-10 font-normal">
-                          {def?.definition || clean}
-                        </span>
-                      </span>
-                    );
-                  }
-                  return <span key={i}>{word} </span>;
-                })}
+                {renderHighlightedAbstract(selectedPaper.abstract, highlightedTerms, glossaryTerms)}
               </p>
             </div>
 
@@ -597,7 +766,7 @@ export default function ResearchCopilotPage() {
                   )}
                 </div>
                 <form
-                  onSubmit={(e) => { e.preventDefault(); handleChatSend(); }}
+                  onSubmit={(e) => { e.preventDefault(); handleChatSend(chatInput); }}
                   className="flex gap-2"
                 >
                   <input
@@ -609,7 +778,7 @@ export default function ResearchCopilotPage() {
                   />
                   <button
                     type="submit"
-                    disabled={!chatInput.trim() || chatLoading}
+                    disabled={!chatInput.trim()}
                     className="px-3 py-2 rounded-xl bg-violet-600 text-white hover:bg-violet-500 transition-colors disabled:opacity-50"
                   >
                     <ArrowRight className="w-4 h-4" />

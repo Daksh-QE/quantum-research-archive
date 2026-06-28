@@ -137,17 +137,17 @@ export const articles: Article[] = [
     author: "Biamonte, Wittek, Pancotti, et al.",
     description:
       "A comprehensive review of quantum machine learning methods, covering variational quantum classifiers, quantum kernel methods, and the potential for quantum advantage.",
-    url: "https://arxiv.org/abs/1611.02427",
+    url: "https://arxiv.org/abs/1611.09347",
     tags: ["PAPER", "QML", "REVIEW"],
     domain: "Quantum Computing",
   },
   {
     id: "quantum-volume-ibm",
     title: "Demonstrating Quantum Volume 64 on a 27-Qubit System",
-    author: "IBM Quantum",
+    author: "Jurcevic et al. (IBM Quantum)",
     description:
       "IBM's demonstration of Quantum Volume 64 on a 27-qubit processor, explaining the quantum volume metric and its significance for benchmarking.",
-    url: "https://arxiv.org/abs/1910.06323",
+    url: "https://arxiv.org/abs/2008.08571",
     tags: ["PAPER", "BENCHMARK", "HARDWARE"],
     domain: "Quantum Computing",
   },
@@ -233,22 +233,12 @@ export const articles: Article[] = [
   },
   {
     id: "quantum-software-stack",
-    title: "The Quantum Computing Software Stack",
-    author: "Will Zeng",
+    title: "The Quantum Software Stack",
+    author: "Various",
     description:
-      "An exploration of the full quantum software stack, from quantum hardware to high-level algorithms, and the challenges in each layer of abstraction.",
-    url: "https://www.quantum-inspire.com/",
+      "An overview of the quantum software stack, from hardware control to high-level algorithms, on Wikipedia's quantum programming page.",
+    url: "https://en.wikipedia.org/wiki/Quantum_programming",
     tags: ["ARTICLE", "SOFTWARE", "STACK"],
-    domain: "Quantum Computing",
-  },
-  {
-    id: "qq-coin",
-    title: "Quantum Computing for the Very Curious",
-    author: "Michael Nielsen & Andy Matuschak",
-    description:
-      "An interactive essay using mnemonic techniques to explain quantum computing fundamentals — qubits, superposition, and quantum gates.",
-    url: "https://quantum.country/qcvc",
-    tags: ["ESSAY", "INTERACTIVE", "BEGINNER"],
     domain: "Quantum Computing",
   },
   {
@@ -286,18 +276,18 @@ export const articles: Article[] = [
     title: "Scheme for Reducing Decoherence in Quantum Computer Memory",
     author: "Peter Shor",
     description:
-      "The seminal 1995 paper that introduced the first quantum error correcting code — the 9-qubit Shor code — demonstrating that fault-tolerant quantum computation is possible.",
-    url: "https://arxiv.org/abs/quant-ph/9605011",
+      "The seminal 1995 paper that introduced the first quantum error correcting code — the 9-qubit Shor code. Published in Physical Review A 52, R2493 (it predates routine arXiv posting).",
+    url: "https://journals.aps.org/pra/abstract/10.1103/PhysRevA.52.R2493",
     tags: ["PAPER", "PIONEER", "QEC"],
     domain: "Quantum Computing",
   },
   {
     id: "steane-qec",
-    title: "Error Correcting Codes in Quantum Theory",
+    title: "Multiple Particle Interference and Quantum Error Correction",
     author: "Andrew Steane",
     description:
-      "The paper introducing the Steane [[7,1,3]] quantum error correcting code, one of the most widely studied QEC codes alongside Shor's code.",
-    url: "https://arxiv.org/abs/quant-ph/9608021",
+      "Steane's 1996 paper (Proc. R. Soc. A 452, 2551) introducing the [[7,1,3]] Steane code, one of the most widely studied quantum error correcting codes alongside Shor's code.",
+    url: "https://arxiv.org/abs/quant-ph/9601029",
     tags: ["PAPER", "QEC", "CODE"],
     domain: "Quantum Computing",
   },

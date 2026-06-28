@@ -31,10 +31,10 @@ export const tools: Tool[] = [
   },
   {
     id: "forest-sdk",
-    title: "Forest SDK (Rigetti)",
+    title: "Forest SDK / pyQuil (Rigetti)",
     description:
-      "Rigetti's Quantum Cloud Services SDK featuring the Quil quantum instruction language and pyQuil library for hybrid quantum-classical computing.",
-    url: "https://www.rigetti.com/",
+      "Rigetti's SDK featuring the Quil quantum instruction language and the pyQuil library for hybrid quantum-classical computing.",
+    url: "https://github.com/rigetti/pyquil",
     category: "SDK",
     tags: ["RIGETTI", "QUIL", "PYTHON", "HYBRID"],
   },
@@ -128,7 +128,7 @@ export const tools: Tool[] = [
     title: "Quipper",
     description:
       "A scalable, functional programming language for quantum computing embedded in Haskell. Used for circuit description and verification.",
-    url: "https://github.com/quipper/quipper",
+    url: "https://www.mathstat.dal.ca/~selinger/quipper/",
     category: "LANGUAGE",
     tags: ["HASKELL", "FUNCTIONAL", "CIRCUITS", "VERIFICATION"],
   },
@@ -137,7 +137,7 @@ export const tools: Tool[] = [
     title: "Quil (Quantum Instruction Language)",
     description:
       "An intermediate quantum instruction language developed by Rigetti, designed for hybrid quantum-classical computing.",
-    url: "https://github.com/rigetti/quil",
+    url: "https://github.com/quil-lang/quil",
     category: "LANGUAGE",
     tags: ["RIGETTI", "INSTRUCTION", "HYBRID", "OPEN-SOURCE"],
   },

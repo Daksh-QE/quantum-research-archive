@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { glossaryTerms } from "@/data/glossary";
 import GlossaryTerm from "@/components/GlossaryTerm";
 import FilterBar from "@/components/FilterBar";
@@ -19,6 +19,16 @@ export default function GlossaryPage() {
       (t) => t.category.toLowerCase() === activeCategory.toLowerCase()
     );
   }, [activeCategory]);
+
+  // Deep-link support: scroll to term specified in ?term= query param
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const termParam = params.get("term");
+    if (termParam) {
+      const el = document.getElementById("term-" + termParam);
+      if (el) el.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+  }, []);
 
   return (
     <div className="space-y-8">
@@ -44,7 +54,9 @@ export default function GlossaryPage() {
         {filtered.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 lg:gap-6">
             {filtered.map((term) => (
-              <GlossaryTerm key={term.id} term={term} />
+              <div key={term.id} id={"term-" + term.id}>
+                <GlossaryTerm term={term} />
+              </div>
             ))}
           </div>
         ) : (

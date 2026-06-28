@@ -2,6 +2,41 @@ import { Module } from "./types";
 
 export const curriculum: Module[] = [
   // ─────────────────────────────────────────────────────────────────────────
+  // MODULE 0 — QUANTUM IN 10 MINUTES (zero prerequisites)
+  // ─────────────────────────────────────────────────────────────────────────
+  {
+    id: "00-quantum-in-10-minutes",
+    title: "00. Quantum in a Nutshell — A Gentle Introduction",
+    description:
+      "No math, no prerequisites. A soft-landing introduction to quantum computing with 4 short explainer videos. Start here if you're brand new to quantum.",
+    lessons: [
+      {
+        id: "00-what-is-quantum",
+        title: "What is Quantum Computing? (Kurzgesagt)",
+        type: "video",
+        url: "https://www.youtube.com/watch?v=JhHMJCUmq28",
+      },
+      {
+        id: "00-qubit-explained-ibm",
+        title: "The Qubit Explained (IBM Quantum)",
+        type: "video",
+        url: "https://www.youtube.com/watch?v=zN7Y1Xyq7_s",
+      },
+      {
+        id: "00-superposition-minutephysics",
+        title: "Quantum Superposition (MinutePhysics)",
+        type: "video",
+        url: "https://www.youtube.com/watch?v=MBnnXbOM5S4",
+      },
+      {
+        id: "00-quantum-computing-veritasium",
+        title: "How Quantum Computers Work (Veritasium)",
+        type: "video",
+        url: "https://www.youtube.com/watch?v=g_IaVebNDec",
+      },
+    ],
+  },
+  // ─────────────────────────────────────────────────────────────────────────
   // PHASE 1 — FOUNDATIONS (6 modules, ~48 lessons)
   // ─────────────────────────────────────────────────────────────────────────
   {
@@ -105,8 +140,8 @@ export const curriculum: Module[] = [
       {
         id: "02e-representation-theory",
         title: "Representation Theory: How Groups Act on Vector Spaces",
-        type: "video",
-        url: "https://www.youtube.com/watch?v=9D0Qf7q_9Tg",
+        type: "notes",
+        url: "https://en.wikipedia.org/wiki/Representation_theory",
       },
       {
         id: "02f-fourier-analysis",
@@ -167,8 +202,8 @@ export const curriculum: Module[] = [
       {
         id: "03f-classical-info-theory",
         title: "Classical Information Theory: Entropy and Communication",
-        type: "video",
-        url: "https://www.youtube.com/watch?v=9D0Qf7q_9Tg",
+        type: "notes",
+        url: "https://en.wikipedia.org/wiki/Information_theory",
       },
     ],
   },
@@ -229,8 +264,8 @@ export const curriculum: Module[] = [
       {
         id: "04i-commutation-relations",
         title: "Commutation Relations and the Uncertainty Principle",
-        type: "tutorial",
-        url: "https://www.youtube.com/watch?v=MBnnXbOM5S4",
+        type: "notes",
+        url: "https://en.wikipedia.org/wiki/Canonical_commutation_relation",
       },
       {
         id: "04j-uncertainty-principle",
@@ -255,8 +290,8 @@ export const curriculum: Module[] = [
       {
         id: "05b-hermitian-operators",
         title: "Hermitian Operators and Observables",
-        type: "video",
-        url: "https://www.youtube.com/watch?v=yDgq6Md5sOA",
+        type: "notes",
+        url: "https://en.wikipedia.org/wiki/Hermitian_operator",
       },
       {
         id: "05c-spin-half",
@@ -365,7 +400,7 @@ export const curriculum: Module[] = [
         id: "07c-single-qubit-gates",
         title: "Single-Qubit Gates: Pauli, Hadamard, Phase, and T Gates",
         type: "tutorial",
-        url: "https://learn.qiskit.org/course/ch-states/single-qubit-gates",
+        url: "https://learning.quantum.ibm.com/catalog/courses",
       },
       {
         id: "07d-multi-qubit-states",
@@ -377,7 +412,7 @@ export const curriculum: Module[] = [
         id: "07e-cnot-gate",
         title: "The CNOT Gate: Creating Entanglement in Circuits",
         type: "tutorial",
-        url: "https://learn.qiskit.org/course/ch-gates/introduction",
+        url: "https://learning.quantum.ibm.com/catalog/courses",
       },
       {
         id: "07f-toffoli-swap",
@@ -427,7 +462,7 @@ export const curriculum: Module[] = [
         id: "08d-deutsch-circuit",
         title: "Deutsch's Algorithm: The First Quantum Advantage",
         type: "tutorial",
-        url: "https://learn.qiskit.org/course/ch-algorithms/deutsch-jozsa-algorithm",
+        url: "https://learning.quantum.ibm.com/catalog/courses",
       },
       {
         id: "08e-circuit-optimization",
@@ -471,7 +506,7 @@ export const curriculum: Module[] = [
         id: "09b-bernstein-vazirani",
         title: "Bernstein-Vazirani Algorithm",
         type: "guide",
-        url: "https://learn.qiskit.org/course/ch-algorithms/bernstein-vazirani-algorithm",
+        url: "https://learning.quantum.ibm.com/catalog/courses",
       },
       {
         id: "09c-simons-algorithm",
@@ -489,7 +524,7 @@ export const curriculum: Module[] = [
         id: "09e-phase-estimation",
         title: "Quantum Phase Estimation Algorithm",
         type: "tutorial",
-        url: "https://learn.qiskit.org/course/ch-algorithms/quantum-phase-estimation",
+        url: "https://learning.quantum.ibm.com/catalog/courses",
       },
       {
         id: "09f-grovers-search",
@@ -533,7 +568,7 @@ export const curriculum: Module[] = [
         id: "10a-vqe-intro",
         title: "Variational Quantum Eigensolver: Principles and Implementation",
         type: "tutorial",
-        url: "https://learn.qiskit.org/course/ch-applications/variational-quantum-eigensolver",
+        url: "https://learning.quantum.ibm.com/catalog/courses",
       },
       {
         id: "10b-qaoa",
@@ -568,14 +603,14 @@ export const curriculum: Module[] = [
       {
         id: "10g-quantum-optimization",
         title: "Quantum Optimization: QUBO and Ising Models",
-        type: "video",
-        url: "https://www.youtube.com/watch?v=8Xo2YHWZn1s",
+        type: "notes",
+        url: "https://en.wikipedia.org/wiki/Quadratic_unconstrained_binary_optimization",
       },
       {
         id: "10h-tensor-networks",
         title: "Tensor Networks: MPS, PEPS, and MERA",
-        type: "video",
-        url: "https://www.youtube.com/watch?v=9D0Qf7q_9Tg",
+        type: "notes",
+        url: "https://en.wikipedia.org/wiki/Tensor_network",
       },
     ],
   },
@@ -595,7 +630,7 @@ export const curriculum: Module[] = [
         id: "11b-quantum-channels",
         title: "Quantum Channels and the Operator-Sum Representation",
         type: "notes",
-        url: "https://www.youtube.com/watch?v=7Dd0-9F0lNY",
+        url: "https://en.wikipedia.org/wiki/Quantum_channel",
       },
       {
         id: "11c-kraus-operators",
@@ -631,7 +666,7 @@ export const curriculum: Module[] = [
         id: "11h-shannon-vs-von-neumann",
         title: "Shannon vs Von Neumann Entropy: Classical and Quantum",
         type: "notes",
-        url: "https://www.youtube.com/watch?v=7Dd0-9F0lNY",
+        url: "https://en.wikipedia.org/wiki/Von_Neumann_entropy",
       },
     ],
   },
@@ -771,8 +806,8 @@ export const curriculum: Module[] = [
       {
         id: "14c-query-complexity",
         title: "Quantum Query Complexity and Grover's Optimality",
-        type: "guide",
-        url: "https://www.youtube.com/watch?v=8Xo2YHWZn1s",
+        type: "notes",
+        url: "https://en.wikipedia.org/wiki/Quantum_query_complexity",
       },
       {
         id: "14d-oracle-separation",
@@ -783,8 +818,8 @@ export const curriculum: Module[] = [
       {
         id: "14e-bell-inequalities",
         title: "Bell's Theorem and Non-Locality: Experimental Tests",
-        type: "video",
-        url: "https://www.youtube.com/watch?v=zN7Y1Xyq7_s",
+        type: "notes",
+        url: "https://en.wikipedia.org/wiki/Bell%27s_theorem",
       },
       {
         id: "14f-quantum-interactive-proofs",
@@ -1037,13 +1072,13 @@ export const curriculum: Module[] = [
         id: "19d-majorana-fermions",
         title: "Majorana Fermions in Quantum Computation",
         type: "paper",
-        url: "https://arxiv.org/abs/1208.0928",
+        url: "https://arxiv.org/abs/cond-mat/0010440",
       },
       {
         id: "19e-topological-qubits-microsoft",
         title: "Microsoft's Topological Qubit Approach",
         type: "guide",
-        url: "https://learn.microsoft.com/en-us/azure/quantum/overview-algebra",
+        url: "https://en.wikipedia.org/wiki/Topological_quantum_computer",
       },
       {
         id: "19f-measurement-only-tqc",
@@ -1062,8 +1097,8 @@ export const curriculum: Module[] = [
       {
         id: "20a-noise-characterization",
         title: "Noise Characterization: T1, T2, and Gate Fidelity",
-        type: "guide",
-        url: "https://www.youtube.com/watch?v=5kY34b6JOe4",
+        type: "notes",
+        url: "https://en.wikipedia.org/wiki/Relaxation_(NMR)",
       },
       {
         id: "20b-randomized-benchmarking",
@@ -1116,7 +1151,7 @@ export const curriculum: Module[] = [
         id: "21b-hartree-fock",
         title: "The Hartree-Fock Method as a Starting Point",
         type: "tutorial",
-        url: "https://learn.qiskit.org/course/ch-applications/quantum-chemistry",
+        url: "https://learning.quantum.ibm.com/catalog/courses",
       },
       {
         id: "21c-jordan-wigner",
@@ -1128,13 +1163,13 @@ export const curriculum: Module[] = [
         id: "21d-vqe-chemistry",
         title: "VQE for Quantum Chemistry: Computing Ground State Energies",
         type: "tutorial",
-        url: "https://learn.qiskit.org/course/ch-applications/variational-quantum-eigensolver",
+        url: "https://learning.quantum.ibm.com/catalog/courses",
       },
       {
         id: "21e-phase-estimation-chemistry",
         title: "Phase Estimation for Chemical Accuracy",
-        type: "guide",
-        url: "https://www.youtube.com/watch?v=2pzlKkXn2dA",
+        type: "notes",
+        url: "https://en.wikipedia.org/wiki/Quantum_phase_estimation_algorithm",
       },
       {
         id: "21f-nisq-chemistry",
@@ -1171,14 +1206,14 @@ export const curriculum: Module[] = [
       {
         id: "22b-entanglement-distillation",
         title: "Entanglement Distillation: Purifying Noisy Entanglement",
-        type: "video",
-        url: "https://www.youtube.com/watch?v=Gxv3j_BoXJU",
+        type: "notes",
+        url: "https://en.wikipedia.org/wiki/Entanglement_distillation",
       },
       {
         id: "22c-quantum-memory",
         title: "Quantum Memory: Storing Quantum Information",
-        type: "guide",
-        url: "https://www.youtube.com/watch?v=o4oV-YFp4T8",
+        type: "notes",
+        url: "https://en.wikipedia.org/wiki/Quantum_memory",
       },
       {
         id: "22d-quantum-switches",
@@ -1195,8 +1230,8 @@ export const curriculum: Module[] = [
       {
         id: "22f-quantum-internet-vision",
         title: "The Quantum Internet: Architecture and Roadmap",
-        type: "video",
-        url: "https://www.youtube.com/watch?v=JhXwU7FWd34",
+        type: "notes",
+        url: "https://en.wikipedia.org/wiki/Quantum_network",
       },
       {
         id: "22g-quantum-entanglement-distribution",
@@ -1221,8 +1256,8 @@ export const curriculum: Module[] = [
       {
         id: "23a-quantum-metrology-basics",
         title: "Quantum Metrology: Precision Beyond Classical Limits",
-        type: "video",
-        url: "https://www.youtube.com/watch?v=4VSe4wtL3i0",
+        type: "notes",
+        url: "https://en.wikipedia.org/wiki/Quantum_metrology",
       },
       {
         id: "23b-heisenberg-limit",
@@ -1239,20 +1274,20 @@ export const curriculum: Module[] = [
       {
         id: "23d-nv-centers",
         title: "NV Centers in Diamond: Room Temperature Quantum Sensing",
-        type: "video",
-        url: "https://www.youtube.com/watch?v=Gxv3j_BoXJU",
+        type: "notes",
+        url: "https://en.wikipedia.org/wiki/Nitrogen-vacancy_center",
       },
       {
         id: "23e-atomic-clocks",
         title: "Atomic Clocks: Quantum Metrology at the Frontier",
-        type: "video",
-        url: "https://www.youtube.com/watch?v=JhXwU7FWd34",
+        type: "notes",
+        url: "https://en.wikipedia.org/wiki/Atomic_clock",
       },
       {
         id: "23f-sensing-applications",
         title: "Quantum Sensing Applications: Magnetometry, Imaging, and Beyond",
-        type: "paper",
-        url: "https://arxiv.org/abs/1611.02427",
+        type: "notes",
+        url: "https://en.wikipedia.org/wiki/Quantum_sensor",
       },
       {
         id: "23g-quantum-radar",
@@ -1289,8 +1324,8 @@ export const curriculum: Module[] = [
       {
         id: "24d-open-problems",
         title: "Open Problems in Quantum Computing and How to Contribute",
-        type: "video",
-        url: "https://www.youtube.com/watch?v=8Xo2YHWZn1s",
+        type: "notes",
+        url: "https://www.scottaaronson.com/blog/",
       },
     ],
   },

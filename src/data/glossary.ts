@@ -13,7 +13,7 @@ export const glossaryTerms: GlossaryTerm[] = [
     id: "logical-qubit",
     term: "Logical Qubit",
     definition:
-      "A qubit encoded across multiple physical qubits using a quantum error-correcting code. Logical qubits are protected from noise and enable fault-tolerant quantum computation. A distance-d code uses d physical qubits per logical qubit.",
+      "A qubit encoded across multiple physical qubits using a quantum error-correcting code. Logical qubits are protected from noise and enable fault-tolerant quantum computation. A distance-d code can correct up to ⌊(d−1)/2⌋ errors; a distance-d surface code, for example, uses on the order of d² physical qubits per logical qubit.",
     category: "Fundamentals",
   },
   {
@@ -69,7 +69,7 @@ export const glossaryTerms: GlossaryTerm[] = [
     id: "quantum-volume",
     term: "Quantum Volume",
     definition:
-      "A metric measuring quantum computer capability, combining qubit count, gate fidelity, connectivity, and coherence. Quantum volume 2\u207f means the system can run all 2\u207f random circuits of width n and depth n.",
+      "A single-number metric for quantum computer capability that accounts for qubit count, gate fidelity, connectivity, and coherence. It is defined as the largest square random circuit \u2014 equal width n and depth n \u2014 that a device can run reliably (passing the heavy-output generation test), and is reported as 2\u207f.",
     category: "Hardware",
   },
   {
@@ -183,7 +183,7 @@ export const glossaryTerms: GlossaryTerm[] = [
     id: "schrodinger-equation",
     term: "Schrödinger Equation",
     definition:
-      "The fundamental equation of quantum mechanics describing how quantum states evolve in time. The time-dependent form is iℏ ∂|ψ⟩/∂t = H|ψ⟩, where H is the Hamiltonian. Developed by Erwin Schrödinger in 1925.",
+      "The fundamental equation of quantum mechanics describing how quantum states evolve in time. The time-dependent form is iℏ ∂|ψ⟩/∂t = H|ψ⟩, where H is the Hamiltonian. Developed by Erwin Schrödinger in 1926.",
     category: "Formalism",
   },
   {
@@ -306,7 +306,7 @@ export const glossaryTerms: GlossaryTerm[] = [
     id: "shors-algorithm",
     term: "Shor's Algorithm",
     definition:
-      "A polynomial-time quantum algorithm for integer factorization, developed by Peter Shor in 1994. It threatens RSA cryptography by factoring large numbers exponentially faster than the best known classical algorithms.",
+      "A polynomial-time quantum algorithm for integer factorization, developed by Peter Shor in 1994 (FOCS; journal version SIAM 1997). It threatens RSA cryptography by factoring large numbers exponentially faster than the best known classical algorithms.",
     category: "Algorithms",
   },
   {
@@ -320,7 +320,7 @@ export const glossaryTerms: GlossaryTerm[] = [
     id: "deutsch-jozsa-algorithm",
     term: "Deutsch-Jozsa Algorithm",
     definition:
-      "One of the first quantum algorithms to demonstrate exponential advantage over classical computation. It determines whether a boolean function is constant or balanced using only one query.",
+      "One of the first quantum algorithms to demonstrate a provable separation from classical computation. It determines whether a boolean function is constant or balanced in a single query — an exponential separation over any deterministic classical algorithm in the query (oracle) model (though efficient randomized classical algorithms solve it with high probability).",
     category: "Algorithms",
   },
   {

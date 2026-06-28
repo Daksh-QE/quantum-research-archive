@@ -70,10 +70,10 @@ export const resources: Resource[] = [
   },
   {
     id: "book-preskill-notes",
-    title: "Lecture Notes on Quantum Information",
+    title: "Lecture Notes on Quantum Information (Ph 219)",
     description:
-      "John Preskill's famous lecture notes covering quantum entanglement, quantum Shannon theory, and quantum error correction.",
-    url: "https://en.wikipedia.org/wiki/John_Preskill",
+      "John Preskill's famous Caltech Ph 219 lecture notes covering quantum entanglement, quantum Shannon theory, and quantum error correction.",
+    url: "http://theory.caltech.edu/~preskill/ph229/",
     tags: ["BOOK", "NOTES", "GUIDE"],
     category: "Book",
     author: "John Preskill",
@@ -139,7 +139,7 @@ export const resources: Resource[] = [
     title: "Principles of Quantum Computation and Information",
     description:
       "A comprehensive two-volume set covering both the foundations of quantum computation and advanced topics in quantum information processing.",
-    url: "https://www.worldscientific.com/worldscibooks/10.1142/qm",
+    url: "https://www.worldscientific.com/search?q=Principles+of+Quantum+Computation+and+Information+Benenti",
     tags: ["BOOK", "GUIDE"],
     category: "Book",
     author: "Giuliano Benenti, Giulio Casati & Giuliano Strini",
@@ -179,14 +179,14 @@ export const resources: Resource[] = [
     domain: "Quantum Mechanics",
   },
   {
-    id: "book-mcintosh",
+    id: "book-mcintyre",
     title: "Quantum Mechanics: A Paradigms Approach",
     description:
       "A modern approach to teaching quantum mechanics using a paradigms-based methodology, emphasizing conceptual understanding.",
-    url: "https://www.cambridge.org/9780521897839",
+    url: "https://www.google.com/search?q=Quantum+Mechanics+A+Paradigms+Approach+David+McIntyre",
     tags: ["BOOK", "GUIDE"],
     category: "Book",
-    author: "David K. Ferry",
+    author: "David H. McIntyre",
     domain: "Quantum Mechanics",
   },
   {
@@ -262,7 +262,7 @@ export const resources: Resource[] = [
     title: "Qiskit Summer School",
     description:
       "IBM's annual quantum computing summer school. Covers quantum gates, algorithms, error mitigation, and hands-on Qiskit programming.",
-    url: "https://qiskit.org/learn/summer-school/",
+    url: "https://learning.quantum.ibm.com/",
     tags: ["COURSE", "VIDEO"],
     category: "Course",
     domain: "Quantum Computing",
@@ -289,10 +289,10 @@ export const resources: Resource[] = [
   },
   {
     id: "course-caltech-quantum-mechanics",
-    title: "Caltech Ph 125: Quantum Mechanics",
+    title: "Caltech Ph 219: Quantum Computation",
     description:
-      "Caltech's graduate-level quantum mechanics course taught by John Preskill. Covers foundations through advanced topics.",
-    url: "https://en.wikipedia.org/wiki/John_Preskill",
+      "Caltech's graduate-level quantum information and computation course taught by John Preskill. Covers quantum error correction, entanglement, and quantum Shannon theory.",
+    url: "http://theory.caltech.edu/~preskill/ph229/",
     tags: ["COURSE", "NOTES", "VIDEO"],
     category: "Course",
     author: "John Preskill",
@@ -300,13 +300,13 @@ export const resources: Resource[] = [
   },
   {
     id: "course-quantum-computing-ucsd",
-    title: "CSE 291: Quantum Computing (UCSD)",
+    title: "Scott Aaronson: Introduction to Quantum Information Science (UT Austin)",
     description:
-      "Graduate course covering quantum algorithms, complexity theory, and quantum information. Taught by Scott Aaronson at UCSD.",
-    url: "https://cseweb.ucsd.edu/classes/wi19/cse291-1/",
+      "Scott Aaronson's lecture notes for his graduate quantum information science course at UT Austin, covering qubits, quantum algorithms, and complexity.",
+    url: "https://www.scottaaronson.com/qclec.pdf",
     tags: ["COURSE", "NOTES"],
     category: "Course",
-    author: "UCSD / Scott Aaronson",
+    author: "Scott Aaronson (UT Austin)",
     domain: "Quantum Computing",
   },
   {
@@ -331,24 +331,24 @@ export const resources: Resource[] = [
   },
   {
     id: "course-coursera-quantum-computing",
-    title: "Coursera: Quantum Computing for Everyone",
+    title: "edX: Quantum Information Science I (MITx 8.370.x)",
     description:
-      "A beginner-friendly introduction to quantum computing from the University of Chicago, covering qubits, gates, and basic algorithms.",
-    url: "https://www.coursera.org/search?query=quantum+computing",
+      "MITx's introduction to quantum information science on edX, taught by Isaac Chuang, Aram Harrow, and Peter Shor — qubits, gates, and core quantum algorithms.",
+    url: "https://www.edx.org/search?q=quantum+information+science+MITx",
     tags: ["COURSE", "VIDEO"],
     category: "Course",
-    author: "University of Chicago",
+    author: "MITx (Isaac Chuang et al.)",
     domain: "Quantum Computing",
   },
   {
     id: "course-coursera-quantum-cryptography",
-    title: "Coursera: Quantum Cryptography",
+    title: "edX: Quantum Cryptography (Caltech & Delft)",
     description:
-      "An advanced course on quantum cryptography from the University of Copenhagen, covering QKD, entanglement-based protocols, and security proofs.",
-    url: "https://www.coursera.org/search?query=quantum+cryptography",
+      "An advanced edX course on quantum cryptography from Caltech and TU Delft, taught by Stephanie Wehner and Umesh Vazirani, covering QKD, entanglement-based protocols, and security proofs.",
+    url: "https://www.edx.org/search?q=quantum+cryptography",
     tags: ["COURSE", "VIDEO"],
     category: "Course",
-    author: "University of Copenhagen",
+    author: "Stephanie Wehner & Umesh Vazirani (Caltech/Delft)",
     domain: "Quantum Computing",
   },
   {
@@ -378,7 +378,7 @@ export const resources: Resource[] = [
     title: "Qiskit Global Summer School 2023: Quantum Computing",
     description:
       "IBM's 2023 global summer school covering quantum algorithms, error mitigation, and hands-on Qiskit exercises.",
-    url: "https://qiskit.org/learn/summer-school/2023/",
+    url: "https://learning.quantum.ibm.com/",
     tags: ["COURSE", "VIDEO"],
     category: "Course",
     domain: "Quantum Computing",
@@ -478,13 +478,14 @@ export const resources: Resource[] = [
     domain: "Both",
   },
   {
-    id: "video-perez-gisbert-qml",
-    title: "Quantum Machine Learning Lectures",
+    id: "video-pennylane-qml",
+    title: "PennyLane: Quantum Machine Learning Demos & Lectures",
     description:
-      "Maria Schuld's lecture series on quantum machine learning, covering variational algorithms, kernel methods, and QML theory.",
-    url: "https://www.youtube.com/@qiskit",
+      "Xanadu's PennyLane quantum machine learning channel and demos, covering variational algorithms, kernel methods, and QML theory (work by Maria Schuld and colleagues).",
+    url: "https://www.youtube.com/@PennyLaneAI",
     tags: ["VIDEO", "COURSE"],
     category: "Video Playlist",
+    author: "PennyLane / Xanadu (Maria Schuld et al.)",
     domain: "Quantum Computing",
   },
   {
@@ -499,10 +500,10 @@ export const resources: Resource[] = [
   },
   {
     id: "video-google-qc-symposium",
-    title: "Google Quantum AI Symposium",
+    title: "Google Quantum AI YouTube Channel",
     description:
-      "Recordings from Google's annual Quantum AI symposium featuring research talks on quantum supremacy, error correction, and quantum hardware.",
-    url: "https://www.youtube.com/playlist?list=PLFZ2DvU9e1DEZ-J-Qqbs5b8iL8zlNrlzR",
+      "Research talks and explainers from Google Quantum AI on quantum supremacy, error correction, and quantum hardware.",
+    url: "https://www.youtube.com/@GoogleQuantumAI",
     tags: ["VIDEO", "PAPER"],
     category: "Video Playlist",
     domain: "Quantum Computing",
@@ -553,21 +554,21 @@ export const resources: Resource[] = [
   },
   {
     id: "video-domain-of-science-quantum",
-    title: "Quantum Computing Explained by Domain of Science",
+    title: "Domain of Science: Quantum Computing Explainers",
     description:
-      "The famous quantum computing explainer video and follow-ups from Domain of Science, covering QC fundamentals visually.",
-    url: "https://www.youtube.com/watch?v=JhHMJCUmq28",
+      "Quantum computing and quantum mechanics explainer videos from Domain of Science, covering QC fundamentals with clear visual maps.",
+    url: "https://www.youtube.com/@domainofscience",
     tags: ["VIDEO", "TUT", "GUIDE"],
     category: "Video Playlist",
-    author: "Domain of Science (Kurt Hugo Schneider)",
+    author: "Domain of Science (Dominic Walliman)",
     domain: "Both",
   },
   {
     id: "video-ryan-odonnell-qm",
-    title: "Quantum Mechanics for Computer Scientists",
+    title: "Ryan O'Donnell: Quantum Computation and Information (CMU)",
     description:
-      "A rigorous introduction to quantum mechanics designed for computer scientists, taught by Ryan O'Donnell at CMU.",
-    url: "https://www.youtube.com/@3blue1brown",
+      "Ryan O'Donnell's CMU lecture course on quantum computation and information, aimed at computer scientists. Full video lectures and notes via his CMU page.",
+    url: "https://www.cs.cmu.edu/~odonnell/",
     tags: ["VIDEO", "COURSE"],
     category: "Video Playlist",
     author: "Ryan O'Donnell",
@@ -597,10 +598,10 @@ export const resources: Resource[] = [
   },
   {
     id: "video-eugene-k-quantum",
-    title: "Physics Videos by Eugene K",
+    title: "Physics Videos by Eugene Khutoryansky",
     description:
       "Clear and detailed video explanations of quantum mechanics concepts, from basic principles to advanced topics.",
-    url: "https://www.youtube.com/@EugeneK",
+    url: "https://www.youtube.com/@EugeneKhutoryansky",
     tags: ["VIDEO", "TUT"],
     category: "Video Playlist",
     author: "Eugene Khutoryansky",
@@ -641,10 +642,10 @@ export const resources: Resource[] = [
   },
   {
     id: "video-cirq-tutorials",
-    title: "Google Cirq: Quantum Programming Tutorials",
+    title: "Google Cirq: Documentation & Tutorials",
     description:
       "Official Google Cirq tutorials covering quantum circuit design, noise simulation, and running circuits on quantum processors.",
-    url: "https://www.youtube.com/playlist?list=PLFZ2DvU9e1DEZ-J-Qqbs5b8iL8zlNrlzR",
+    url: "https://quantumai.google/cirq/tutorials",
     tags: ["VIDEO", "TUT"],
     category: "Video Playlist",
     author: "Google Quantum AI",
@@ -667,7 +668,7 @@ export const resources: Resource[] = [
     title: "IBM Quantum Experience",
     description:
       "Cloud-based quantum computing platform. Access real IBM quantum processors, run circuits, and use the Qiskit SDK.",
-    url: "https://quantum-computing.ibm.com/",
+    url: "https://quantum.ibm.com/",
     tags: ["PLATFORM", "GUIDE"],
     category: "Platform",
     domain: "Quantum Computing",
@@ -704,10 +705,10 @@ export const resources: Resource[] = [
   },
   {
     id: "platform-pennylane",
-    title: "PennyLane",
+    title: "PennyLane (Cloud & Learning Platform)",
     description:
-      "Cross-platform quantum machine learning library with automatic differentiation, integration with PyTorch, TensorFlow, and JAX.",
-    url: "https://pennylane.ai/",
+      "Xanadu's PennyLane web platform: hosted QML demos, the Codebook interactive course, datasets, and cloud access to quantum devices. (For the SDK itself, see the Tools section.)",
+    url: "https://pennylane.ai/qml/",
     tags: ["PLATFORM", "GUIDE", "TUT"],
     category: "Platform",
     domain: "Quantum Computing",

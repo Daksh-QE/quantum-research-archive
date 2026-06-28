@@ -68,9 +68,9 @@ export const communityMembers: CommunityMember[] = [
     initials: "AK",
     role: "RES",
     description:
-      "Pioneered topological quantum computing and the stabilizer formalism. Developed the quantum phase estimation algorithm and the Kitaev model.",
+      "Pioneered topological quantum computing, anyons, and the toric code. Developed the quantum phase estimation algorithm and the Kitaev model.",
     url: "https://en.wikipedia.org/wiki/Alexei_Kitaev",
-    tags: ["TOPOLOGICAL", "STABILIZER", "ALGORITHMS"],
+    tags: ["TOPOLOGICAL", "ANYONS", "ALGORITHMS"],
   },
   {
     id: "richard-feynman",
@@ -123,7 +123,7 @@ export const communityMembers: CommunityMember[] = [
     tags: ["EXPERIMENT", "ENTANGLEMENT", "TELEPORTATION", "NOBEL"],
   },
   {
-    id: "alon-kitaev",
+    id: "alain-aspect",
     name: "Alain Aspect",
     initials: "AA",
     role: "RES",

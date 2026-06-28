@@ -33,7 +33,7 @@ export default function Header() {
 
         {/* Right: GitHub */}
         <Link
-          href="https://github.com/quantum-research-archive"
+          href="https://github.com/Daksh-QE/quantum-research-archive"
           target="_blank"
           rel="noopener noreferrer"
           className="flex items-center gap-2 text-sm text-slate-600 bg-slate-100 hover:bg-slate-200 transition-colors px-3 py-1.5 rounded-md border border-slate-200"

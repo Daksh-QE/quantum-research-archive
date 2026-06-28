@@ -189,7 +189,7 @@ function buildTiles(): Tile[] {
     ["Quantum Supremacy Using a Programmable Superconducting Processor", "Arute et al.", "https://www.nature.com/articles/s41586-019-1666-5"],
     ["Simulating Physics with Computers", "Richard Feynman", "https://link.springer.com/article/10.1007/BF02650179"],
     ["Introduction to Quantum Error Correction", "Daniel Gottesman", "https://arxiv.org/abs/0904.2557"],
-    ["Quantum Machine Learning: A Review", "Various", "https://arxiv.org/abs/1910.06323"],
+    ["Quantum Machine Learning: A Review", "Biamonte et al.", "https://arxiv.org/abs/1611.09347"],
     ["The Physical Implementation of Quantum Computation", "DiVincenzo", "https://arxiv.org/abs/quant-ph/0002077"],
   ];
   for (const [t, a, u] of ARTICLES)
@@ -197,16 +197,16 @@ function buildTiles(): Tile[] {
 
   /* ── Challenges ── */
   const CHALLENGES: [string, string, string, string][] = [
-    ["Visualize a Qubit on the Bloch Sphere", "beginner", "#22c55e", "https://qiskit.org/ecosystem/ibm-quantum-experience/"],
-    ["Create a Bell State Circuit", "beginner", "#22c55e", "https://learn.qiskit.org/course/ch-gates/bell-states"],
-    ["Implement Deutsch-Jozsa Algorithm", "beginner", "#22c55e", "https://learn.qiskit.org/course/ch-algorithms/deutsch-jozsa-algorithm"],
-    ["Grover's Search Algorithm", "intermediate", "#f59e0b", "https://learn.qiskit.org/course/ch-algorithms/grovers-algorithm"],
-    ["Quantum Fourier Transform", "intermediate", "#f59e0b", "https://learn.qiskit.org/course/ch-algorithms/quantum-fourier-transform"],
-    ["Quantum Teleportation Protocol", "intermediate", "#f59e0b", "https://learn.qiskit.org/course/ch-algorithms/quantum-teleportation"],
-    ["VQE for Hydrogen Molecule", "intermediate", "#f59e0b", "https://learn.qiskit.org/course/ch-applications/variational-quantum-eigensolver"],
-    ["BB84 Quantum Key Distribution", "intermediate", "#f59e0b", "https://qiskit.org/textbook/ch-algorithms/quantum-key-distribution.html"],
+    ["Visualize a Qubit on the Bloch Sphere", "beginner", "#22c55e", "https://quantum.ibm.com/composer"],
+    ["Create a Bell State Circuit", "beginner", "#22c55e", "https://learning.quantum.ibm.com/"],
+    ["Implement Deutsch-Jozsa Algorithm", "beginner", "#22c55e", "https://learning.quantum.ibm.com/"],
+    ["Grover's Search Algorithm", "intermediate", "#f59e0b", "https://docs.quantum.ibm.com/guides/grovers-algorithm"],
+    ["Quantum Fourier Transform", "intermediate", "#f59e0b", "https://learning.quantum.ibm.com/"],
+    ["Quantum Teleportation Protocol", "intermediate", "#f59e0b", "https://learning.quantum.ibm.com/"],
+    ["VQE for Hydrogen Molecule", "intermediate", "#f59e0b", "https://learning.quantum.ibm.com/"],
+    ["BB84 Quantum Key Distribution", "intermediate", "#f59e0b", "https://learning.quantum.ibm.com/"],
     ["Repetition Code Error Correction", "intermediate", "#f59e0b", "https://arxiv.org/abs/0904.2557"],
-    ["Shor's Algorithm — Factor 15", "advanced", "#ef4444", "https://learn.qiskit.org/course/ch-algorithms/shors-algorithm"],
+    ["Shor's Algorithm — Factor 15", "advanced", "#ef4444", "https://learning.quantum.ibm.com/"],
     ["Surface Code Distance-3", "advanced", "#ef4444", "https://github.com/quantumlib/Stim"],
     ["HHL Algorithm for Linear Systems", "advanced", "#ef4444", "https://arxiv.org/abs/0811.3171"],
   ];
@@ -248,7 +248,7 @@ export default function LandingPage() {
   const [stars, setStars] = useState(0);
 
   useEffect(() => {
-    fetch("https://api.github.com/repos/Daksh-QE/quantum-research-archive")
+    fetch("https://api.github.com/repos/Daksh-QE/quantum-research-archive", { cache: "no-store" })
       .then((r) => r.json()).then((d) => setStars(d.stargazers_count || 0)).catch(() => {});
   }, []);
 
@@ -351,15 +351,43 @@ export default function LandingPage() {
         .lc-play svg { filter:drop-shadow(0 1px 3px rgba(0,0,0,0.3)); opacity:0.8 }
         .lc-book { border:none; background:#f0f0f0; border-radius:5px }
         .hero-card { background:rgba(242,242,242,0.95); backdrop-filter:blur(6px); border:1px solid rgba(0,0,0,0.06); box-shadow:0 2px 20px rgba(0,0,0,0.06); border-radius:16px }
+        @keyframes scroll { 0% { transform:translateX(0) } 100% { transform:translateX(-50%) } }
       `}</style>
       <div className="landing-vp" ref={vpRef}><div className="landing-grid-canvas" ref={canvasRef} /></div>
       <div className="fixed inset-0 z-10 flex flex-col items-center justify-center pointer-events-none">
+        {/* ── Quantum news ticker (marquee) ── */}
+        <div className="absolute top-4 left-0 right-0 z-20 overflow-hidden pointer-events-none">
+          <div className="pointer-events-auto bg-white/90 backdrop-blur-sm rounded-full py-2 border border-slate-200 shadow-sm mx-4 overflow-hidden">
+            <div className="flex whitespace-nowrap animate-[scroll_30s_linear_infinite]">
+              <span className="flex items-center gap-4 px-5 text-xs">
+                <span className="font-semibold text-indigo-600 shrink-0">📰 Quantum News</span>
+                <span className="text-slate-500">Google's Willow chip: error correction below threshold</span>
+                <span className="text-slate-300">•</span>
+                <span className="text-slate-500">Microsoft topological qubit milestone</span>
+                <span className="text-slate-300">•</span>
+                <span className="text-slate-500">IBM 1121-qubit Condor processor</span>
+                <span className="text-slate-300">•</span>
+                <span className="text-slate-500">Xanadu photonic quantum computing breakthrough</span>
+                <span className="text-slate-300">•</span>
+                <span className="text-slate-500">IonQ achieves 99.9% gate fidelity</span>
+                <span className="text-slate-300">•</span>
+                <span className="text-slate-500">Google's Willow chip: error correction below threshold</span>
+                <span className="text-slate-300">•</span>
+                <span className="text-slate-500">Microsoft topological qubit milestone</span>
+                <span className="text-slate-300">•</span>
+                <span className="text-slate-500">IBM 1121-qubit Condor processor</span>
+                <span className="text-slate-300">•</span>
+                <span className="text-slate-500">Xanadu photonic quantum computing breakthrough</span>
+              </span>
+            </div>
+          </div>
+        </div>
         <div className="hero-card px-8 py-8 sm:px-10 sm:py-9 max-w-sm mx-4 text-center pointer-events-auto">
           <h1 className="text-[20px] sm:text-[23px] font-bold text-[#1D1D1D] leading-tight tracking-tight">quantum research archive</h1>
-          <p className="mt-1.5 text-sm text-[#6E6E6E]">the biggest quantum research archive on the internet</p>
+          <p className="mt-1.5 text-sm text-[#6E6E6E]">Everything you need to go from zero to quantum — curated, free, and jargon-explained.</p>
         </div>
         <div className="pointer-events-auto mt-4 flex flex-wrap items-center justify-center gap-2">
-          <Link href="/overview" className="inline-flex items-center gap-1 px-3.5 py-1.5 rounded-full bg-[#1D1D1D] text-white text-[11px] font-semibold hover:bg-[#2a2a2a] transition-colors shadow-sm">
+          <Link href="/start" className="inline-flex items-center gap-1 px-3.5 py-1.5 rounded-full bg-[#1D1D1D] text-white text-[11px] font-semibold hover:bg-[#2a2a2a] transition-colors shadow-sm">
             Get Started <ArrowRight className="w-2.5 h-2.5" />
           </Link>
           <Link href="/resources" className="inline-flex items-center gap-1 px-3.5 py-1.5 rounded-full bg-white text-[#4A4A4A] text-[11px] font-medium hover:bg-[#f3f3f3] transition-colors border border-[#E1E1E1] shadow-sm">

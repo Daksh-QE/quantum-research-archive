@@ -91,7 +91,7 @@ async function fetchRemoteOK(): Promise<JobItem[]> {
         location: extractLocation(item),
         description: desc,
         url: item.url || item.apply_url || "",
-        tags: ["LIVE", "QUANTUM", "REMOTEOK"],
+        tags: ["QUANTUM", "REMOTEOK"],
         postedAt: item.date,
         source: "remoteok",
       });
@@ -128,7 +128,7 @@ async function fetchGitHubJobs(): Promise<JobItem[]> {
           location: "Remote / Open Source",
           description: body.slice(0, 200),
           url: item.html_url || "",
-          tags: ["LIVE", "QUANTUM", "GITHUB"],
+          tags: ["QUANTUM", "GITHUB"],
           postedAt: item.created_at,
           source: "github",
         });

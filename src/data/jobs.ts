@@ -25,7 +25,7 @@ export const jobs: Job[] = [
     company: "IBM Quantum",
     location: "Toronto, Canada / Remote",
     description: "Build and maintain the Qiskit SDK. Implement new transpiler passes, improve circuit optimization, and develop quantum runtime primitives.",
-    url: "https://qiskit.org/careers",
+    url: "https://www.ibm.com/careers/search?q=quantum",
     tags: ["ENGINEERING", "QISKIT", "PYTHON", "OPEN SOURCE"],
   },
   {
@@ -94,10 +94,10 @@ export const jobs: Job[] = [
   {
     id: "job-qml-startup",
     title: "Quantum ML Engineer",
-    company: "Zapata Computing",
-    location: "Boston, MA / Remote",
-    description: "Build quantum machine learning pipelines using Zapata's Orquestra platform. Develop hybrid quantum-classical models for industrial use cases.",
-    url: "https://www.ibm.com/quantum",
+    company: "IonQ",
+    location: "College Park, MD / Remote",
+    description: "Build quantum machine learning pipelines on IonQ's trapped-ion systems. Develop hybrid quantum-classical models for industrial use cases.",
+    url: "https://ionq.com/careers",
     tags: ["QML", "ENGINEERING", "HYBRID", "INDUSTRY"],
   },
   {
