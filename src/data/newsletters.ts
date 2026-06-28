@@ -2,11 +2,11 @@ import { Newsletter } from "./types";
 
 export const newsletters: Newsletter[] = [
   {
-    id: "quantum-weekly",
-    name: "Quantum Weekly",
+    id: "quantum-zeitgeist",
+    name: "Quantum Zeitgeist",
     description:
-      "A curated roundup of the most important quantum computing news, research papers, and community updates delivered every Monday.",
-    url: "https://quantumweekly.com/",
+      "A widely-read roundup of quantum computing breakthroughs, deals, and research — read by quantum researchers, engineers, and investors worldwide.",
+    url: "https://quantumzeitgeist.com/",
     frequency: "Weekly",
     tags: ["NEWS", "CURATED", "PAPERS"],
   },
@@ -14,8 +14,8 @@ export const newsletters: Newsletter[] = [
     id: "qiskit-newsletter",
     name: "IBM Qiskit Newsletter",
     description:
-      "Official newsletter from the IBM Quantum team featuring new Qiskit releases, tutorials, research breakthroughs, and community events.",
-    url: "https://qiskit.org/newsletter/",
+      "Official blog from the IBM Quantum team featuring new Qiskit releases, tutorials, research breakthroughs, and community events.",
+    url: "https://www.ibm.com/quantum/blog",
     frequency: "Monthly",
     tags: ["QISKIT", "IBM", "TUTORIALS", "EVENTS"],
   },
@@ -56,11 +56,11 @@ export const newsletters: Newsletter[] = [
     tags: ["BUSINESS", "COMMERCIALIZATION", "INDUSTRY"],
   },
   {
-    id: "quantum-bytes",
-    name: "Quantum Bytes",
+    id: "quantum-world-detangled",
+    name: "Quantum World Detangled (GQI)",
     description:
-      "A concise weekly digest of quantum computing news and research, designed for busy professionals and researchers.",
-    url: "https://quantumbytes.substack.com/",
+      "A widely-read Substack from GQI offering thought leadership and a concise digest of quantum computing news and research.",
+    url: "https://quantumcomputing.substack.com/",
     frequency: "Weekly",
     tags: ["NEWS", "DIGEST", "RESEARCH"],
   },
@@ -75,19 +75,19 @@ export const newsletters: Newsletter[] = [
   },
   {
     id: "quantum-engineering-news",
-    name: "Quantum Engineering Newsletter (IEEE)",
+    name: "IEEE Quantum Week Alerts",
     description:
-      "IEEE's newsletter covering advances in quantum engineering, including hardware, error correction, and quantum system design.",
-    url: "https://ieeexplore.ieee.org/community/newsletters/quantum",
+      "IEEE Computer Society alerts covering the IEEE Quantum Week (QCE) conference and advances in quantum engineering, hardware, and system design.",
+    url: "https://www.computer.org/resources/newsletters/quantum-week-alerts",
     frequency: "Monthly",
     tags: ["ENGINEERING", "HARDWARE", "IEEE", "TECHNICAL"],
   },
   {
     id: "aps-quantum",
-    name: "APS Quantum Physics Newsletter",
+    name: "APS Division of Quantum Information (DQI)",
     description:
-      "American Physical Society newsletter highlighting the latest quantum physics research, meetings, and funding opportunities.",
-    url: "https://www.aps.org/units/dqp/newsletters/",
+      "American Physical Society's Division of Quantum Information newsletter, highlighting the latest quantum research, meetings, and funding opportunities.",
+    url: "https://www.aps.org/units/dqi/newsletters/index.cfm",
     frequency: "Quarterly",
     tags: ["PHYSICS", "RESEARCH", "APS", "ACADEMIC"],
   },

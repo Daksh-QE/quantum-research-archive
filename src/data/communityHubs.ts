@@ -2,12 +2,12 @@ import { CommunityHub } from "./types";
 
 export const communityHubs: CommunityHub[] = [
   {
-    id: "hub-qiskit-discord",
-    name: "Qiskit Discord",
-    platform: "discord",
-    description: "Official IBM Qiskit Discord server. Ask questions, share projects, and connect with the global quantum computing community.",
-    url: "https://discord.gg/qiskit",
-    tags: ["DISCORD", "QISKIT", "COMMUNITY", "HELP"],
+    id: "hub-qiskit-slack",
+    name: "Qiskit Slack",
+    platform: "slack",
+    description: "Official IBM Qiskit Slack workspace — the main Qiskit community. Topical channels for help, ecosystem, transpiler, and runtime.",
+    url: "https://qisk.it/join-slack",
+    tags: ["SLACK", "QISKIT", "COMMUNITY", "HELP"],
   },
   {
     id: "hub-quantum-computing-stackexchange",

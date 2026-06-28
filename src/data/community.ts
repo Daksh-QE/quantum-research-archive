@@ -59,7 +59,7 @@ export const communityMembers: CommunityMember[] = [
     role: "RES",
     description:
       "Co-inventor of measurement-based quantum computation (one-way quantum computer). Pioneered the cluster-state model of quantum computing.",
-    url: "https://en.wikipedia.org/wiki/One-way_quantum_computer",
+    url: "https://de.wikipedia.org/wiki/Robert_Rau%C3%9Fendorf",
     tags: ["MEASUREMENT-BASED", "CLUSTER STATES", "PIONEER"],
   },
   {
@@ -225,13 +225,13 @@ export const communityMembers: CommunityMember[] = [
     tags: ["EDUCATION", "INTERACTIVE", "QUANTUM COUNTRY"],
   },
   {
-    id: "shannon-sessions",
-    name: "Shannon Sessions",
-    initials: "SS",
+    id: "kiera-peltz",
+    name: "Kiera Peltz",
+    initials: "KP",
     role: "EDU",
     description:
-      "Founder of Qubit by Qubit, a comprehensive quantum computing education program for high school and undergraduate students.",
-    url: "https://www.thecodingschool.com/qubitbyqubit",
+      "Founder of The Coding School and Qubit by Qubit, a comprehensive quantum computing education program for high school and undergraduate students.",
+    url: "https://www.qubitbyqubit.org/about",
     tags: ["EDUCATION", "YOUTH", "CURRICULUM"],
   },
   {
@@ -240,8 +240,8 @@ export const communityMembers: CommunityMember[] = [
     initials: "AA",
     role: "EDU",
     description:
-      "IBM Quantum's global lead for quantum education. Drives the Qiskit textbook, summer schools, and quantum educational initiatives worldwide.",
-    url: "https://en.wikipedia.org/wiki/Abraham_Asfaw",
+      "Quantum computing experimentalist and educator. Former IBM Quantum global lead for quantum education, driving the Qiskit textbook and summer schools.",
+    url: "https://abrahamasfaw.com/",
     tags: ["EDUCATION", "QISKIT", "SUMMER SCHOOL"],
   },
 

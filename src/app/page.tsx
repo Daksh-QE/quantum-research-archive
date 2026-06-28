@@ -215,7 +215,7 @@ function buildTiles(): Tile[] {
 
   /* ── Community hubs (Discord / Reddit / X) ── */
   const HUBS: [string, string, string, string][] = [
-    ["Qiskit Discord", "#5865F2", "discord", "https://discord.gg/qiskit"],
+    ["Qiskit Slack", "#4A154B", "slack", "https://qisk.it/join-slack"],
     ["Quantum Computing SE", "#6366f1", "forum", "https://quantumcomputing.stackexchange.com/"],
     ["r/QuantumComputing", "#FF4500", "reddit", "https://www.reddit.com/r/QuantumComputing/"],
     ["r/QuantumPhysics", "#FF4500", "reddit", "https://www.reddit.com/r/QuantumPhysics/"],
@@ -223,7 +223,7 @@ function buildTiles(): Tile[] {
     ["John Preskill (X)", "#000", "x", "https://x.com/preskill"],
     ["Unitary Fund Discord", "#5865F2", "discord", "https://discord.gg/unitaryfund"],
     ["QOSF Slack", "#4A154B", "slack", "https://qosf.org/"],
-    ["PennyLane Discord", "#5865F2", "discord", "https://discord.gg/xanadu"],
+    ["PennyLane Forum", "#6366f1", "forum", "https://discuss.pennylane.ai/"],
   ];
   for (const [name, bg, plat, url] of HUBS)
     add(`<div class="lc" style="display:flex;align-items:center;gap:8px;padding:0 10px;background:${bg}10;height:100%;box-sizing:border-box"><div style="width:22px;height:22px;border-radius:4px;display:flex;align-items:center;justify-content:center;background:${bg};flex-shrink:0"><svg width="13" height="13" viewBox="0 0 256 199" fill="white"><path d="M216.856 16.597A208.502 208.502 0 0 0 164.042 0c-2.275 4.113-4.933 9.645-6.766 14.046-19.692-2.961-39.203-2.961-58.533 0-1.832-4.4-4.55-9.933-6.846-14.046a207.809 207.809 0 0 0-52.855 16.638C5.618 67.147-3.443 116.4 1.087 164.956c22.169 16.555 43.653 26.612 64.775 33.193A161.094 161.094 0 0 0 79.735 175.3a136.413 136.413 0 0 1-21.846-10.632c5.642-3.76 5.356-4.237 5.356-4.237 42.122 19.702 87.89 19.702 129.51 0a131.66 131.66 0 0 0 5.355 4.237 136.07 136.07 0 0 1-21.886 10.653c4.006 8.02 8.638 15.67 13.873 22.848 21.142-6.58 42.646-16.637 64.815-33.213 5.316-56.288-9.08-105.09-38.056-148.36Z"/></svg></div><span class="lc-name" style="font-size:11px">${name}</span></div>`, url, H.HUB);
