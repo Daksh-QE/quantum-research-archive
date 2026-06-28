@@ -158,13 +158,33 @@ export default function QuantumSandbox() {
   const [histogram, setHistogram] = useState<Record<string, number>>({});
   const blochRef = useRef<HTMLCanvasElement>(null);
   const wireRef = useRef<HTMLCanvasElement>(null);
+  const skipResetRef = useRef(false);
 
-  // Reset on qubit change
+  // Reset on qubit change (skipped once when a preset sets the state directly)
   useEffect(() => {
+    if (skipResetRef.current) { skipResetRef.current = false; return; }
     setStatevector(initialVector(numQubits));
     setCircuit([]);
     setActiveQubit(0);
     setLastAction("");
+    setShots(0);
+    setHistogram({});
+  }, [numQubits]);
+
+  // Load a preset circuit deterministically (no addGate/setTimeout races)
+  const loadPreset = useCallback((n: number, gates: Gate[], note: string) => {
+    let sv = initialVector(n);
+    for (const g of gates) {
+      const m = gateMatrix(g.type);
+      if (m) sv = applySingleQubitGate(sv, g.qubit, m);
+      else if (g.type === "CNOT" && g.target !== undefined) sv = applyCNOT(sv, g.qubit, g.target);
+      else if (g.type === "SWAP" && g.target !== undefined) sv = applySWAP(sv, g.qubit, g.target);
+    }
+    if (n !== numQubits) { skipResetRef.current = true; setNumQubits(n); }
+    setCircuit(gates);
+    setStatevector(sv);
+    setActiveQubit(0);
+    setLastAction(note);
     setShots(0);
     setHistogram({});
   }, [numQubits]);
@@ -445,15 +465,15 @@ export default function QuantumSandbox() {
       <div className="bg-white rounded-xl border border-indigo-100 p-3">
         <p className="text-xs font-semibold text-indigo-700 mb-2">🎯 Try a classic experiment</p>
         <div className="flex flex-wrap gap-2">
-          <button onClick={() => { setNumQubits(1); setTimeout(() => addGate("H"), 60); }}
+          <button onClick={() => loadPreset(1, [{ type: "H", qubit: 0 }], "Loaded a superposition: one Hadamard on qubit 0 gives a 50/50 state. Run shots to see it.")}
             className="px-3 py-1.5 rounded-lg bg-indigo-100 text-indigo-700 text-xs font-medium hover:bg-indigo-200 transition-colors">
             🌀 Superposition (one H gate)
           </button>
-          <button onClick={() => { setNumQubits(2); setTimeout(() => { addGate("H"); setTimeout(() => addGate("CNOT"), 60); }, 120); }}
+          <button onClick={() => loadPreset(2, [{ type: "H", qubit: 0 }, { type: "CNOT", qubit: 0, target: 1 }], "Loaded a Bell state (|00⟩+|11⟩)/√2 — the two qubits are now entangled. Measuring one instantly determines the other.")}
             className="px-3 py-1.5 rounded-lg bg-indigo-100 text-indigo-700 text-xs font-medium hover:bg-indigo-200 transition-colors">
             🔗 Bell state (entanglement)
           </button>
-          <button onClick={() => { setNumQubits(3); setTimeout(() => { addGate("H"); setTimeout(() => { addGate("CNOT"); setTimeout(() => { setActiveQubit(1); setTimeout(() => addGate("CNOT"), 40); }, 60); }, 60); }, 120); }}
+          <button onClick={() => loadPreset(3, [{ type: "H", qubit: 0 }, { type: "CNOT", qubit: 0, target: 1 }, { type: "CNOT", qubit: 1, target: 2 }], "Loaded a GHZ state (|000⟩+|111⟩)/√2 — three-way entanglement.")}
             className="px-3 py-1.5 rounded-lg bg-indigo-100 text-indigo-700 text-xs font-medium hover:bg-indigo-200 transition-colors">
             🌐 GHZ state (3-qubit entanglement)
           </button>
