@@ -19,6 +19,7 @@ Quantum Computing + Mechanics Research Archive. Research Copilot at `src/app/(ar
 6. **Useful Summary** — Replaced generic AI Explanation with proper 3-part breakdown: "What this paper achieves", "The key technique", "Why it matters" — content dynamically generated from paper title, authors, year, abstract, and categories
 
 ## Recent Agent Updates
+- 2026-06-29T22:37:17.355Z — Updated src/app/layout.tsx. Review this entry and expand the relevant sections when the change affects architecture, commands, conventions, tests, or user-facing behavior.
 - 2026-06-28T01:24:18.885Z — Updated src/app/(archive)/quantum-sandbox/page.tsx. Review this entry and expand the relevant sections when the change affects architecture, commands, conventions, tests, or user-facing behavior.
 - 2026-06-28T01:24:07.833Z — Updated src/app/(archive)/quantum-sandbox/page.tsx. Review this entry and expand the relevant sections when the change affects architecture, commands, conventions, tests, or user-facing behavior.
 - 2026-06-28T01:24:04.538Z — Updated src/app/(archive)/quantum-sandbox/page.tsx. Review this entry and expand the relevant sections when the change affects architecture, commands, conventions, tests, or user-facing behavior.
