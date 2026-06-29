@@ -1,733 +1,666 @@
 "use client";
 
-import React, { useState, useRef, useEffect, useCallback } from "react";
-import { ChevronDown, ChevronRight, Info, RotateCcw, Play, BarChart3 } from "lucide-react";
+import React, { useState, useRef, useEffect, useCallback, useMemo } from "react";
+import { ChevronDown, ChevronRight, Info, Plus, Minus, Trash2, Copy, RotateCcw } from "lucide-react";
 
-/* ── Types ── */
-type Gate = { type: "H" | "X" | "Y" | "Z" | "S" | "T" | "CNOT" | "SWAP" | "Measure" | "Rx" | "Ry" | "Rz"; qubit: number; target?: number; angle?: number };
-
-/* ── Complex number helpers ──
-   Amplitudes are genuine complex numbers so phase gates (S, T, Y, Rz) and
-   interference are physically correct, not approximated. */
+/* ════════════════════════════════════════════════════════════════════
+   Complex-number quantum circuit simulator (Qiskit little-endian).
+   Qubit 0 is the least-significant bit; basis labels are written
+   q[n-1] … q[0] left→right, matching IBM Quantum Composer.
+   ════════════════════════════════════════════════════════════════════ */
 type C = { re: number; im: number };
-const c = (re: number, im = 0): C => ({ re, im });
+const cx = (re: number, im = 0): C => ({ re, im });
 const cadd = (a: C, b: C): C => ({ re: a.re + b.re, im: a.im + b.im });
 const cmul = (a: C, b: C): C => ({ re: a.re * b.re - a.im * b.im, im: a.re * b.im + a.im * b.re });
-const cconj = (a: C): C => ({ re: a.re, im: -a.im });
 const cabs2 = (a: C): number => a.re * a.re + a.im * a.im;
 const cabs = (a: C): number => Math.sqrt(cabs2(a));
 const cphase = (a: C): number => Math.atan2(a.im, a.re);
+const cexp = (theta: number): C => ({ re: Math.cos(theta), im: Math.sin(theta) }); // e^{iθ}
 
-/* ── Single-qubit gate matrices (correct, complex) ── */
-const S2 = 1 / Math.SQRT2;
-const H: C[][] = [[c(S2), c(S2)], [c(S2), c(-S2)]];
-const X: C[][] = [[c(0), c(1)], [c(1), c(0)]];
-const Y: C[][] = [[c(0), c(0, -1)], [c(0, 1), c(0)]];
-const Z: C[][] = [[c(1), c(0)], [c(0), c(-1)]];
-const S: C[][] = [[c(1), c(0)], [c(0), c(0, 1)]];                                  // diag(1, i)
-const T: C[][] = [[c(1), c(0)], [c(0), c(Math.cos(Math.PI / 4), Math.sin(Math.PI / 4))]]; // diag(1, e^{iπ/4})
-
-/* ── Statevector utilities (2^n complex amplitudes) ── */
-function initialVector(n: number): C[] {
-  const v: C[] = new Array(1 << n).fill(0).map(() => c(0));
-  v[0] = c(1);
-  return v;
-}
-
-function applySingleQubitGate(state: C[], target: number, matrix: C[][]): C[] {
-  const result = state.map((z) => c(z.re, z.im));
-  for (let i = 0; i < state.length; i++) {
-    const bit = (i >> target) & 1;
-    const pair = i ^ (1 << target);
-    if (bit === 0) {
-      // |...0...> row
-      result[i] = cadd(cmul(matrix[0][0], state[i]), cmul(matrix[0][1], state[pair]));
-    } else {
-      // |...1...> row
-      result[i] = cadd(cmul(matrix[1][0], state[pair]), cmul(matrix[1][1], state[i]));
-    }
-  }
-  return result;
-}
-
-function applyCNOT(state: C[], control: number, target: number): C[] {
-  const result = state.map((z) => c(z.re, z.im));
-  for (let i = 0; i < state.length; i++) {
-    const cBit = (i >> control) & 1;
-    if (cBit === 1) {
-      const flipped = i ^ (1 << target);
-      result[i] = state[flipped];
-    }
-  }
-  return result;
-}
-
-function applySWAP(state: C[], q0: number, q1: number): C[] {
-  let result = state.map((z) => c(z.re, z.im));
-  result = applyCNOT(result, q0, q1);
-  result = applyCNOT(result, q1, q0);
-  result = applyCNOT(result, q0, q1);
-  return result;
-}
-
-function measureState(state: C[]): { outcome: number; prob: number } {
-  const probs = state.map(cabs2);
-  const total = probs.reduce((s, p) => s + p, 0) || 1;
-  const r = Math.random() * total;
-  let cum = 0;
-  for (let i = 0; i < state.length; i++) {
-    cum += probs[i];
-    if (r < cum) return { outcome: i, prob: probs[i] / total };
-  }
-  return { outcome: state.length - 1, prob: 0 };
-}
-
-/* Reduced density matrix of qubit 0 → Bloch vector (x, y, z) and P(|0⟩). */
-function blochVector(state: C[]): { x: number; y: number; z: number; prob0: number } {
-  let rho00 = 0, rho11 = 0;
-  let rho01 = c(0);
-  for (let i = 0; i < state.length; i += 2) {
-    rho00 += cabs2(state[i]);
-    rho11 += cabs2(state[i + 1]);
-    rho01 = cadd(rho01, cmul(state[i], cconj(state[i + 1])));
-  }
-  // ρ = (I + r·σ)/2  ⇒  ρ01 = (x − i y)/2
-  const x = 2 * rho01.re;
-  const y = -2 * rho01.im;
-  const z = rho00 - rho11;
-  return { x, y, z, prob0: rho00 };
-}
-
-function formatBinary(n: number, bits: number): string {
-  return "|" + n.toString(2).padStart(bits, "0") + "⟩";
-}
-
-const GATE_COLORS: Record<string, string> = {
-  H: "#6366f1", X: "#ef4444", Y: "#22c55e", Z: "#f59e0b",
-  S: "#06b6d4", T: "#8b5cf6", CNOT: "#ec4899", SWAP: "#f97316", Measure: "#6b7280",
-  Rx: "#8b5cf6", Ry: "#8b5cf6", Rz: "#8b5cf6",
-};
-
-function rotationMatrix(axis: "Rx" | "Ry" | "Rz", theta: number): C[][] {
-  const cos = Math.cos(theta / 2);
-  const sin = Math.sin(theta / 2);
-  if (axis === "Rx") return [[c(cos), c(0, -sin)], [c(0, -sin), c(cos)]];
-  if (axis === "Ry") return [[c(cos), c(-sin)], [c(sin), c(cos)]];
-  // Rz = diag(e^{-iθ/2}, e^{iθ/2})
-  return [[c(cos, -sin), c(0)], [c(0), c(cos, sin)]];
-}
-
-function gateMatrix(type: Gate["type"]): C[][] | null {
+/* ── Single-qubit gate matrices ── */
+const SQ = 1 / Math.SQRT2;
+function baseMatrix(type: string, p: number[]): C[][] | null {
+  const th = p[0] ?? 0, ph = p[1] ?? 0, lam = p[2] ?? 0;
   switch (type) {
-    case "H": return H;
-    case "X": return X;
-    case "Y": return Y;
-    case "Z": return Z;
-    case "S": return S;
-    case "T": return T;
+    case "H": return [[cx(SQ), cx(SQ)], [cx(SQ), cx(-SQ)]];
+    case "X": case "CX": case "CCX": return [[cx(0), cx(1)], [cx(1), cx(0)]];
+    case "Y": case "CY": return [[cx(0), cx(0, -1)], [cx(0, 1), cx(0)]];
+    case "Z": case "CZ": return [[cx(1), cx(0)], [cx(0), cx(-1)]];
+    case "S": return [[cx(1), cx(0)], [cx(0), cx(0, 1)]];
+    case "Sdg": return [[cx(1), cx(0)], [cx(0), cx(0, -1)]];
+    case "T": return [[cx(1), cx(0)], [cx(0), cexp(Math.PI / 4)]];
+    case "Tdg": return [[cx(1), cx(0)], [cx(0), cexp(-Math.PI / 4)]];
+    case "SX": return [[cx(0.5, 0.5), cx(0.5, -0.5)], [cx(0.5, -0.5), cx(0.5, 0.5)]];
+    case "SXdg": return [[cx(0.5, -0.5), cx(0.5, 0.5)], [cx(0.5, 0.5), cx(0.5, -0.5)]];
+    case "ID": return [[cx(1), cx(0)], [cx(0), cx(1)]];
+    case "P": case "CP": return [[cx(1), cx(0)], [cx(0), cexp(lam)]];
+    case "RX": case "CRX": {
+      const c = Math.cos(th / 2), s = Math.sin(th / 2);
+      return [[cx(c), cx(0, -s)], [cx(0, -s), cx(c)]];
+    }
+    case "RY": case "CRY": {
+      const c = Math.cos(th / 2), s = Math.sin(th / 2);
+      return [[cx(c), cx(-s)], [cx(s), cx(c)]];
+    }
+    case "RZ": case "CRZ": return [[cexp(-th / 2), cx(0)], [cx(0), cexp(th / 2)]];
+    case "U": {
+      const c = Math.cos(th / 2), s = Math.sin(th / 2);
+      return [
+        [cx(c), cmul(cexp(lam), cx(-s))],
+        [cmul(cexp(ph), cx(s)), cmul(cexp(ph + lam), cx(c))],
+      ];
+    }
     default: return null;
   }
 }
 
-const GATE_TOOLTIPS: Record<string, string> = {
-  H: "Hadamard — creates an equal superposition: |0⟩ → (|0⟩+|1⟩)/√2",
-  X: "Pauli-X (bit flip) — the quantum NOT: |0⟩ ↔ |1⟩",
-  Y: "Pauli-Y — a combined bit flip and phase flip (introduces an i phase)",
-  Z: "Pauli-Z (phase flip) — leaves |0⟩ alone, flips the sign of |1⟩",
-  S: "S (phase) gate — adds a 90° (i) phase to |1⟩",
-  T: "T (π/8) gate — adds a 45° phase to |1⟩",
-  CNOT: "Controlled-NOT — flips the target qubit when the control is |1⟩. Creates entanglement.",
-  SWAP: "Swaps the states of two qubits",
-  Measure: "Measures — collapses the superposition to |0⟩ or |1⟩ at random",
-  Rx: "Rotation about the X-axis by an angle you set with the slider",
-  Ry: "Rotation about the Y-axis by an angle you set with the slider",
-  Rz: "Rotation about the Z-axis (a pure phase rotation) by the angle you set",
-};
+function initialState(n: number): C[] {
+  const v: C[] = new Array(1 << n).fill(0).map(() => cx(0));
+  v[0] = cx(1);
+  return v;
+}
 
-/* ── Component ── */
+function applyControlledSingle(state: C[], controls: number[], target: number, M: C[][]): C[] {
+  const r = state.slice();
+  const cmask = controls.reduce((m, c) => m | (1 << c), 0);
+  for (let i = 0; i < state.length; i++) {
+    if ((i & cmask) !== cmask) continue;            // controls must all be 1
+    if (((i >> target) & 1) !== 0) continue;        // act once, on target-bit-0 index
+    const j = i ^ (1 << target);
+    const a = state[i], b = state[j];
+    r[i] = cadd(cmul(M[0][0], a), cmul(M[0][1], b));
+    r[j] = cadd(cmul(M[1][0], a), cmul(M[1][1], b));
+  }
+  return r;
+}
+
+function applySwap(state: C[], a: number, b: number, controls: number[] = []): C[] {
+  const r = state.slice();
+  const cmask = controls.reduce((m, c) => m | (1 << c), 0);
+  for (let i = 0; i < state.length; i++) {
+    if ((i & cmask) !== cmask) continue;
+    const bitA = (i >> a) & 1, bitB = (i >> b) & 1;
+    if (bitA === 0 && bitB === 1) {
+      const j = i ^ (1 << a) ^ (1 << b);
+      r[i] = state[j]; r[j] = state[i];
+    }
+  }
+  return r;
+}
+
+function applyRZZ(state: C[], a: number, b: number, theta: number): C[] {
+  return state.map((amp, i) => {
+    const za = ((i >> a) & 1) ? -1 : 1;
+    const zb = ((i >> b) & 1) ? -1 : 1;
+    return cmul(amp, cexp(-theta / 2 * za * zb));
+  });
+}
+
+function applyRXX(state: C[], a: number, b: number, theta: number): C[] {
+  const r = state.slice();
+  const c = Math.cos(theta / 2), s = Math.sin(theta / 2);
+  const seen = new Array(state.length).fill(false);
+  for (let i = 0; i < state.length; i++) {
+    if (seen[i]) continue;
+    const j = i ^ (1 << a) ^ (1 << b); // flip both
+    seen[i] = seen[j] = true;
+    const ai = state[i], aj = state[j];
+    // exp(-iθ/2 XX): |x⟩ -> c|x⟩ - i s |x flipped on both⟩
+    r[i] = cadd(cmul(cx(c), ai), cmul(cx(0, -s), aj));
+    r[j] = cadd(cmul(cx(c), aj), cmul(cx(0, -s), ai));
+  }
+  return r;
+}
+
+/* ── Operation instance ── */
+interface Op {
+  uid: string;
+  type: string;
+  col: number;
+  targets: number[];
+  controls: number[];
+  params: number[];
+}
+
+function involved(op: Op): number[] { return [...op.controls, ...op.targets]; }
+
+function applyOp(state: C[], op: Op): C[] {
+  const t = op.targets, c = op.controls, p = op.params;
+  switch (op.type) {
+    case "Measure": case "Reset": case "Barrier": return state; // shown pre-measurement
+    case "SWAP": return applySwap(state, t[0], t[1], c);
+    case "CSWAP": return applySwap(state, t[0], t[1], c);
+    case "RZZ": return applyRZZ(state, t[0], t[1], p[0] ?? 0);
+    case "RXX": return applyRXX(state, t[0], t[1], p[0] ?? 0);
+    default: {
+      const M = baseMatrix(op.type, p);
+      if (!M) return state;
+      return applyControlledSingle(state, c, t[0], M);
+    }
+  }
+}
+
+function simulate(ops: Op[], n: number): C[] {
+  let s = initialState(n);
+  const sorted = [...ops].sort((a, b) => a.col - b.col);
+  for (const op of sorted) s = applyOp(s, op);
+  return s;
+}
+
+function labelOf(i: number, n: number): string {
+  let str = "";
+  for (let q = n - 1; q >= 0; q--) str += ((i >> q) & 1);
+  return str;
+}
+
+/* ── Gate palette (IBM Composer-style operation set) ── */
+interface GateDef {
+  type: string; label: string; cat: string; color: string;
+  ctrls: number; tgts: number; params: { name: string; def: number }[];
+}
+const PI = Math.PI;
+const PALETTE: GateDef[] = [
+  // Single-qubit Clifford / common
+  { type: "H", label: "H", cat: "Single-qubit", color: "#6366f1", ctrls: 0, tgts: 1, params: [] },
+  { type: "X", label: "X", cat: "Single-qubit", color: "#a855f7", ctrls: 0, tgts: 1, params: [] },
+  { type: "Y", label: "Y", cat: "Single-qubit", color: "#a855f7", ctrls: 0, tgts: 1, params: [] },
+  { type: "Z", label: "Z", cat: "Single-qubit", color: "#a855f7", ctrls: 0, tgts: 1, params: [] },
+  { type: "S", label: "S", cat: "Single-qubit", color: "#0ea5e9", ctrls: 0, tgts: 1, params: [] },
+  { type: "Sdg", label: "S†", cat: "Single-qubit", color: "#0ea5e9", ctrls: 0, tgts: 1, params: [] },
+  { type: "T", label: "T", cat: "Single-qubit", color: "#0ea5e9", ctrls: 0, tgts: 1, params: [] },
+  { type: "Tdg", label: "T†", cat: "Single-qubit", color: "#0ea5e9", ctrls: 0, tgts: 1, params: [] },
+  { type: "SX", label: "√X", cat: "Single-qubit", color: "#0ea5e9", ctrls: 0, tgts: 1, params: [] },
+  { type: "SXdg", label: "√X†", cat: "Single-qubit", color: "#0ea5e9", ctrls: 0, tgts: 1, params: [] },
+  { type: "ID", label: "I", cat: "Single-qubit", color: "#94a3b8", ctrls: 0, tgts: 1, params: [] },
+  // Parametric single-qubit
+  { type: "P", label: "P(λ)", cat: "Parametric", color: "#14b8a6", ctrls: 0, tgts: 1, params: [{ name: "λ", def: PI / 2 }] },
+  { type: "RX", label: "RX(θ)", cat: "Parametric", color: "#14b8a6", ctrls: 0, tgts: 1, params: [{ name: "θ", def: PI / 2 }] },
+  { type: "RY", label: "RY(θ)", cat: "Parametric", color: "#14b8a6", ctrls: 0, tgts: 1, params: [{ name: "θ", def: PI / 2 }] },
+  { type: "RZ", label: "RZ(θ)", cat: "Parametric", color: "#14b8a6", ctrls: 0, tgts: 1, params: [{ name: "θ", def: PI / 2 }] },
+  { type: "U", label: "U", cat: "Parametric", color: "#14b8a6", ctrls: 0, tgts: 1, params: [{ name: "θ", def: PI / 2 }, { name: "φ", def: 0 }, { name: "λ", def: 0 }] },
+  // Controlled two-qubit
+  { type: "CX", label: "CX", cat: "Controlled", color: "#ec4899", ctrls: 1, tgts: 1, params: [] },
+  { type: "CY", label: "CY", cat: "Controlled", color: "#ec4899", ctrls: 1, tgts: 1, params: [] },
+  { type: "CZ", label: "CZ", cat: "Controlled", color: "#ec4899", ctrls: 1, tgts: 1, params: [] },
+  { type: "CH", label: "CH", cat: "Controlled", color: "#ec4899", ctrls: 1, tgts: 1, params: [] },
+  { type: "CP", label: "CP(λ)", cat: "Controlled", color: "#ec4899", ctrls: 1, tgts: 1, params: [{ name: "λ", def: PI / 2 }] },
+  { type: "CRX", label: "CRX(θ)", cat: "Controlled", color: "#ec4899", ctrls: 1, tgts: 1, params: [{ name: "θ", def: PI / 2 }] },
+  { type: "CRZ", label: "CRZ(θ)", cat: "Controlled", color: "#ec4899", ctrls: 1, tgts: 1, params: [{ name: "θ", def: PI / 2 }] },
+  // Two-qubit non-controlled
+  { type: "SWAP", label: "SWAP", cat: "Multi-qubit", color: "#f97316", ctrls: 0, tgts: 2, params: [] },
+  { type: "RXX", label: "RXX(θ)", cat: "Multi-qubit", color: "#f97316", ctrls: 0, tgts: 2, params: [{ name: "θ", def: PI / 2 }] },
+  { type: "RZZ", label: "RZZ(θ)", cat: "Multi-qubit", color: "#f97316", ctrls: 0, tgts: 2, params: [{ name: "θ", def: PI / 2 }] },
+  // Three-qubit
+  { type: "CCX", label: "CCX", cat: "Multi-qubit", color: "#f59e0b", ctrls: 2, tgts: 1, params: [] },
+  { type: "CSWAP", label: "CSWAP", cat: "Multi-qubit", color: "#f59e0b", ctrls: 1, tgts: 2, params: [] },
+  // Non-unitary / structural
+  { type: "Reset", label: "|0⟩", cat: "Operations", color: "#64748b", ctrls: 0, tgts: 1, params: [] },
+  { type: "Measure", label: "M", cat: "Operations", color: "#475569", ctrls: 0, tgts: 1, params: [] },
+];
+const DEF: Record<string, GateDef> = Object.fromEntries(PALETTE.map((g) => [g.type, g]));
+
+/* ── Qiskit code generation ── */
+function fmtPi(r: number): string {
+  if (Math.abs(r) < 1e-9) return "0";
+  for (const den of [1, 2, 3, 4, 6, 8, 12]) {
+    const num = (r * den) / PI;
+    if (Math.abs(num - Math.round(num)) < 1e-6) {
+      let nn = Math.round(num), dd = den;
+      const g = gcd(Math.abs(nn), dd); nn /= g; dd /= g;
+      const sign = nn < 0 ? "-" : ""; nn = Math.abs(nn);
+      const numPart = nn === 1 ? "np.pi" : `${nn}*np.pi`;
+      return dd === 1 ? `${sign}${numPart}` : `${sign}${numPart}/${dd}`;
+    }
+  }
+  return r.toFixed(5);
+}
+function gcd(a: number, b: number): number { return b === 0 ? (a || 1) : gcd(b, a % b); }
+
+function genQiskit(ops: Op[], n: number): string {
+  const sorted = [...ops].sort((a, b) => a.col - b.col);
+  const hasMeasure = sorted.some((o) => o.type === "Measure");
+  let code = "from qiskit import QuantumCircuit\nimport numpy as np\n\n";
+  code += hasMeasure ? `qc = QuantumCircuit(${n}, ${n})\n` : `qc = QuantumCircuit(${n})\n`;
+  for (const o of sorted) {
+    const t = o.targets, c = o.controls, p = o.params.map(fmtPi);
+    switch (o.type) {
+      case "H": case "X": case "Y": case "Z": case "S": case "T":
+        code += `qc.${o.type.toLowerCase()}(${t[0]})\n`; break;
+      case "Sdg": code += `qc.sdg(${t[0]})\n`; break;
+      case "Tdg": code += `qc.tdg(${t[0]})\n`; break;
+      case "SX": code += `qc.sx(${t[0]})\n`; break;
+      case "SXdg": code += `qc.sxdg(${t[0]})\n`; break;
+      case "ID": code += `qc.id(${t[0]})\n`; break;
+      case "P": code += `qc.p(${p[0]}, ${t[0]})\n`; break;
+      case "RX": code += `qc.rx(${p[0]}, ${t[0]})\n`; break;
+      case "RY": code += `qc.ry(${p[0]}, ${t[0]})\n`; break;
+      case "RZ": code += `qc.rz(${p[0]}, ${t[0]})\n`; break;
+      case "U": code += `qc.u(${p[0]}, ${p[1]}, ${p[2]}, ${t[0]})\n`; break;
+      case "CX": code += `qc.cx(${c[0]}, ${t[0]})\n`; break;
+      case "CY": code += `qc.cy(${c[0]}, ${t[0]})\n`; break;
+      case "CZ": code += `qc.cz(${c[0]}, ${t[0]})\n`; break;
+      case "CH": code += `qc.ch(${c[0]}, ${t[0]})\n`; break;
+      case "CP": code += `qc.cp(${p[0]}, ${c[0]}, ${t[0]})\n`; break;
+      case "CRX": code += `qc.crx(${p[0]}, ${c[0]}, ${t[0]})\n`; break;
+      case "CRZ": code += `qc.crz(${p[0]}, ${c[0]}, ${t[0]})\n`; break;
+      case "SWAP": code += `qc.swap(${t[0]}, ${t[1]})\n`; break;
+      case "RXX": code += `qc.rxx(${p[0]}, ${t[0]}, ${t[1]})\n`; break;
+      case "RZZ": code += `qc.rzz(${p[0]}, ${t[0]}, ${t[1]})\n`; break;
+      case "CCX": code += `qc.ccx(${c[0]}, ${c[1]}, ${t[0]})\n`; break;
+      case "CSWAP": code += `qc.cswap(${c[0]}, ${t[0]}, ${t[1]})\n`; break;
+      case "Reset": code += `qc.reset(${t[0]})\n`; break;
+      case "Measure": code += `qc.measure(${t[0]}, ${t[0]})\n`; break;
+      case "Barrier": code += `qc.barrier()\n`; break;
+    }
+  }
+  return code;
+}
+
+/* ── Layout geometry ── */
+const CELL = 56, LEFT = 64, TOPP = 8;
+const rowY = (q: number) => TOPP + q * CELL + CELL / 2;
+const colX = (col: number) => LEFT + col * CELL + CELL / 2;
+
+let UIDC = 0;
+const uid = () => `op${UIDC++}`;
+
+/* ════════════════════════════════════════════════════════════════════
+   COMPONENT
+   ════════════════════════════════════════════════════════════════════ */
 export default function QuantumSandbox() {
-  const [numQubits, setNumQubits] = useState(1);
-  const [circuit, setCircuit] = useState<Gate[]>([]);
-  const [statevector, setStatevector] = useState<C[]>(initialVector(1));
-  const [activeQubit, setActiveQubit] = useState(0);
   const [introOpen, setIntroOpen] = useState(true);
-  const [lastAction, setLastAction] = useState("");
-  const [activeRotation, setActiveRotation] = useState<string | null>(null);
-  const [rotationAngle, setRotationAngle] = useState(90);
-  const [shots, setShots] = useState(0);
-  const [histogram, setHistogram] = useState<Record<string, number>>({});
-  const blochRef = useRef<HTMLCanvasElement>(null);
-  const wireRef = useRef<HTMLCanvasElement>(null);
-  const skipResetRef = useRef(false);
+  const [numQubits, setNumQubits] = useState(3);
+  const [ops, setOps] = useState<Op[]>([]);
+  const [armed, setArmed] = useState<string | null>(null); // palette gate armed for click-place
+  const [selected, setSelected] = useState<string | null>(null);
+  const [showPhaseLabels, setShowPhaseLabels] = useState(false);
+  const qsphereRef = useRef<HTMLCanvasElement>(null);
 
-  // Reset on qubit change (skipped once when a preset sets the state directly)
-  useEffect(() => {
-    if (skipResetRef.current) { skipResetRef.current = false; return; }
-    setStatevector(initialVector(numQubits));
-    setCircuit([]);
-    setActiveQubit(0);
-    setLastAction("");
-    setShots(0);
-    setHistogram({});
-  }, [numQubits]);
+  const maxCol = ops.reduce((m, o) => Math.max(m, o.col), -1);
+  const numCols = Math.max(10, maxCol + 3);
 
-  // Load a preset circuit deterministically (no addGate/setTimeout races)
-  const loadPreset = useCallback((n: number, gates: Gate[], note: string) => {
-    let sv = initialVector(n);
-    for (const g of gates) {
-      const m = gateMatrix(g.type);
-      if (m) sv = applySingleQubitGate(sv, g.qubit, m);
-      else if (g.type === "CNOT" && g.target !== undefined) sv = applyCNOT(sv, g.qubit, g.target);
-      else if (g.type === "SWAP" && g.target !== undefined) sv = applySWAP(sv, g.qubit, g.target);
+  const state = useMemo(() => simulate(ops, numQubits), [ops, numQubits]);
+  const qiskit = useMemo(() => genQiskit(ops, numQubits), [ops, numQubits]);
+
+  const cellOccupied = useCallback((q: number, col: number, ignoreUid?: string) =>
+    ops.some((o) => o.col === col && o.uid !== ignoreUid && involved(o).includes(q)), [ops]);
+
+  /* Build an op when a gate is dropped/placed on (q, col). Auto-assigns
+     controls/extra targets to nearby free wires. Returns null if it can't fit. */
+  const buildOp = useCallback((type: string, q: number, col: number): Op | null => {
+    const def = DEF[type];
+    const need = def.ctrls + def.tgts;
+    if (need > numQubits) return null;
+    // candidate wires: q first, then nearest neighbours
+    const order: number[] = [q];
+    for (let d = 1; d < numQubits; d++) {
+      if (q - d >= 0) order.push(q - d);
+      if (q + d < numQubits) order.push(q + d);
     }
-    if (n !== numQubits) { skipResetRef.current = true; setNumQubits(n); }
-    setCircuit(gates);
-    setStatevector(sv);
-    setActiveQubit(0);
-    setLastAction(note);
-    setShots(0);
-    setHistogram({});
-  }, [numQubits]);
+    const free = order.filter((w) => !cellOccupied(w, col));
+    if (free.length < need) return null;
+    const wires = free.slice(0, need);
+    let targets: number[] = [], controls: number[] = [];
+    if (def.type === "CSWAP") { controls = [wires[0]]; targets = [wires[1], wires[2]]; }
+    else if (def.ctrls > 0) { targets = [wires[0]]; controls = wires.slice(1, 1 + def.ctrls); }
+    else { targets = wires.slice(0, def.tgts); }
+    return { uid: uid(), type, col, targets, controls, params: def.params.map((p) => p.def) };
+  }, [numQubits, cellOccupied]);
 
-  const addGate = useCallback((type: Gate["type"]) => {
-    const target = type === "CNOT" || type === "SWAP" ? (activeQubit + 1) % numQubits : undefined;
-    if ((type === "CNOT" || type === "SWAP") && numQubits < 2) {
-      setLastAction(`${type} needs at least 2 qubits. Switch to 2 or 3 qubits first.`);
-      return;
-    }
-    const gate: Gate = { type, qubit: activeQubit, target };
-    setCircuit((prev) => [...prev, gate]);
+  const placeGate = useCallback((type: string, q: number, col: number) => {
+    const op = buildOp(type, q, col);
+    if (op) { setOps((prev) => [...prev, op]); setSelected(op.uid); }
+  }, [buildOp]);
 
-    setStatevector((prev) => {
-      let newSV: C[];
-      const m = gateMatrix(type);
-      if (m) newSV = applySingleQubitGate(prev, activeQubit, m);
-      else if (type === "CNOT" && target !== undefined) newSV = applyCNOT(prev, activeQubit, target);
-      else if (type === "SWAP" && target !== undefined) newSV = applySWAP(prev, activeQubit, target);
-      else if (type === "Measure") {
-        const { outcome, prob } = measureState(prev);
-        const result: C[] = new Array(prev.length).fill(0).map(() => c(0));
-        result[outcome] = c(1);
-        setLastAction(`Measured the system. The probability of |0⟩ on qubit ${activeQubit} was ${(prob * 100).toFixed(0)}% — the superposition collapsed to ${formatBinary(outcome, numQubits)}. Measure again to see it can land differently.`);
-        setShots(0); setHistogram({});
-        return result;
-      } else {
-        newSV = prev;
-      }
-
-      let explanation = "";
-      if (type === "H") explanation = `Applied a Hadamard (H) to qubit ${activeQubit}. It now sits in an equal superposition of |0⟩ and |1⟩ — a 50/50 chance of each if measured.`;
-      else if (type === "X") explanation = `Applied a bit flip (X) to qubit ${activeQubit}, swapping the |0⟩ and |1⟩ amplitudes.`;
-      else if (type === "Y") explanation = `Applied a Pauli-Y to qubit ${activeQubit} — a bit flip plus a 90° phase (the i factor shows up in the phase disks).`;
-      else if (type === "Z") explanation = `Applied a phase flip (Z) to qubit ${activeQubit}. Probabilities are unchanged, but the phase of |1⟩ flipped — watch the phase disks. This matters for interference.`;
-      else if (type === "S") explanation = `Applied an S gate to qubit ${activeQubit}, adding a 90° phase to |1⟩. The measurement probabilities don't change — only the phase does.`;
-      else if (type === "T") explanation = `Applied a T gate to qubit ${activeQubit}, adding a 45° phase to |1⟩. T gates are the key ingredient that makes a gate set universal.`;
-      else if (type === "CNOT" && target !== undefined) explanation = `Applied CNOT (control q${activeQubit}, target q${target}). If you ran H on the control first, the two qubits are now entangled — measuring one instantly determines the other.`;
-      else if (type === "SWAP" && target !== undefined) explanation = `Swapped the full states of qubits ${activeQubit} and ${target}.`;
-      setLastAction(explanation);
-      setShots(0); setHistogram({});
-      return newSV;
+  const moveOp = useCallback((u: string, q: number, col: number) => {
+    setOps((prev) => {
+      const op = prev.find((o) => o.uid === u);
+      if (!op) return prev;
+      const delta = q - op.targets[0];
+      const newTargets = op.targets.map((t) => t + delta);
+      const newControls = op.controls.map((c) => c + delta);
+      const all = [...newTargets, ...newControls];
+      if (all.some((w) => w < 0 || w >= numQubits)) return prev;
+      // collision check against other ops in target col
+      const clash = prev.some((o) => o.uid !== u && o.col === col && involved(o).some((w) => all.includes(w)));
+      if (clash) return prev;
+      return prev.map((o) => o.uid === u ? { ...o, col, targets: newTargets, controls: newControls } : o);
     });
-  }, [activeQubit, numQubits]);
+  }, [numQubits]);
 
-  const clearCircuit = () => {
-    setCircuit([]);
-    setStatevector(initialVector(numQubits));
-    setLastAction("");
-    setShots(0);
-    setHistogram({});
-  };
-
-  const runShots = useCallback((count: number) => {
-    const sv = statevector;
-    const results: Record<string, number> = {};
-    for (let s = 0; s < count; s++) {
-      const { outcome } = measureState(sv);
-      const label = formatBinary(outcome, numQubits);
-      results[label] = (results[label] || 0) + 1;
-    }
-    setShots(count);
-    setHistogram(results);
-  }, [statevector, numQubits]);
-
-  // Apply a rotation gate at the current slider angle (absolute, non-compounding)
-  const applyRotation = useCallback((axis: "Rx" | "Ry" | "Rz", deg: number) => {
-    const matrix = rotationMatrix(axis, (deg * Math.PI) / 180);
-    setStatevector((prev) => applySingleQubitGate(prev, activeQubit, matrix));
-    setCircuit((prev) => [...prev, { type: axis, qubit: activeQubit, angle: deg }]);
-    setLastAction(`Applied ${axis}(${deg}°) to qubit ${activeQubit} — a rotation about the ${axis[1].toLowerCase()}-axis of the Bloch sphere.`);
-    setShots(0); setHistogram({});
-  }, [activeQubit]);
-
-  // Draw Bloch sphere
-  useEffect(() => {
-    const canvas = blochRef.current;
-    if (!canvas || numQubits === 0) return;
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
-    const w = canvas.width, h = canvas.height, cx = w / 2, cy = h / 2, r = Math.min(cx, cy) - 16;
-
-    ctx.clearRect(0, 0, w, h);
-    ctx.strokeStyle = "#cbd5e1"; ctx.lineWidth = 1;
-    ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.stroke();
-    ctx.beginPath(); ctx.ellipse(cx, cy, r, r * 0.3, 0, 0, Math.PI * 2); ctx.strokeStyle = "#e2e8f0"; ctx.stroke();
-    ctx.beginPath(); ctx.ellipse(cx, cy, r * 0.3, r, 0, 0, Math.PI * 2); ctx.strokeStyle = "#f1f5f9"; ctx.stroke();
-
-    // Axis labels: |0⟩ top, |1⟩ bottom, |+⟩/|−⟩ on the equator
-    ctx.fillStyle = "#64748b"; ctx.font = "11px sans-serif"; ctx.textAlign = "center";
-    ctx.fillText("|0⟩", cx, cy - r - 5);
-    ctx.fillText("|1⟩", cx, cy + r + 14);
-    ctx.textAlign = "left"; ctx.fillText("|+⟩", cx + r + 4, cy + 4);
-    ctx.textAlign = "right"; ctx.fillText("|−⟩", cx - r - 4, cy + 4);
-
-    // Correct Bloch vector from the reduced density matrix of qubit 0.
-    // 2D projection: x → horizontal, z → vertical (a small y tilt adds depth).
-    const { x, y, z } = blochVector(statevector);
-    const vx = cx + r * (x + 0.18 * y);
-    const vy = cy - r * (z - 0.12 * y);
-
-    ctx.strokeStyle = "#6366f1"; ctx.lineWidth = 2.5;
-    ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(vx, vy); ctx.stroke();
-    ctx.beginPath(); ctx.arc(vx, vy, 5, 0, Math.PI * 2); ctx.fillStyle = "#6366f1"; ctx.fill();
-  }, [statevector, numQubits]);
-
-  // Draw wire diagram
-  useEffect(() => {
-    const canvas = wireRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
-    const laneH = 40, padX = 50, gateW = 36, padY = 20;
-    const w = canvas.width, h = canvas.height;
-
-    ctx.clearRect(0, 0, w, h);
-    ctx.fillStyle = "#f8fafc"; ctx.fillRect(0, 0, w, h);
-
-    if (circuit.length === 0) {
-      ctx.fillStyle = "#94a3b8"; ctx.font = "12px sans-serif"; ctx.textAlign = "center";
-      ctx.fillText("Add gates to build your circuit...", w / 2, h / 2);
-      return;
-    }
-
-    const maxGates = Math.min(circuit.length, Math.floor((w - padX) / (gateW + 8)));
-
-    for (let q = 0; q < numQubits; q++) {
-      const y = padY + q * laneH + laneH / 2;
-      ctx.strokeStyle = "#cbd5e1"; ctx.lineWidth = 1;
-      ctx.beginPath(); ctx.moveTo(padX - 30, y); ctx.lineTo(padX + maxGates * (gateW + 8), y); ctx.stroke();
-      ctx.fillStyle = "#64748b"; ctx.font = "11px sans-serif"; ctx.textAlign = "right";
-      ctx.fillText(`q${q}`, padX - 34, y + 3);
-    }
-
-    for (let i = 0; i < maxGates; i++) {
-      const g = circuit[i];
-      const x = padX + i * (gateW + 8);
-
-      if ((g.type === "CNOT" || g.type === "SWAP") && g.target !== undefined) {
-        const cY = padY + g.qubit * laneH + laneH / 2;
-        const tY = padY + g.target * laneH + laneH / 2;
-        ctx.strokeStyle = GATE_COLORS[g.type]; ctx.lineWidth = 2;
-        ctx.beginPath(); ctx.moveTo(x + gateW / 2, cY); ctx.lineTo(x + gateW / 2, tY); ctx.stroke();
-        if (g.type === "CNOT") {
-          ctx.beginPath(); ctx.arc(x + gateW / 2, cY, 5, 0, Math.PI * 2); ctx.fillStyle = GATE_COLORS.CNOT; ctx.fill();
-          ctx.strokeStyle = GATE_COLORS.CNOT; ctx.lineWidth = 2;
-          ctx.beginPath(); ctx.arc(x + gateW / 2, tY, 8, 0, Math.PI * 2); ctx.stroke();
-          ctx.beginPath(); ctx.moveTo(x + gateW / 2 - 5, tY); ctx.lineTo(x + gateW / 2 + 5, tY); ctx.stroke();
-          ctx.beginPath(); ctx.moveTo(x + gateW / 2, tY - 5); ctx.lineTo(x + gateW / 2, tY + 5); ctx.stroke();
-        } else {
-          for (const yy of [cY, tY]) {
-            ctx.strokeStyle = GATE_COLORS.SWAP; ctx.lineWidth = 2;
-            ctx.beginPath(); ctx.moveTo(x + gateW / 2 - 5, yy - 5); ctx.lineTo(x + gateW / 2 + 5, yy + 5); ctx.stroke();
-            ctx.beginPath(); ctx.moveTo(x + gateW / 2 - 5, yy + 5); ctx.lineTo(x + gateW / 2 + 5, yy - 5); ctx.stroke();
-          }
-        }
-      } else {
-        const y = padY + g.qubit * laneH + laneH / 2;
-        const col = GATE_COLORS[g.type] || "#6b7280";
-        ctx.fillStyle = col;
-        ctx.beginPath();
-        ctx.roundRect(x, y - 12, gateW, 24, 6);
-        ctx.fill();
-        ctx.fillStyle = "#fff"; ctx.font = "bold 10px sans-serif"; ctx.textAlign = "center";
-        ctx.fillText(g.type === "Measure" ? "M" : g.type, x + gateW / 2, y + 3);
-      }
-    }
-  }, [circuit, numQubits]);
-
-  // Statevector amplitudes for display
-  const amplitudes = statevector.map((amp, i) => ({ label: formatBinary(i, numQubits), amp }));
-
-  // Probability of |0⟩ on qubit 0
-  const { prob0 } = blochVector(statevector);
-  const prob1 = 1 - prob0;
-
-  // Parse shared circuit from URL
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const circuitParam = params.get("circuit");
-    if (circuitParam) {
-      const gates = circuitParam.split("-").map((s) => {
-        const parts = s.match(/([A-Za-z]+)(\d+)(?:,(\d+))?/);
-        if (!parts) return null;
-        return { type: parts[1] as Gate["type"], qubit: parseInt(parts[2]), target: parts[3] ? parseInt(parts[3]) : undefined };
-      }).filter(Boolean) as Gate[];
-      if (gates.length > 0) {
-        const n = Math.max(...gates.map((g) => Math.max(g.qubit, g.target ?? 0))) + 1;
-        const qc = Math.min(Math.max(n, 1), 3);
-        setNumQubits(qc);
-        setCircuit(gates);
-        let sv = initialVector(qc);
-        for (const g of gates) {
-          const m = gateMatrix(g.type);
-          if (m) sv = applySingleQubitGate(sv, g.qubit, m);
-          else if (g.type === "CNOT" && g.target !== undefined) sv = applyCNOT(sv, g.qubit, g.target);
-          else if (g.type === "SWAP" && g.target !== undefined) sv = applySWAP(sv, g.qubit, g.target);
-        }
-        setStatevector(sv);
-      }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+  const deleteOp = useCallback((u: string) => {
+    setOps((prev) => prev.filter((o) => o.uid !== u));
+    setSelected((s) => (s === u ? null : s));
   }, []);
 
-  const shareCircuit = () => {
-    const gates = circuit.map((g) => `${g.type}${g.qubit}${g.target !== undefined ? `,${g.target}` : ""}`).join("-");
-    const url = `${window.location.origin}${window.location.pathname}?circuit=${encodeURIComponent(gates)}`;
-    navigator.clipboard.writeText(url).then(() => {
-      alert("Circuit URL copied to clipboard! Share it with anyone.");
-    });
+  const onCellDrop = (q: number, col: number) => (e: React.DragEvent) => {
+    e.preventDefault();
+    const data = e.dataTransfer.getData("text/plain");
+    if (!data) return;
+    try {
+      const pl = JSON.parse(data);
+      if (pl.newGate) placeGate(pl.newGate, q, col);
+      else if (pl.move) moveOp(pl.move, q, col);
+    } catch { /* ignore */ }
   };
 
-  const exportToQiskit = () => {
-    let code = `from qiskit import QuantumCircuit\n`;
-    code += `from qiskit_aer import Aer\n\n`;
-    code += `qc = QuantumCircuit(${numQubits})\n\n`;
-    for (const g of circuit) {
-      if (g.type === "H") code += `qc.h(${g.qubit})\n`;
-      else if (g.type === "X") code += `qc.x(${g.qubit})\n`;
-      else if (g.type === "Y") code += `qc.y(${g.qubit})\n`;
-      else if (g.type === "Z") code += `qc.z(${g.qubit})\n`;
-      else if (g.type === "S") code += `qc.s(${g.qubit})\n`;
-      else if (g.type === "T") code += `qc.t(${g.qubit})\n`;
-      else if (g.type === "Rx") code += `qc.rx(${((g.angle ?? 0) * Math.PI / 180).toFixed(4)}, ${g.qubit})\n`;
-      else if (g.type === "Ry") code += `qc.ry(${((g.angle ?? 0) * Math.PI / 180).toFixed(4)}, ${g.qubit})\n`;
-      else if (g.type === "Rz") code += `qc.rz(${((g.angle ?? 0) * Math.PI / 180).toFixed(4)}, ${g.qubit})\n`;
-      else if (g.type === "CNOT" && g.target !== undefined) code += `qc.cx(${g.qubit}, ${g.target})\n`;
-      else if (g.type === "SWAP" && g.target !== undefined) code += `qc.swap(${g.qubit}, ${g.target})\n`;
-      else if (g.type === "Measure") { code += `qc.measure_all()\n`; break; }
+  const onCellClick = (q: number, col: number) => {
+    if (armed && !cellOccupied(q, col)) { placeGate(armed, q, col); }
+  };
+
+  const addQubit = () => { if (numQubits < 8) setNumQubits((n) => n + 1); };
+  const removeQubit = () => {
+    if (numQubits <= 1) return;
+    const top = numQubits - 1;
+    setOps((prev) => prev.filter((o) => !involved(o).includes(top)));
+    setNumQubits((n) => n - 1);
+  };
+  const clearAll = () => { setOps([]); setSelected(null); setArmed(null); };
+
+  const selOp = ops.find((o) => o.uid === selected) || null;
+
+  /* ── Q-sphere rendering ── */
+  useEffect(() => {
+    const canvas = qsphereRef.current;
+    if (!canvas || numQubits > 5) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+    const W = canvas.width, H = canvas.height, ox = W / 2, oy = H / 2, R = Math.min(ox, oy) - 28;
+    ctx.clearRect(0, 0, W, H);
+
+    // sphere wireframe
+    ctx.strokeStyle = "#e2e8f0"; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.arc(ox, oy, R, 0, Math.PI * 2); ctx.stroke();
+    ctx.beginPath(); ctx.ellipse(ox, oy, R, R * 0.32, 0, 0, Math.PI * 2); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(ox, oy - R); ctx.lineTo(ox, oy + R); ctx.stroke();
+    // latitude rings by Hamming weight
+    for (let w = 1; w < numQubits; w++) {
+      const theta = Math.PI * (w / numQubits);
+      const ry = R * Math.cos(theta), rad = R * Math.sin(theta);
+      ctx.beginPath(); ctx.ellipse(ox, oy - ry, rad, rad * 0.32, 0, 0, Math.PI * 2);
+      ctx.strokeStyle = "#f1f5f9"; ctx.stroke();
     }
-    code += `\n# Simulate\nsimulator = Aer.get_backend('aer_simulator')\nresult = simulator.run(qc).result()\ncounts = result.get_counts()\nprint(counts)\n`;
-    navigator.clipboard.writeText(code).then(() => {
-      alert("Qiskit code copied to clipboard!");
-    });
-  };
 
-  const gateButtons = ["H", "X", "Y", "Z", "S", "T"] as const;
-  const multiButtons = ["CNOT", "SWAP", "Measure"] as const;
+    // group basis states by Hamming weight
+    const dim = 1 << numQubits;
+    const groups: number[][] = Array.from({ length: numQubits + 1 }, () => []);
+    for (let i = 0; i < dim; i++) {
+      let w = 0; for (let q = 0; q < numQubits; q++) w += (i >> q) & 1;
+      groups[w].push(i);
+    }
+    type Node = { x: number; y: number; depth: number; prob: number; phase: number; label: string };
+    const nodes: Node[] = [];
+    for (let w = 0; w <= numQubits; w++) {
+      const theta = Math.PI * (w / numQubits);   // 0 = north (|0..0⟩)
+      const ry = R * Math.cos(theta), rad = R * Math.sin(theta);
+      const g = groups[w];
+      g.forEach((i, k) => {
+        const prob = cabs2(state[i]);
+        const phi = g.length === 1 ? 0 : (2 * Math.PI * k) / g.length;
+        const x = ox + rad * Math.cos(phi);
+        const depth = Math.sin(phi); // front/back
+        const y = oy - ry - rad * 0.32 * Math.sin(phi);
+        nodes.push({ x, y, depth, prob, phase: cphase(state[i]), label: labelOf(i, numQubits) });
+      });
+    }
+    // draw lines + nodes (back to front)
+    nodes.sort((a, b) => a.depth - b.depth);
+    for (const nd of nodes) {
+      if (nd.prob < 1e-4) continue;
+      const hue = ((nd.phase + Math.PI) / (2 * Math.PI)) * 360;
+      ctx.strokeStyle = `hsl(${hue},70%,55%)`; ctx.lineWidth = 1.5;
+      ctx.beginPath(); ctx.moveTo(ox, oy); ctx.lineTo(nd.x, nd.y); ctx.stroke();
+      const rr = 3 + Math.sqrt(nd.prob) * 13;
+      ctx.beginPath(); ctx.arc(nd.x, nd.y, rr, 0, Math.PI * 2);
+      ctx.fillStyle = `hsl(${hue},75%,55%)`; ctx.fill();
+      ctx.strokeStyle = "#fff"; ctx.lineWidth = 1.5; ctx.stroke();
+      ctx.fillStyle = "#0f172a"; ctx.font = "9px ui-monospace, monospace"; ctx.textAlign = "center";
+      const txt = showPhaseLabels ? `${(nd.phase * 180 / Math.PI).toFixed(0)}°` : nd.label;
+      ctx.fillText(txt, nd.x, nd.y - rr - 3);
+    }
+  }, [state, numQubits, showPhaseLabels]);
+
+  /* amplitudes for the statevector table */
+  const amps = state.map((a, i) => ({ i, label: labelOf(i, numQubits), prob: cabs2(a), phase: cphase(a), amp: a }))
+    .filter((a) => a.prob > 1e-6);
+
+  const copyCode = () => navigator.clipboard?.writeText(qiskit);
+
+  const cats = ["Single-qubit", "Parametric", "Controlled", "Multi-qubit", "Operations"];
 
   return (
-    <div className="space-y-6 pb-8">
+    <div className="space-y-6 pb-10">
       <div className="flex items-center gap-3">
         <div className="w-10 h-10 rounded-xl bg-indigo-100 flex items-center justify-center text-indigo-600 font-bold text-lg">⚛</div>
         <div>
           <h1 className="text-2xl font-bold text-slate-900">Quantum Sandbox</h1>
-          <p className="text-sm text-slate-500">Build circuits visually and watch the qubit&apos;s real, complex state update live.</p>
+          <p className="text-sm text-slate-500">A drag-and-drop quantum circuit composer with a live Q-sphere and Qiskit code.</p>
         </div>
       </div>
 
-      {/* ── Beginner intro card ── */}
+      {/* ── Beginner intro (kept) ── */}
       <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
         <button onClick={() => setIntroOpen(!introOpen)}
           className="w-full flex items-center gap-2 px-4 py-3 text-sm font-semibold text-slate-700 hover:bg-slate-50 transition-colors">
           {introOpen ? <ChevronDown className="w-4 h-4 text-slate-400" /> : <ChevronRight className="w-4 h-4 text-slate-400" />}
           <Info className="w-4 h-4 text-indigo-500" />
-          New to this? Start here — a plain-English guide
+          New to this? How the composer works
         </button>
         {introOpen && (
           <div className="px-4 pb-4 space-y-2 text-sm text-slate-600 border-t border-slate-100 pt-3">
-            <p><strong className="text-slate-800">Qubit:</strong> A quantum bit. Unlike a normal bit (0 or 1), it can be |0⟩, |1⟩, <em>or a blend of both at once</em> — called <em>superposition</em>.</p>
-            <p><strong className="text-slate-800">Notation |0⟩:</strong> The bracket is just how physicists write a quantum state. Read &ldquo;|0⟩&rdquo; as &ldquo;the state zero.&rdquo;</p>
-            <p><strong className="text-slate-800">Bloch sphere:</strong> A globe showing one qubit&apos;s state. The arrow at the <em>top</em> = |0⟩, <em>bottom</em> = |1⟩, and the <em>equator</em> = a 50/50 superposition. Gates rotate this arrow.</p>
-            <p><strong className="text-slate-800">Statevector:</strong> The list of all possible outcomes and their <em>amplitudes</em>. The probability of seeing an outcome is its amplitude&apos;s size squared.</p>
-            <p><strong className="text-slate-800">Phase:</strong> Each amplitude also has a direction (a phase, shown as a clock hand). You can&apos;t see phase in a single measurement, but it controls <em>interference</em> when gates combine — it&apos;s what makes quantum different.</p>
-            <p><strong className="text-slate-800">Measure:</strong> Looking at a qubit forces it to randomly pick |0⟩ or |1⟩. Run many shots to see the pattern.</p>
-            <div className="flex flex-wrap gap-2 pt-1">
-              <span className="px-2 py-0.5 rounded text-[11px] font-medium bg-indigo-100 text-indigo-700">H = superposition</span>
-              <span className="px-2 py-0.5 rounded text-[11px] font-medium bg-red-100 text-red-700">X = bit flip (NOT)</span>
-              <span className="px-2 py-0.5 rounded text-[11px] font-medium bg-amber-100 text-amber-700">Z / S / T = phase</span>
-              <span className="px-2 py-0.5 rounded text-[11px] font-medium bg-pink-100 text-pink-700">CNOT = entangles 2 qubits</span>
-              <span className="px-2 py-0.5 rounded text-[11px] font-medium bg-slate-100 text-slate-700">Hover any gate for its meaning</span>
-            </div>
+            <p><strong className="text-slate-800">Build a circuit:</strong> drag an operation from the palette onto a qubit wire — or click an operation to arm it, then click a cell. Many operations can share the same column across different wires.</p>
+            <p><strong className="text-slate-800">Move &amp; delete:</strong> drag a placed gate to a new cell to move it, or drag it to the trash. Click a gate to select it (and edit its angle).</p>
+            <p><strong className="text-slate-800">Q-sphere:</strong> a global view of the state (≤ 5 qubits). Node size ∝ the probability of that basis state; node colour reflects its phase. Toggle labels between basis state and phase angle.</p>
+            <p><strong className="text-slate-800">Qiskit code:</strong> the exact Qiskit program for your circuit is generated live. Qubit ordering follows Qiskit (q0 = least-significant bit), so results match IBM Quantum.</p>
           </div>
         )}
       </div>
 
-      {/* ── Classic Experiments ── */}
-      <div className="bg-white rounded-xl border border-indigo-100 p-3">
-        <p className="text-xs font-semibold text-indigo-700 mb-2">🎯 Try a classic experiment</p>
-        <div className="flex flex-wrap gap-2">
-          <button onClick={() => loadPreset(1, [{ type: "H", qubit: 0 }], "Loaded a superposition: one Hadamard on qubit 0 gives a 50/50 state. Run shots to see it.")}
-            className="px-3 py-1.5 rounded-lg bg-indigo-100 text-indigo-700 text-xs font-medium hover:bg-indigo-200 transition-colors">
-            🌀 Superposition (one H gate)
-          </button>
-          <button onClick={() => loadPreset(2, [{ type: "H", qubit: 0 }, { type: "CNOT", qubit: 0, target: 1 }], "Loaded a Bell state (|00⟩+|11⟩)/√2 — the two qubits are now entangled. Measuring one instantly determines the other.")}
-            className="px-3 py-1.5 rounded-lg bg-indigo-100 text-indigo-700 text-xs font-medium hover:bg-indigo-200 transition-colors">
-            🔗 Bell state (entanglement)
-          </button>
-          <button onClick={() => loadPreset(3, [{ type: "H", qubit: 0 }, { type: "CNOT", qubit: 0, target: 1 }, { type: "CNOT", qubit: 1, target: 2 }], "Loaded a GHZ state (|000⟩+|111⟩)/√2 — three-way entanglement.")}
-            className="px-3 py-1.5 rounded-lg bg-indigo-100 text-indigo-700 text-xs font-medium hover:bg-indigo-200 transition-colors">
-            🌐 GHZ state (3-qubit entanglement)
-          </button>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Controls */}
-        <div className="space-y-4">
-          {/* Qubit selector */}
-          <div className="bg-white rounded-xl border border-slate-200 p-4">
-            <label className="text-xs font-semibold text-slate-900 uppercase tracking-wider">Qubits</label>
-            <div className="flex gap-2 mt-2">
-              {[1, 2, 3].map((n) => (
-                <button key={n} onClick={() => setNumQubits(n)}
-                  className={`px-4 py-1.5 rounded-lg text-xs font-medium transition-colors ${
-                    numQubits === n ? "bg-indigo-600 text-white" : "bg-slate-100 text-slate-600 hover:bg-slate-200"
-                  }`}>{n}</button>
-              ))}
-            </div>
-            <p className="text-[10px] text-slate-400 mt-1">Changing the count resets the circuit.</p>
-          </div>
-
-          {/* Active qubit */}
-          <div className="bg-white rounded-xl border border-slate-200 p-4">
-            <label className="text-xs font-semibold text-slate-900 uppercase tracking-wider">Active Qubit</label>
-            <p className="text-[10px] text-slate-400 mt-0.5 mb-2">Single-qubit gates apply here. For CNOT/SWAP this is the control/first qubit.</p>
-            <div className="flex gap-2">
-              {Array.from({ length: numQubits }, (_, i) => (
-                <button key={i} onClick={() => setActiveQubit(i)}
-                  className={`px-4 py-1.5 rounded-lg text-xs font-medium transition-colors ${
-                    activeQubit === i ? "bg-indigo-600 text-white" : "bg-slate-100 text-slate-600 hover:bg-slate-200"
-                  }`}>Q{i}</button>
-              ))}
-            </div>
-          </div>
-
-          {/* Gates */}
-          <div className="bg-white rounded-xl border border-slate-200 p-4">
-            <label className="text-xs font-semibold text-slate-900 uppercase tracking-wider mb-2">Gates</label>
-            <div className="grid grid-cols-3 gap-1.5">
-              {gateButtons.map((g) => (
-                <button key={g} title={GATE_TOOLTIPS[g]} onClick={() => addGate(g)}
-                  className="px-3 py-2 rounded-lg text-xs font-bold text-white transition-all hover:scale-105 active:scale-95"
-                  style={{ backgroundColor: GATE_COLORS[g] }}>{g}</button>
-              ))}
-            </div>
-            <div className="grid grid-cols-3 gap-1.5 mt-1.5">
-              {multiButtons.map((g) => (
-                <button key={g} title={GATE_TOOLTIPS[g]} onClick={() => addGate(g)}
-                  className="px-3 py-2 rounded-lg text-xs font-bold text-white transition-all hover:scale-105 active:scale-95"
-                  style={{ backgroundColor: GATE_COLORS[g] }}>{g === "Measure" ? "M" : g}</button>
-              ))}
-            </div>
-            {/* Rotation gates */}
-            <div className="grid grid-cols-3 gap-1.5 mt-1.5">
-              {["Rx", "Ry", "Rz"].map((g) => (
-                <button key={g} title={GATE_TOOLTIPS[g]}
-                  onClick={() => setActiveRotation(activeRotation === g ? null : g)}
-                  className={`w-full px-3 py-2 rounded-lg text-xs font-bold text-white transition-all hover:scale-105 active:scale-95 ${activeRotation === g ? "ring-2 ring-white ring-offset-1 ring-offset-violet-500" : ""}`}
-                  style={{ backgroundColor: "#8b5cf6" }}>
-                  {g}(θ)
-                </button>
-              ))}
-            </div>
-            <p className="text-[10px] text-slate-400 mt-2">Hover a gate to see what it does.</p>
-          </div>
-
-          {/* Rotation slider */}
-          {activeRotation && (
-            <div className="bg-white rounded-xl border border-slate-200 p-3">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-medium text-slate-700">{activeRotation}(θ)</span>
-                <span className="text-xs font-mono text-slate-500">{rotationAngle}°</span>
+      {/* ════════ COMPOSER ════════ */}
+      <div className="grid grid-cols-1 xl:grid-cols-[220px_1fr] gap-4">
+        {/* Palette */}
+        <div className="bg-white rounded-xl border border-slate-200 p-3 h-fit">
+          <h3 className="text-xs font-semibold text-slate-900 uppercase tracking-wider mb-2">Operations <span className="text-slate-400 font-normal">({PALETTE.length})</span></h3>
+          {cats.map((cat) => (
+            <div key={cat} className="mb-3">
+              <p className="text-[10px] font-semibold text-slate-400 uppercase mb-1">{cat}</p>
+              <div className="flex flex-wrap gap-1.5">
+                {PALETTE.filter((g) => g.cat === cat).map((g) => (
+                  <button key={g.type}
+                    draggable
+                    onDragStart={(e) => e.dataTransfer.setData("text/plain", JSON.stringify({ newGate: g.type }))}
+                    onClick={() => setArmed(armed === g.type ? null : g.type)}
+                    title={g.label}
+                    className={`px-2 h-8 min-w-[34px] rounded-md text-[11px] font-bold text-white cursor-grab active:cursor-grabbing transition-all hover:brightness-110 ${armed === g.type ? "ring-2 ring-offset-1 ring-slate-900" : ""}`}
+                    style={{ backgroundColor: g.color }}>
+                    {g.label}
+                  </button>
+                ))}
               </div>
-              <input type="range" min="0" max="360" value={rotationAngle}
-                onChange={(e) => setRotationAngle(parseInt(e.target.value))}
-                className="w-full mt-1 accent-violet-600" />
-              <button onClick={() => applyRotation(activeRotation as "Rx" | "Ry" | "Rz", rotationAngle)}
-                className="w-full mt-2 py-1.5 rounded-lg bg-violet-100 text-violet-700 text-xs font-semibold hover:bg-violet-200 transition-colors">
-                Apply {activeRotation}({rotationAngle}°)
-              </button>
-              <p className="text-[10px] text-slate-400 mt-1">Set the angle, then apply — the Bloch arrow rotates by that amount.</p>
             </div>
-          )}
-
-          {/* Clear + Share + Export */}
-          <div className="flex gap-2">
-            <button onClick={clearCircuit}
-              className="flex-1 py-2 rounded-xl bg-slate-100 text-slate-600 text-xs font-medium hover:bg-slate-200 transition-colors flex items-center justify-center gap-1.5">
-              <RotateCcw className="w-3.5 h-3.5" /> Clear
-            </button>
-            <button onClick={shareCircuit}
-              className="flex-1 py-2 rounded-xl bg-indigo-100 text-indigo-600 text-xs font-medium hover:bg-indigo-200 transition-colors">
-              🔗 Share
-            </button>
-            <button onClick={exportToQiskit}
-              className="flex-1 py-2 rounded-xl bg-emerald-100 text-emerald-600 text-xs font-medium hover:bg-emerald-200 transition-colors">
-              📄 Qiskit
-            </button>
-          </div>
+          ))}
+          {armed && <p className="text-[10px] text-indigo-600 mt-1">Click a cell to place <b>{DEF[armed].label}</b> · click the gate again to cancel</p>}
         </div>
 
-        {/* Circuit + Bloch + Statevector */}
-        <div className="lg:col-span-2 space-y-4">
-          {/* Wire diagram */}
-          <div className="bg-white rounded-xl border border-slate-200 p-4">
-            <h3 className="text-xs font-semibold text-slate-900 uppercase tracking-wider mb-3">Circuit</h3>
-            <div className="overflow-x-auto">
-              <canvas ref={wireRef} width={600} height={numQubits * 40 + 40} className="w-full min-h-[80px] rounded-lg" />
+        {/* Circuit + outputs */}
+        <div className="space-y-4 min-w-0">
+          {/* Toolbar */}
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Qubits: {numQubits}</span>
+            <button onClick={addQubit} disabled={numQubits >= 8}
+              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-100 text-slate-700 text-xs font-medium hover:bg-slate-200 disabled:opacity-40">
+              <Plus className="w-3 h-3" /> Add qubit
+            </button>
+            <button onClick={removeQubit} disabled={numQubits <= 1}
+              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-100 text-slate-700 text-xs font-medium hover:bg-slate-200 disabled:opacity-40">
+              <Minus className="w-3 h-3" /> Remove qubit
+            </button>
+            <button onClick={clearAll}
+              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-rose-50 text-rose-600 text-xs font-medium hover:bg-rose-100">
+              <RotateCcw className="w-3 h-3" /> Clear
+            </button>
+            {/* Trash drop zone */}
+            <div
+              onDragOver={(e) => e.preventDefault()}
+              onDrop={(e) => { e.preventDefault(); try { const pl = JSON.parse(e.dataTransfer.getData("text/plain")); if (pl.move) deleteOp(pl.move); } catch { } }}
+              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg border border-dashed border-slate-300 text-slate-400 text-xs ml-auto">
+              <Trash2 className="w-3 h-3" /> drag here to delete
             </div>
           </div>
 
-          {/* What just happened? */}
-          {lastAction && (
-            <div className="bg-indigo-50 border border-indigo-200 rounded-xl p-3 transition-all">
-              <p className="text-xs font-semibold text-indigo-700 mb-1">💡 What just happened?</p>
-              <p className="text-xs text-indigo-800 leading-relaxed">{lastAction}</p>
-            </div>
-          )}
-
-          {/* Bloch sphere + statevector row */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {/* Bloch sphere */}
-            <div className="bg-white rounded-xl border border-slate-200 p-4">
-              <h3 className="text-xs font-semibold text-slate-900 uppercase tracking-wider mb-2">Bloch Sphere — Qubit 0</h3>
-              <div className="flex justify-center">
-                <canvas ref={blochRef} width={190} height={190} className="max-w-[190px]" />
-              </div>
-              <div className="mt-3">
-                <div className="flex justify-between text-[10px] text-slate-400 mb-1">
-                  <span>chance of |0⟩ = {(prob0 * 100).toFixed(1)}%</span>
-                  <span>chance of |1⟩ = {(prob1 * 100).toFixed(1)}%</span>
+          {/* Circuit grid */}
+          <div className="bg-white rounded-xl border border-slate-200 p-3 overflow-x-auto">
+            <div className="relative" style={{ width: LEFT + numCols * CELL, height: TOPP * 2 + numQubits * CELL }}>
+              {/* wires */}
+              {Array.from({ length: numQubits }, (_, q) => (
+                <div key={q}>
+                  <div className="absolute text-[11px] font-mono text-slate-500" style={{ left: 4, top: rowY(q) - 20 }}>q[{q}]</div>
+                  <div className="absolute text-[10px] font-mono text-slate-400" style={{ left: 8, top: rowY(q) + 4 }}>|0⟩</div>
+                  <div className="absolute bg-slate-300" style={{ left: LEFT, top: rowY(q), width: numCols * CELL, height: 1 }} />
                 </div>
-                <div className="w-full h-3 rounded-full bg-slate-100 overflow-hidden flex">
-                  <div style={{ width: `${Math.max(prob0 * 100, 1)}%` }}
-                    className="bg-indigo-500 h-full transition-all duration-300" />
-                  <div style={{ width: `${Math.max(prob1 * 100, 1)}%` }}
-                    className="bg-pink-500 h-full transition-all duration-300" />
-                </div>
-              </div>
-            </div>
-
-            {/* Statevector display */}
-            <div className="bg-white rounded-xl border border-slate-200 p-4">
-              <h3 className="text-xs font-semibold text-slate-900 uppercase tracking-wider mb-2">Statevector</h3>
-              <p className="text-[10px] text-slate-400 mb-2">Bar = amplitude size. Number = amplitude (with phase, if any).</p>
-              <div className="space-y-1 max-h-[150px] overflow-y-auto">
-                {amplitudes.map(({ label, amp }) => {
-                  const mod = cabs(amp);
-                  const deg = (cphase(amp) * 180 / Math.PI);
-                  const disp = Math.abs(amp.im) < 1e-6
-                    ? amp.re.toFixed(3)
-                    : `${mod.toFixed(2)}∠${deg.toFixed(0)}°`;
-                  return (
-                    <div key={label} className="flex items-center gap-2 text-xs">
-                      <span className="font-mono text-slate-700 w-16 shrink-0">{label}</span>
-                      <div className="flex-1 bg-slate-100 rounded-full h-2 overflow-hidden">
-                        <div style={{ width: `${mod * 100}%` }}
-                          className="bg-violet-500 h-full transition-all duration-300" />
-                      </div>
-                      <span className="font-mono text-slate-500 w-16 text-right">{disp}</span>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          </div>
-
-          {/* Run shots + Histogram */}
-          <div className="bg-white rounded-xl border border-slate-200 p-4">
-            <div className="flex items-center justify-between mb-3">
-              <h3 className="text-xs font-semibold text-slate-900 uppercase tracking-wider">
-                <BarChart3 className="w-3.5 h-3.5 inline mr-1" />
-                Measurement Statistics
-              </h3>
-              <div className="flex gap-2">
-                <button onClick={() => runShots(100)}
-                  className="px-3 py-1.5 rounded-lg bg-indigo-600 text-white text-xs font-semibold hover:bg-indigo-500 transition-colors flex items-center gap-1">
-                  <Play className="w-3 h-3" /> Run 100 shots
-                </button>
-                <button onClick={() => runShots(1000)}
-                  className="px-3 py-1.5 rounded-lg bg-violet-600 text-white text-xs font-semibold hover:bg-violet-500 transition-colors flex items-center gap-1">
-                  <Play className="w-3 h-3" /> Run 1000
-                </button>
-              </div>
-            </div>
-            {shots > 0 && (
-              <div>
-                <div className="space-y-1.5 mb-2">
-                  {Object.entries(histogram).sort(([a], [b]) => {
-                    const na = parseInt(a.replace(/[^0-9]/g, ""), 2);
-                    const nb = parseInt(b.replace(/[^0-9]/g, ""), 2);
-                    return na - nb;
-                  }).map(([label, count]) => {
-                    const pct = (count / shots) * 100;
-                    return (
-                      <div key={label} className="flex items-center gap-2 text-xs">
-                        <span className="font-mono text-slate-700 w-16 shrink-0">{label}</span>
-                        <div className="flex-1 bg-slate-100 rounded-full h-3 overflow-hidden">
-                          <div style={{ width: `${pct}%` }}
-                            className="bg-indigo-500 h-full transition-all duration-500" />
-                        </div>
-                        <span className="text-slate-500 w-16 text-right">{count} ({pct.toFixed(0)}%)</span>
-                      </div>
-                    );
-                  })}
-                </div>
-                <p className="text-xs text-slate-400 leading-relaxed mt-2">
-                  Each shot is random — quantum measurement has no predetermined outcome. Run it 1000 times and a stable pattern emerges even though no single shot is predictable.
-                </p>
-              </div>
-            )}
-            {shots === 0 && (
-              <p className="text-xs text-slate-400 py-2">Click &ldquo;Run 100 shots&rdquo; to measure the current state many times and see the distribution.</p>
-            )}
-          </div>
-
-          {/* Phase disks */}
-          <div className="bg-white rounded-xl border border-slate-200 p-4">
-            <h3 className="text-xs font-semibold text-slate-900 uppercase tracking-wider mb-1">Phase Visualization</h3>
-            <p className="text-[10px] text-slate-400 mb-3">Each disk is one possible outcome. Fill = probability; the clock hand = phase. Phase gates (Z, S, T) rotate the hand without changing the fill.</p>
-            <div className="flex flex-wrap gap-4 justify-center">
-              {statevector.map((amp, i) => {
-                const mag = cabs(amp);
-                const phase = cphase(amp);
-                const basis = i.toString(2).padStart(numQubits, "0");
+              ))}
+              {/* drop cells */}
+              {Array.from({ length: numQubits }, (_, q) =>
+                Array.from({ length: numCols }, (_, col) => (
+                  <div key={`${q}-${col}`}
+                    onDragOver={(e) => e.preventDefault()}
+                    onDrop={onCellDrop(q, col)}
+                    onClick={() => onCellClick(q, col)}
+                    className={`absolute ${armed && !cellOccupied(q, col) ? "hover:bg-indigo-50 cursor-pointer" : ""}`}
+                    style={{ left: colX(col) - CELL / 2, top: rowY(q) - CELL / 2, width: CELL, height: CELL }} />
+                ))
+              )}
+              {/* ops */}
+              {ops.map((op) => {
+                const wires = involved(op);
+                const minQ = Math.min(...wires), maxQ = Math.max(...wires);
+                const def = DEF[op.type];
+                const isSel = op.uid === selected;
                 return (
-                  <div key={i} className="flex flex-col items-center gap-1">
-                    <canvas width={60} height={60} className="rounded-full bg-slate-50 border border-slate-200"
-                      ref={(el) => {
-                        if (!el) return;
-                        const ctx = el.getContext("2d");
-                        if (!ctx) return;
-                        const cx = 30, cy = 30, r = 25;
-                        ctx.clearRect(0, 0, 60, 60);
-                        ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2);
-                        ctx.fillStyle = "#f8fafc"; ctx.fill();
-                        ctx.strokeStyle = "#e2e8f0"; ctx.lineWidth = 1; ctx.stroke();
-                        if (mag > 0.01) {
-                          ctx.beginPath(); ctx.arc(cx, cy, r * mag, 0, Math.PI * 2);
-                          ctx.fillStyle = `rgba(99,102,241,${0.2 + mag * 0.5})`; ctx.fill();
-                          // Phase hand (screen y is inverted so negate sin)
-                          ctx.beginPath(); ctx.moveTo(cx, cy);
-                          ctx.lineTo(cx + r * Math.cos(phase), cy - r * Math.sin(phase));
-                          ctx.strokeStyle = "#6366f1"; ctx.lineWidth = 2; ctx.stroke();
-                        }
-                      }} />
-                    <span className="text-[10px] font-mono text-slate-500">|{basis}⟩</span>
-                    {mag > 0.01 && <span className="text-[8px] text-slate-400">φ={(phase * 180 / Math.PI).toFixed(0)}°</span>}
+                  <div key={op.uid}>
+                    {/* vertical connector */}
+                    {maxQ !== minQ && (
+                      <div className="absolute" style={{ left: colX(op.col) - 1, top: rowY(minQ), width: 2, height: rowY(maxQ) - rowY(minQ), background: def.color }} />
+                    )}
+                    {/* control dots */}
+                    {op.controls.map((c) => (
+                      <div key={c} className="absolute rounded-full" style={{ left: colX(op.col) - 6, top: rowY(c) - 6, width: 12, height: 12, background: def.color }} />
+                    ))}
+                    {/* targets */}
+                    {op.targets.map((t, ti) => {
+                      const isX = (op.type === "CX" || op.type === "CCX");
+                      return (
+                        <div key={t}
+                          draggable
+                          onDragStart={(e) => e.dataTransfer.setData("text/plain", JSON.stringify({ move: op.uid }))}
+                          onClick={() => setSelected(op.uid)}
+                          title={`${def.label} — click to select, drag to move`}
+                          className={`absolute flex items-center justify-center rounded-md text-white text-[11px] font-bold cursor-grab active:cursor-grabbing ${isSel ? "ring-2 ring-offset-1 ring-slate-900" : ""}`}
+                          style={{
+                            left: colX(op.col) - (isX ? 13 : 17), top: rowY(t) - (isX ? 13 : 13),
+                            width: isX ? 26 : 34, height: 26, borderRadius: isX ? 13 : 6,
+                            background: (op.type === "SWAP" || op.type === "CSWAP") ? "transparent" : def.color,
+                            color: (op.type === "SWAP" || op.type === "CSWAP") ? def.color : "#fff",
+                            border: (op.type === "SWAP" || op.type === "CSWAP") ? "none" : undefined,
+                          }}>
+                          {op.type === "SWAP" || op.type === "CSWAP" ? <span style={{ fontSize: 16 }}>✕</span>
+                            : isX ? <span style={{ fontSize: 16, lineHeight: 1 }}>⊕</span>
+                            : (def.label.replace(/\(.*\)/, ""))}
+                        </div>
+                      );
+                    })}
                   </div>
                 );
               })}
             </div>
+          </div>
+
+          {/* Selected-op editor */}
+          {selOp && (
+            <div className="bg-white rounded-xl border border-slate-200 p-3 flex flex-wrap items-center gap-3">
+              <span className="text-xs font-semibold text-slate-700">{DEF[selOp.type].label}</span>
+              <span className="text-[11px] text-slate-400 font-mono">
+                {selOp.controls.length > 0 && `ctrl q[${selOp.controls.join(",")}] · `}target q[{selOp.targets.join(",")}]
+              </span>
+              {DEF[selOp.type].params.map((pd, pi) => (
+                <label key={pi} className="flex items-center gap-1 text-xs text-slate-600">
+                  {pd.name} =
+                  <input type="number" step="0.0001" value={selOp.params[pi].toFixed(4)}
+                    onChange={(e) => {
+                      const v = parseFloat(e.target.value);
+                      if (Number.isNaN(v)) return;
+                      setOps((prev) => prev.map((o) => o.uid === selOp.uid ? { ...o, params: o.params.map((x, k) => k === pi ? v : x) } : o));
+                    }}
+                    className="w-20 px-1.5 py-0.5 rounded border border-slate-300 font-mono text-xs" />
+                  <span className="text-slate-400">({fmtPi(selOp.params[pi]).replace(/np\./g, "")})</span>
+                </label>
+              ))}
+              <button onClick={() => deleteOp(selOp.uid)}
+                className="ml-auto inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-rose-50 text-rose-600 text-xs font-medium hover:bg-rose-100">
+                <Trash2 className="w-3 h-3" /> Delete
+              </button>
+            </div>
+          )}
+
+          {/* Outputs: Q-sphere + statevector + code */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            {/* Q-sphere */}
+            <div className="bg-white rounded-xl border border-slate-200 p-4">
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="text-xs font-semibold text-slate-900 uppercase tracking-wider">Q-sphere</h3>
+                <button onClick={() => setShowPhaseLabels((v) => !v)}
+                  className="text-[10px] px-2 py-0.5 rounded bg-slate-100 text-slate-600 hover:bg-slate-200">
+                  {showPhaseLabels ? "Show state labels" : "Show phase angles"}
+                </button>
+              </div>
+              {numQubits <= 5 ? (
+                <>
+                  <div className="flex justify-center">
+                    <canvas ref={qsphereRef} width={300} height={300} className="max-w-full" />
+                  </div>
+                  <div className="mt-2 flex items-center justify-center gap-3 text-[10px] text-slate-400">
+                    <span>node size ∝ probability</span>
+                    <span className="inline-flex items-center gap-1">colour = phase
+                      <span className="inline-block w-16 h-2 rounded" style={{ background: "linear-gradient(90deg,hsl(0,75%,55%),hsl(120,75%,55%),hsl(240,75%,55%),hsl(360,75%,55%))" }} />
+                    </span>
+                  </div>
+                </>
+              ) : (
+                <div className="h-[300px] flex items-center justify-center text-center text-sm text-slate-400 px-6">
+                  The Q-sphere is limited to 5 qubits. Remove qubits to view it, or read the statevector table.
+                </div>
+              )}
+            </div>
+
+            {/* Statevector */}
+            <div className="bg-white rounded-xl border border-slate-200 p-4">
+              <h3 className="text-xs font-semibold text-slate-900 uppercase tracking-wider mb-2">Statevector</h3>
+              <p className="text-[10px] text-slate-400 mb-2">Computational basis (q[{numQubits - 1}]…q[0]). Bar = probability.</p>
+              <div className="space-y-1 max-h-[240px] overflow-y-auto pr-1">
+                {amps.length === 0 && <p className="text-xs text-slate-400">All amplitude is in |{"0".repeat(numQubits)}⟩.</p>}
+                {amps.map(({ i, label, prob, phase }) => (
+                  <div key={i} className="flex items-center gap-2 text-xs">
+                    <span className="font-mono text-slate-700 w-20 shrink-0">|{label}⟩</span>
+                    <div className="flex-1 bg-slate-100 rounded-full h-2 overflow-hidden">
+                      <div style={{ width: `${prob * 100}%` }} className="h-full bg-indigo-500" />
+                    </div>
+                    <span className="font-mono text-slate-500 w-14 text-right">{(prob * 100).toFixed(1)}%</span>
+                    <span className="font-mono text-slate-400 w-12 text-right">{(phase * 180 / Math.PI).toFixed(0)}°</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Qiskit code */}
+          <div className="bg-slate-900 rounded-xl border border-slate-800 p-4">
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="text-xs font-semibold text-slate-300 uppercase tracking-wider">Qiskit code</h3>
+              <button onClick={copyCode} className="inline-flex items-center gap-1 text-[11px] px-2 py-1 rounded bg-slate-800 text-slate-300 hover:bg-slate-700">
+                <Copy className="w-3 h-3" /> Copy
+              </button>
+            </div>
+            <pre className="text-[12px] leading-relaxed text-emerald-300 font-mono overflow-x-auto whitespace-pre">{qiskit}</pre>
           </div>
         </div>
       </div>
