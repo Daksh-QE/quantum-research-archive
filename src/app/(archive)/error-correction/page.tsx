@@ -7,7 +7,9 @@ interface Coord { x: number; y: number; }
 interface Defect { pos: Coord; type: "X" | "Z"; round: number; }
 interface MatchingEdge { from: Coord; to: Coord; color: string; }
 
-function generateSyndrome(d: number, errorRate: number, seed: number): { defects: Defect[]; plaquettes: Coord[] } {
+type NoiseModel = "depolarizing" | "biased" | "erasure";
+
+function generateSyndrome(d: number, errorRate: number, seed: number, noise: NoiseModel = "depolarizing"): { defects: Defect[]; plaquettes: Coord[] } {
   const plaquettes: Coord[] = [];
   let s = (seed % 2147483647 + 2147483647) % 2147483647 || 1;
   const rand = () => { s = (s * 16807) % 2147483647; return (s & 0x7fffffff) / 0x7fffffff; };
@@ -18,6 +20,11 @@ function generateSyndrome(d: number, errorRate: number, seed: number): { defects
       plaquettes.push({ x, y });
     }
   }
+
+  // Noise model shapes the syndrome: depolarizing → equal X/Z; biased →
+  // mostly Z (phase-flip) defects; erasure → more error chains (lost qubits).
+  const zProb = noise === "biased" ? 0.8 : 0.5;
+  const chainScale = noise === "erasure" ? 1.6 : 1;
 
   // Physically, an error *chain* flips the two stabilizers at its endpoints.
   // We therefore generate defects in PAIRS: pick two distinct stabilizers of
@@ -33,9 +40,9 @@ function generateSyndrome(d: number, errorRate: number, seed: number): { defects
   };
 
   // Expected number of error chains scales with lattice size and error rate.
-  const numChains = Math.max(1, Math.round(plaquettes.length * errorRate));
+  const numChains = Math.max(1, Math.round(plaquettes.length * errorRate * chainScale));
   for (let c = 0; c < numChains; c++) {
-    const type: "X" | "Z" = rand() > 0.5 ? "X" : "Z";
+    const type: "X" | "Z" = rand() < zProb ? "Z" : "X";
     const a = plaquettes[Math.floor(rand() * plaquettes.length)];
     // Chain endpoint: a nearby (or any other) stabilizer of the same lattice.
     let b = plaquettes[Math.floor(rand() * plaquettes.length)];
@@ -182,18 +189,20 @@ export default function QECDashboard() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const curveCanvasRef = useRef<HTMLCanvasElement>(null);
   const [hoveredDefect, setHoveredDefect] = useState<number | null>(null);
-  const [seed, setSeed] = useState(12345);
+  // Seed lives in a ref, NOT state: advancing it must not recreate
+  // runSimulation, or the mount effect (which depends on runSimulation) would
+  // re-fire endlessly and regenerate the syndrome forever.
+  const seedRef = useRef(12345);
 
   const runSimulation = useCallback(() => {
-    const nextSeed = (seed * 1103515245 + 12345) % 2147483647;
-    setSeed(nextSeed);
-    const result = generateSyndrome(distance, errorRate, nextSeed);
+    seedRef.current = (seedRef.current * 1103515245 + 12345) % 2147483647;
+    const result = generateSyndrome(distance, errorRate, seedRef.current, noiseModel);
     setDefects(result.defects);
     setCoord(result.plaquettes);
     setMatching([]);
     setShowDecoder(false);
     setAnimStep(0);
-  }, [distance, errorRate, seed]);
+  }, [distance, errorRate, noiseModel]);
 
   const runDecoder = useCallback(() => {
     const edges = generateMatching(defects, distance);
@@ -421,7 +430,8 @@ export default function QECDashboard() {
     const interval = setInterval(() => {
       setAnimStep((prev) => {
         const max = showDecoder ? matching.length * 3 + 3 : defects.length * 2 + 3;
-        return prev < max ? prev + 1 : prev;
+        if (prev >= max) { clearInterval(interval); return prev; } // stop when the reveal finishes
+        return prev + 1;
       });
     }, 200);
     return () => clearInterval(interval);
