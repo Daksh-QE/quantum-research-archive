@@ -176,6 +176,83 @@ function monteCarlo(family: Family, d: number, p: number, trials: number, rng: (
 }
 interface MCSeries { d: number; points: { p: number; rate: number }[]; }
 
+/* ── #1/#2 Measurement errors + multi-round space-time decoding ──
+   A measurement error makes a stabilizer report the wrong value in one round.
+   A naive "single-shot" decoder trusts a single round and mistakes measurement
+   errors for data errors. A space-time decoder repeats the measurement R times
+   (+ one perfect final round) and matches DETECTION EVENTS — differences between
+   consecutive rounds — in a 3D (space × time) graph, so measurement errors show
+   up as short time-like pairs that carry no spatial correction. */
+function matchGeneric(n: number, dist: (i: number, j: number) => number, bnd: (i: number) => number): { pairs: [number, number][]; boundary: number[] } {
+  if (n === 0) return { pairs: [], boundary: [] };
+  if (n > 14) {
+    const used = new Array(n).fill(false); const pairs: [number, number][] = []; const boundary: number[] = [];
+    for (let i = 0; i < n; i++) { if (used[i]) continue; let bj = -1, bw = bnd(i); for (let j = i + 1; j < n; j++) { if (used[j]) continue; const w = dist(i, j); if (w < bw) { bw = w; bj = j; } } used[i] = true; if (bj >= 0) { used[bj] = true; pairs.push([i, bj]); } else boundary.push(i); }
+    return { pairs, boundary };
+  }
+  const memo = new Map<number, { pairs: [number, number][]; boundary: number[]; weight: number }>();
+  const solve = (mask: number): { pairs: [number, number][]; boundary: number[]; weight: number } => {
+    if (mask === 0) return { pairs: [], boundary: [], weight: 0 };
+    const hit = memo.get(mask); if (hit) return hit;
+    let i = 0; while (!(mask & (1 << i))) i++;
+    const r0 = mask & ~(1 << i);
+    let best = (() => { const r = solve(r0); return { pairs: r.pairs, boundary: [i, ...r.boundary], weight: r.weight + bnd(i) }; })();
+    for (let j = i + 1; j < n; j++) { if (!(mask & (1 << j))) continue; const r = solve(r0 & ~(1 << j)); const w = r.weight + dist(i, j); if (w <= best.weight) best = { pairs: [[i, j], ...r.pairs], boundary: r.boundary, weight: w }; }
+    memo.set(mask, best); return best;
+  };
+  const r = solve((1 << n) - 1); return { pairs: r.pairs, boundary: r.boundary };
+}
+function allStabsList(lat: Lattice): { r: number; c: number }[] { const o: { r: number; c: number }[] = []; for (let r = 0; r < lat.rows; r++) for (let c = 0; c < lat.cols; c++) o.push({ r, c }); return o; }
+function litKeysOf(errors: Set<string>, lat: Lattice): Set<string> { return new Set(syndromeOf(errors, lat).map((v) => vkey(v.r, v.c))); }
+function corrFromMatch(verts: { r: number; c: number }[], m: { pairs: [number, number][]; boundary: number[] }, cols: number): Set<string> {
+  const corr = new Set<string>(); const t = (id: string) => (corr.has(id) ? corr.delete(id) : corr.add(id));
+  for (const [i, j] of m.pairs) for (const id of pathEdges(verts[i], verts[j])) t(id);
+  for (const i of m.boundary) for (const id of boundaryPathEdges(verts[i], cols)) t(id);
+  return corr;
+}
+function logicalFrom(trueError: Set<string>, corr: Set<string>): boolean {
+  const res = new Set(trueError); for (const id of corr) res.has(id) ? res.delete(id) : res.add(id);
+  let bl = 0; for (const id of res) if (id.startsWith("bl:")) bl ^= 1; return bl === 1;
+}
+// Returns whether each decoder produced a logical error on the same noisy data.
+function simulateCompare(lat: Lattice, R: number, pData: number, pMeas: number, rng: () => number): { single: boolean; spacetime: boolean } {
+  const trueError = new Set<string>();
+  for (const e of lat.edges) if (rng() < pData) trueError.add(e.id);
+  const trueLit = litKeysOf(trueError, lat);
+  const stabs = allStabsList(lat);
+  const meas: Set<string>[] = [];
+  for (let t = 0; t < R; t++) { const m = new Set(trueLit); for (const s of stabs) if (rng() < pMeas) { const k = vkey(s.r, s.c); m.has(k) ? m.delete(k) : m.add(k); } meas.push(m); }
+  meas.push(new Set(trueLit)); // perfect final readout closes the time boundary
+  // single-shot: trust round 0 as if perfect
+  const v0 = [...meas[0]].map((k) => { const [r, c] = k.split(",").map(Number); return { r, c }; });
+  const m0 = matchGeneric(v0.length, (i, j) => vdist(v0[i], v0[j]), (i) => boundaryDist(v0[i], lat.cols).dist);
+  const single = logicalFrom(trueError, corrFromMatch(v0, m0, lat.cols));
+  // space-time: detection events = symmetric difference between consecutive rounds
+  const events: { r: number; c: number; t: number }[] = [];
+  for (let t = 0; t <= R; t++) {
+    const prev = t === 0 ? new Set<string>() : meas[t - 1]; const cur = meas[t];
+    for (const k of cur) if (!prev.has(k)) { const [r, c] = k.split(",").map(Number); events.push({ r, c, t }); }
+    for (const k of prev) if (!cur.has(k)) { const [r, c] = k.split(",").map(Number); events.push({ r, c, t }); }
+  }
+  const me = matchGeneric(events.length, (i, j) => vdist(events[i], events[j]) + Math.abs(events[i].t - events[j].t), (i) => boundaryDist(events[i], lat.cols).dist);
+  const corr = new Set<string>(); const tog = (id: string) => (corr.has(id) ? corr.delete(id) : corr.add(id));
+  for (const [i, j] of me.pairs) for (const id of pathEdges(events[i], events[j])) tog(id); // spatial part only
+  for (const i of me.boundary) for (const id of boundaryPathEdges(events[i], lat.cols)) tog(id);
+  const spacetime = logicalFrom(trueError, corr);
+  return { single, spacetime };
+}
+interface MRPoint { pMeas: number; single: number; spacetime: number; }
+function measurementStudy(family: Family, d: number, R: number, pData: number, trials: number, rng: () => number): MRPoint[] {
+  const lat = latticeFor(family, d);
+  const pts: MRPoint[] = [];
+  for (let pm = 0; pm <= 0.2001; pm += 0.025) {
+    let s = 0, st = 0;
+    for (let t = 0; t < trials; t++) { const r = simulateCompare(lat, R, pData, Math.round(pm * 1000) / 1000, rng); if (r.single) s++; if (r.spacetime) st++; }
+    pts.push({ pMeas: Math.round(pm * 1000) / 1000, single: s / trials, spacetime: st / trials });
+  }
+  return pts;
+}
+
 /* ── Render geometry ── */
 const SIZE = 500;
 function edgeMid(e: Edge): { r: number; c: number } {
@@ -199,6 +276,10 @@ export default function QECDashboard() {
   const [mcData, setMcData] = useState<MCSeries[] | null>(null);
   const [mcRunning, setMcRunning] = useState(false);
   const mcSeedRef = useRef(777);
+  const [rounds, setRounds] = useState(5);
+  const [mrData, setMrData] = useState<MRPoint[] | null>(null);
+  const [mrRunning, setMrRunning] = useState(false);
+  const mrRef = useRef<HTMLCanvasElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const curveRef = useRef<HTMLCanvasElement>(null);
 
@@ -265,6 +346,16 @@ export default function QECDashboard() {
       setMcRunning(false);
     });
   }, [family]);
+
+  const runStudy = useCallback(() => {
+    setMrRunning(true);
+    requestAnimationFrame(() => {
+      let s = (mcSeedRef.current = (mcSeedRef.current * 16807 + 7) % 2147483647) || 1;
+      const rng = () => { s = (s * 16807) % 2147483647; return (s & 0x7fffffff) / 0x7fffffff; };
+      setMrData(measurementStudy(family, distance, rounds, errorRate, 300, rng));
+      setMrRunning(false);
+    });
+  }, [family, distance, rounds, errorRate]);
 
   const toPx = (r: number, c: number) => {
     const cellX = SIZE / (lat.cols + 1), cellY = SIZE / (lat.rows + 1);
@@ -382,6 +473,29 @@ export default function QECDashboard() {
     if (mcData) { ctx.fillStyle = "#334155"; ctx.font = "9px sans-serif"; ctx.fillText("empirical (sampled) — curves cross at the threshold", ml + pw / 2, mt - 4); }
   }, [showCurve, mcData]);
 
+  // Measurement-error study plot: single-shot vs space-time logical rate vs pMeas.
+  useEffect(() => {
+    const canvas = mrRef.current; if (!canvas || !mrData) return;
+    const ctx = canvas.getContext("2d"); if (!ctx) return;
+    const w = canvas.width, h = canvas.height; ctx.clearRect(0, 0, w, h); ctx.fillStyle = "#f8fafc"; ctx.fillRect(0, 0, w, h);
+    const ml = 46, mr = 16, mt = 16, mb = 26, pw = w - ml - mr, ph = h - mt - mb;
+    const xMax = 0.2, yMax = 0.55;
+    ctx.strokeStyle = "#cbd5e1"; ctx.beginPath(); ctx.moveTo(ml, mt); ctx.lineTo(ml, h - mb); ctx.lineTo(w - mr, h - mb); ctx.stroke();
+    const xOf = (p: number) => ml + (p / xMax) * pw, yOf = (v: number) => mt + ph - (v / yMax) * ph;
+    ctx.fillStyle = "#94a3b8"; ctx.font = "9px sans-serif"; ctx.textAlign = "right";
+    for (const v of [0, 0.25, 0.5]) ctx.fillText(`${Math.round(v * 100)}%`, ml - 4, yOf(v) + 3);
+    const line = (key: "single" | "spacetime", color: string, label: string) => {
+      ctx.strokeStyle = color; ctx.fillStyle = color; ctx.lineWidth = 2; ctx.beginPath();
+      mrData.forEach((pt, i) => { const x = xOf(pt.pMeas), y = yOf(pt[key]); i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y); });
+      ctx.stroke();
+      for (const pt of mrData) { const x = xOf(pt.pMeas), y = yOf(pt[key]); ctx.beginPath(); ctx.arc(x, y, 2.5, 0, Math.PI * 2); ctx.fill(); }
+      const last = mrData[mrData.length - 1]; ctx.font = "10px sans-serif"; ctx.textAlign = "right"; ctx.fillText(label, xOf(last.pMeas) - 3, yOf(last[key]) - 5);
+    };
+    line("single", "#ef4444", "single-shot");
+    line("spacetime", "#22c55e", "space-time");
+    ctx.fillStyle = "#94a3b8"; ctx.textAlign = "center"; ctx.fillText("measurement error rate", ml + pw / 2, h - 2);
+  }, [mrData]);
+
   const onCanvasClick = (ev: React.MouseEvent) => {
     const rect = canvasRef.current!.getBoundingClientRect();
     const scale = SIZE / rect.width;
@@ -495,6 +609,24 @@ export default function QECDashboard() {
             <p>Physical qubits fail ~1 in 100–1000 operations. To run a real algorithm you need a logical error rate near 10⁻¹⁵ — which means wrapping <strong>thousands</strong> of physical qubits around each logical one. Estimates put factoring RSA-2048 at roughly <strong>20 million</strong> physical qubits. That gap is why error correction, not just more qubits, is the central challenge.</p>
           </div>
 
+          {/* Measurement errors & multi-round (#1, #2) */}
+          <div className="bg-white rounded-xl border border-slate-200 p-4">
+            <h3 className="text-xs font-semibold text-slate-900 uppercase tracking-wider mb-1">Measurement Errors &amp; Rounds</h3>
+            <p className="text-[10px] text-slate-400 mb-2">Real stabilizer measurements are themselves noisy. A single round can&apos;t tell a measurement error from a data error — you repeat the measurement and decode across time.</p>
+            <label className="text-xs font-semibold text-slate-900 uppercase tracking-wider">Rounds (R)</label>
+            <div className="flex gap-2 mt-2 mb-3">
+              {[1, 3, 5, 9].map((r) => (
+                <button key={r} onClick={() => setRounds(r)}
+                  className={`flex-1 px-2 py-1.5 rounded-lg text-xs font-medium transition-colors ${rounds === r ? "bg-indigo-600 text-white" : "bg-slate-100 text-slate-600 hover:bg-slate-200"}`}>{r}</button>
+              ))}
+            </div>
+            <button onClick={runStudy} disabled={mrRunning}
+              className="w-full py-2 rounded-xl bg-indigo-600 text-white text-xs font-semibold hover:bg-indigo-500 disabled:opacity-60 transition-colors">
+              {mrRunning ? "Sampling…" : "Run measurement-error study"}
+            </button>
+            <p className="text-[10px] text-slate-400 mt-1">Compares a naive single-round decoder vs a space-time decoder ({rounds}-round) as measurement noise rises.</p>
+          </div>
+
           {/* Export (#9) */}
           <div className="bg-white rounded-xl border border-slate-200 p-4">
             <h3 className="text-xs font-semibold text-slate-900 uppercase tracking-wider mb-2">Export</h3>
@@ -556,6 +688,17 @@ export default function QECDashboard() {
                 : "Illustrative curves. Click “Run Monte-Carlo” to sample real errors, decode them, and plot the empirical logical error rate — the curves will cross at the code's true threshold."}
             </p>
           </div>
+
+          {/* Measurement-error study plot (#1, #2) */}
+          {mrData && (
+            <div className="bg-white rounded-xl border border-slate-200 p-4">
+              <h3 className="text-xs font-semibold text-slate-900 uppercase tracking-wider mb-2">Measurement Errors: single-shot vs space-time (R={rounds})</h3>
+              <canvas ref={mrRef} width={440} height={220} className="w-full max-w-[440px] mx-auto border border-slate-200 rounded-lg" />
+              <p className="text-xs text-slate-400 mt-2">
+                As measurement noise rises, the <span className="text-red-600 font-medium">single-shot</span> decoder degrades fast — it mistakes measurement errors for data errors. The <span className="text-emerald-600 font-medium">space-time</span> decoder repeats the measurement over {rounds} rounds and matches detection events across time, staying robust. At zero measurement noise the two coincide — the whole gap is measurement error.
+              </p>
+            </div>
+          )}
         </div>
       </div>
     </div>
