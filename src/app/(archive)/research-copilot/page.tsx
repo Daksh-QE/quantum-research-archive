@@ -5,6 +5,7 @@ import { Search, Sparkles, BookOpen, Lightbulb, ChevronRight, ArrowRight, Messag
 import { glossaryTerms } from "@/data/glossary";
 import { curriculum } from "@/data/curriculum";
 import { resources } from "@/data/resources";
+import { answerFromPaper } from "@/lib/paperAnswer";
 
 /* ── Interfaces ── */
 interface PaperData {
@@ -331,7 +332,10 @@ export default function ResearchCopilotPage() {
   const [chatMessages, setChatMessages] = useState<CopilotMessage[]>([]);
   const [chatLoading, setChatLoading] = useState(false);
   const [arxivInput, setArxivInput] = useState("");
+  const [arxivLoading, setArxivLoading] = useState(false);
+  const [arxivError, setArxivError] = useState("");
   const selectedPaperRef = useRef<PaperData | null>(null);
+  const chatMessagesRef = useRef<CopilotMessage[]>([]);
 
   const allPapers = useMemo(() => {
     // Combine preset papers with resources that are papers
@@ -398,6 +402,10 @@ export default function ResearchCopilotPage() {
     }
   }, [quizSubmitted, quizScore, quiz.length, selectedPaper, completedPapers]);
 
+  useEffect(() => {
+    chatMessagesRef.current = chatMessages;
+  }, [chatMessages]);
+
   const handleSelectPaper = useCallback((paper: PaperData) => {
     setSelectedPaper(paper);
     selectedPaperRef.current = paper;
@@ -405,8 +413,30 @@ export default function ResearchCopilotPage() {
     setQuizAnswers({});
     setQuizSubmitted(false);
     setChatMessages([]);
+    chatMessagesRef.current = [];
     setActiveTab("explain");
   }, []);
+
+  const loadArxiv = useCallback(async () => {
+    const raw = arxivInput.trim();
+    setArxivError("");
+    if (!raw) { setArxivError("Paste an arXiv URL or id first."); return; }
+    const match = raw.match(/(\d{4}\.\d{4,5}|[a-z-]+(?:\.[a-z-]+)*\/\d{7})(v\d+)?/i);
+    if (!match) { setArxivError("That doesn't look like an arXiv id (e.g. 1801.00862 or quant-ph/9508027)."); return; }
+    const id = match[1];
+    setArxivLoading(true);
+    try {
+      const res = await fetch(`/api/arxiv?id=${encodeURIComponent(id)}`, { signal: AbortSignal.timeout(15000) });
+      const data = await res.json();
+      if (!res.ok || !data.title) { setArxivError(data.error || "Could not load that paper."); return; }
+      handleSelectPaper({ id: data.id, title: data.title, authors: data.authors, abstract: data.abstract, url: data.url, year: data.year || "—" });
+      setArxivInput("");
+    } catch {
+      setArxivError("Could not reach arXiv. Please try again.");
+    } finally {
+      setArxivLoading(false);
+    }
+  }, [arxivInput, handleSelectPaper]);
 
   const handleAnswer = (qIdx: number, optIdx: number) => {
     if (quizSubmitted) return;
@@ -417,9 +447,7 @@ export default function ResearchCopilotPage() {
     setQuizSubmitted(true);
   };
 
-  const handleChatSend = (rawMessage: string) => {
-    // Read the captured submitted value, not a mutable ref, so rapid
-    // successive sends each produce their own reliable reply.
+  const handleChatSend = async (rawMessage: string) => {
     const msg = rawMessage.trim();
     const paper = selectedPaperRef.current;
     if (!msg || !paper) return;
@@ -427,18 +455,37 @@ export default function ResearchCopilotPage() {
     setChatMessages((prev) => [...prev, { role: "user", content: msg }]);
     setChatLoading(true);
 
-    // Generate a response locally using our data
-    setTimeout(() => {
-      const termMatch = glossaryTerms.find((t) => msg.toLowerCase().includes(t.term.toLowerCase()));
-      let reply = "I can help explain concepts from this paper. Try asking about specific terms or ideas mentioned in the abstract.";
-      if (termMatch) {
-        reply = `**${termMatch.term}**: ${termMatch.definition}`;
-      } else if (msg.toLowerCase().includes("summary") || msg.toLowerCase().includes("explain")) {
-        reply = `Here's a plain-English explanation: This paper by **${paper.authors}** discusses ${paper.title.toLowerCase()}. The key idea is that ${paper.abstract.split(". ")[0]}. The implications are significant for quantum computing because it addresses a fundamental challenge in the field.`;
+    // Try the AI API first
+    try {
+      const res = await fetch("/api/copilot", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          messages: [...chatMessagesRef.current, { role: "user", content: msg }],
+          paperTitle: paper.title,
+          paperAuthors: paper.authors,
+          paperAbstract: paper.abstract,
+        }),
+        signal: AbortSignal.timeout(20000),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.reply) {
+          setChatMessages((prev) => [...prev, { role: "assistant", content: data.reply }]);
+          setChatLoading(false);
+          return;
+        }
       }
-      setChatMessages((prev) => [...prev, { role: "assistant", content: reply }]);
-      setChatLoading(false);
-    }, 800);
+    } catch {}
+
+    // Fallback (API unreachable): the same paper-grounded answerer the server uses.
+    const reply = answerFromPaper(
+      msg,
+      { title: paper.title, authors: paper.authors, abstract: paper.abstract, categories: paper.categories },
+      glossaryTerms
+    );
+    setChatMessages((prev) => [...prev, { role: "assistant", content: reply }]);
+    setChatLoading(false);
   };
 
   return (
@@ -477,53 +524,25 @@ export default function ResearchCopilotPage() {
           </div>
 
           {/* arXiv direct link */}
-          <div className="flex gap-2">
-            <input
-              type="text"
-              placeholder="Or paste an arXiv URL (e.g., https://arxiv.org/abs/quant-ph/9508027)"
-              value={arxivInput}
-              onChange={(e) => setArxivInput(e.target.value)}
-              className="flex-1 px-4 py-2 rounded-xl border border-slate-300 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-violet-500"
-            />
-            <button
-              onClick={() => {
-                if (arxivInput.trim()) {
-                  const match = arxivInput.match(/arxiv\.org\/abs\/(\d{4}\.\d{4,5}|[a-z-]+(?:\.[a-z-]+)*\/\d{7})(v\d+)?/i);
-                  if (match) {
-                    // Strip any trailing version suffix (v1/v2/...) so the API
-                    // fetch uses the base ID. arXiv returns the latest version.
-                    const id = match[1];
-                    setSearchQuery("");
-                    fetch(`https://export.arxiv.org/api/query?id_list=${id}`)
-                      .then((r) => r.text())
-                      .then((xml) => {
-                        const title = (xml.match(/<title>(.+?)<\/title>/)?.[1] || "Untitled").replace(/^arXiv:\S+\s*/, "").trim();
-                        const abstract = (xml.match(/<summary>(.+?)<\/summary>/)?.[1] || "").replace(/<[^>]+>/g, "").trim();
-                        const authorMatches = [...xml.matchAll(/<author><name>(.+?)<\/name><\/author>/g)];
-                        const authors = authorMatches.map((m) => m[1]).join(", ") || "Unknown";
-                        handleSelectPaper({
-                          id,
-                          title: title.replace(/^[a-z-]+\/\d{7}\s*/i, ""),
-                          authors,
-                          abstract,
-                          url: arxivInput.trim(),
-                          year: new Date().getFullYear().toString(),
-                        });
-                      })
-                      .catch(() => {
-                        alert("Could not fetch paper from arXiv. Check the URL and try again.");
-                      });
-                  } else {
-                    alert("Please enter a valid arXiv URL (e.g., https://arxiv.org/abs/quant-ph/9508027)");
-                  }
-                } else {
-                  alert("Please paste an arXiv URL first.");
-                }
-              }}
-              className="px-4 py-2 rounded-xl bg-violet-600 text-white text-sm font-medium hover:bg-violet-500 transition-colors shrink-0"
-            >
-              Load
-            </button>
+          <div>
+            <div className="flex gap-2">
+              <input
+                type="text"
+                placeholder="Or paste an arXiv URL (e.g., https://arxiv.org/abs/quant-ph/9508027)"
+                value={arxivInput}
+                onChange={(e) => { setArxivInput(e.target.value); setArxivError(""); }}
+                onKeyDown={(e) => { if (e.key === "Enter") loadArxiv(); }}
+                className="flex-1 px-4 py-2 rounded-xl border border-slate-300 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-violet-500"
+              />
+              <button
+                onClick={loadArxiv}
+                disabled={arxivLoading}
+                className="px-4 py-2 rounded-xl bg-violet-600 text-white text-sm font-medium hover:bg-violet-500 transition-colors shrink-0 disabled:opacity-60 inline-flex items-center gap-1.5"
+              >
+                {arxivLoading ? <><Loader2 className="w-4 h-4 animate-spin" /> Loading…</> : "Load"}
+              </button>
+            </div>
+            {arxivError && <p className="text-xs text-red-600 mt-1.5">{arxivError}</p>}
           </div>
 
           <p className="text-xs text-slate-400">Pre-loaded papers:</p>
@@ -742,9 +761,17 @@ export default function ResearchCopilotPage() {
                 </div>
                 <div className="h-48 overflow-y-auto mb-3 space-y-2 bg-slate-50 rounded-xl p-3">
                   {chatMessages.length === 0 && (
-                    <p className="text-xs text-slate-400 text-center pt-8">
-                      Ask anything about this paper. Try "What's the main result?" or "Explain superposition."
-                    </p>
+                    <div className="text-center pt-4">
+                      <p className="text-xs text-slate-400 mb-2">Ask anything about this paper — try one:</p>
+                      <div className="flex flex-wrap gap-1.5 justify-center">
+                        {["What's the main result?", "Summarize this paper", "How does it work?", ...(highlightedTerms[0] ? [`Explain ${highlightedTerms[0]}`] : [])].map((s) => (
+                          <button key={s} onClick={() => handleChatSend(s)}
+                            className="px-2.5 py-1 rounded-full bg-white border border-slate-200 text-[11px] text-slate-600 hover:border-violet-300 hover:text-violet-700 transition-colors">
+                            {s}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
                   )}
                   {chatMessages.map((m, i) => (
                     <div key={i} className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
@@ -824,22 +851,26 @@ export default function ResearchCopilotPage() {
               </div>
             )}
 
-            {/* Smart recommendations */}
-            <div className="bg-gradient-to-br from-violet-50 to-fuchsia-50 rounded-xl border border-slate-200 p-4">
-              <h3 className="text-xs font-semibold text-slate-900 uppercase tracking-wider mb-2">Next Paper</h3>
-              <p className="text-xs text-slate-600 leading-relaxed">
-                After this, try reading <strong>Quantum Computing in the NISQ era</strong> by John Preskill — it builds on these concepts and explores near-term quantum devices.
-              </p>
-              <button
-                onClick={() => {
-                  const next = PRESET_PAPERS.find((p) => p.id === "preskill-nisq");
-                  if (next) handleSelectPaper(next);
-                }}
-                className="mt-2 text-xs text-violet-600 hover:text-violet-500 font-medium flex items-center gap-1"
-              >
-                Read now <ArrowRight className="w-3 h-3" />
-              </button>
-            </div>
+            {/* Smart recommendations — pick a different paper, prefer a shared category */}
+            {(() => {
+              const cur = selectedPaper;
+              const others = PRESET_PAPERS.filter((p) => p.id !== cur.id);
+              const shared = others.find((p) => p.categories?.some((c) => cur.categories?.includes(c)));
+              const next = shared || others[0];
+              if (!next) return null;
+              return (
+                <div className="bg-gradient-to-br from-violet-50 to-fuchsia-50 rounded-xl border border-slate-200 p-4">
+                  <h3 className="text-xs font-semibold text-slate-900 uppercase tracking-wider mb-2">Next Paper</h3>
+                  <p className="text-xs text-slate-600 leading-relaxed">
+                    After this, try <strong>{next.title}</strong>{next.authors ? ` by ${next.authors.split(",")[0]}` : ""}{shared ? " — it shares themes with this one." : "."}
+                  </p>
+                  <button onClick={() => handleSelectPaper(next)}
+                    className="mt-2 text-xs text-violet-600 hover:text-violet-500 font-medium flex items-center gap-1">
+                    Read now <ArrowRight className="w-3 h-3" />
+                  </button>
+                </div>
+              );
+            })()}
           </div>
         </div>
       )}

@@ -5,6 +5,23 @@ Created: 2026-06-24T22:44:40.666Z
 This file is maintained by the stratum orchestrator. It logs manager decisions, worker assignments, worker summaries, checks, repairs, and phase notes.
 
 ## Manager
+- 2026-07-01T04:55:25.223Z — **done** Fixed 6 broken resource URLs (search pages → direct links)
+  Fixed URLs in `src/data/resources.ts` for 6 resources that pointed to search results pages instead of the actual content:
+  
+  1. **book-benenti** — `worldscientific.com/search?q=...` → Amazon book page
+  2. **book-mcintyre** — `google.com/search?q=...` → Amazon book page
+  3. **course-coursera-quantum-computing** (MITx 8.370.x) — `edx.org/search?q=...` → MIT Open Learning Library
+  4. **course-coursera-quantum-cryptography** (Caltech/Delft) — `edx.org/search?q=...` → edX Delft quantum computing topic
+  5. **course-edx-quantum-fundamentals** (QM for Everyone) — `edx.org/search?q=quantum+mechanics` → actual course page (verified 200)
+  6. **course-grovers-algorithm-course** (TU Delft) — `edx.org/search?q=quantum+computing` → edX Quantum Error Correction & Algorithms
+  
+  All verified. Build passes. Deployed to production.
+- 2026-07-01T04:31:21.601Z — **started** Desktop orchestrator session started
+  Selected project folder: /Users/dakshjain/Documents/Quantum Research Archive
+- 2026-06-29T22:38:14.055Z — **done** Analytics implemented + backup + push
+  - **Backup**: Cloned GitHub repo to `~/Desktop/quantum-research-archive-backup/` (commit 1ccc1f0)
+  - **Analytics**: Installed `@vercel/analytics` package, added `<Analytics />` to root layout. Build passes with 0 errors.
+  - **Push**: Committed and pushed to GitHub (b6888b00) — includes Vercel Analytics, plan.md, codebase.md updates
 - 2026-06-29T22:35:33.490Z — **started** Desktop orchestrator session started
   Selected project folder: /Users/dakshjain/Documents/Quantum Research Archive
 - 2026-06-28T02:05:17.118Z — **started** Desktop orchestrator session started
@@ -3939,6 +3956,9 @@ This file is maintained by the stratum orchestrator. It logs manager decisions, 
 - worker-review: Review Worker (reviewer)
 
 ## Activity Log
+- 2026-07-01T04:55:25.223Z — Manager: Fixed 6 broken resource URLs (search pages → direct links) (done)
+- 2026-07-01T04:31:21.601Z — Manager: Desktop orchestrator session started (started)
+- 2026-06-29T22:38:14.056Z — Manager: Analytics implemented + backup + push (done)
 - 2026-06-29T22:35:33.490Z — Manager: Desktop orchestrator session started (started)
 - 2026-06-28T02:05:17.118Z — Manager: Desktop orchestrator session started (started)
 - 2026-06-28T01:24:40.496Z — Frontend: Completed by Frontend Worker: Add phase disks, rotation sliders, share URLs, Qiskit export (done)

@@ -139,7 +139,7 @@ export const resources: Resource[] = [
     title: "Principles of Quantum Computation and Information",
     description:
       "A comprehensive two-volume set covering both the foundations of quantum computation and advanced topics in quantum information processing.",
-    url: "https://www.worldscientific.com/search?q=Principles+of+Quantum+Computation+and+Information+Benenti",
+    url: "https://www.amazon.com/Principles-Quantum-Computation-Information-Vol/dp/9812388303",
     tags: ["BOOK", "GUIDE"],
     category: "Book",
     author: "Giuliano Benenti, Giulio Casati & Giuliano Strini",
@@ -183,7 +183,7 @@ export const resources: Resource[] = [
     title: "Quantum Mechanics: A Paradigms Approach",
     description:
       "A modern approach to teaching quantum mechanics using a paradigms-based methodology, emphasizing conceptual understanding.",
-    url: "https://www.google.com/search?q=Quantum+Mechanics+A+Paradigms+Approach+David+McIntyre",
+    url: "https://www.amazon.com/Quantum-Mechanics-Paradigms-David-McIntyre/dp/0321765796",
     tags: ["BOOK", "GUIDE"],
     category: "Book",
     author: "David H. McIntyre",
@@ -334,7 +334,7 @@ export const resources: Resource[] = [
     title: "edX: Quantum Information Science I (MITx 8.370.x)",
     description:
       "MITx's introduction to quantum information science on edX, taught by Isaac Chuang, Aram Harrow, and Peter Shor — qubits, gates, and core quantum algorithms.",
-    url: "https://www.edx.org/search?q=quantum+information+science+MITx",
+    url: "https://openlearninglibrary.mit.edu/courses/course-v1:MITx+8.370.1x+1T2018/about",
     tags: ["COURSE", "VIDEO"],
     category: "Course",
     author: "MITx (Isaac Chuang et al.)",
@@ -345,7 +345,7 @@ export const resources: Resource[] = [
     title: "edX: Quantum Cryptography (Caltech & Delft)",
     description:
       "An advanced edX course on quantum cryptography from Caltech and TU Delft, taught by Stephanie Wehner and Umesh Vazirani, covering QKD, entanglement-based protocols, and security proofs.",
-    url: "https://www.edx.org/search?q=quantum+cryptography",
+    url: "https://www.edx.org/learn/quantum-computing/delft-university-of-technology-quantum-computing",
     tags: ["COURSE", "VIDEO"],
     category: "Course",
     author: "Stephanie Wehner & Umesh Vazirani (Caltech/Delft)",
@@ -356,7 +356,7 @@ export const resources: Resource[] = [
     title: "edX: Quantum Mechanics for Everyone",
     description:
       "A conceptual introduction to quantum mechanics from Georgetown University, requiring no advanced math background.",
-    url: "https://www.edx.org/search?q=quantum+mechanics",
+    url: "https://www.edx.org/learn/quantum-physics-mechanics/georgetown-university-quantum-mechanics-for-everyone",
     tags: ["COURSE", "VIDEO"],
     category: "Course",
     author: "Georgetown University",
@@ -438,7 +438,7 @@ export const resources: Resource[] = [
     title: "Quantum Algorithm Design (EdX)",
     description:
       "A deep dive into quantum algorithm design from TU Delft, covering Grover, Shor, and quantum Fourier transform.",
-    url: "https://www.edx.org/search?q=quantum+computing",
+    url: "https://www.edx.org/learn/computer-programming/delft-university-of-technology-quantum-algorithms-and-error-correction",
     tags: ["COURSE", "VIDEO"],
     category: "Course",
     domain: "Quantum Computing",
