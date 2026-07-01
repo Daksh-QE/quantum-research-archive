@@ -485,7 +485,7 @@ export default function ResearchCopilotPage() {
           paperAuthors: paper.authors,
           paperAbstract: paper.abstract,
         }),
-        signal: AbortSignal.timeout(30000),
+        signal: AbortSignal.timeout(40000),
       });
       if (res.ok) {
         const data = await res.json();

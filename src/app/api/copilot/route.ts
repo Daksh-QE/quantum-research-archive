@@ -15,8 +15,12 @@ interface ChatMessage {
   content: string;
 }
 
-/** OpenRouter model (only used when OPENROUTER_API_KEY is configured). */
-const MODEL = process.env.OPENROUTER_MODEL || "deepseek/deepseek-v4-flash";
+/** OpenRouter models, tried in order (only used when OPENROUTER_API_KEY is set):
+    primary → backup → local answerer. Overridable via env. */
+const MODELS = [
+  process.env.OPENROUTER_MODEL || "nvidia/nemotron-3-ultra-550b-a55b:free",
+  process.env.OPENROUTER_MODEL_BACKUP || "nvidia/nemotron-3-super-120b-a12b:free",
+];
 const OPENROUTER_KEY = process.env.OPENROUTER_API_KEY || null;
 
 const SITE_URL = process.env.SITE_URL || "https://quantum-research-archive.vercel.app";
@@ -127,13 +131,15 @@ Guidelines:
         ...messages.slice(-10),
       ];
 
-      // ── Attempt 1: hosted model (only when a key is configured) ──
+      // ── Attempt 1: hosted models in order (primary → backup) ──
       if (OPENROUTER_KEY) {
-        try {
-          const reply = await callOpenRouter(MODEL, apiMessages, OPENROUTER_KEY, AbortSignal.timeout(18000));
-          if (reply) return NextResponse.json({ reply }, { headers: rateCheck.headers });
-        } catch (err) {
-          console.error(`[copilot] ${MODEL} error:`, err);
+        for (const model of MODELS) {
+          try {
+            const reply = await callOpenRouter(model, apiMessages, OPENROUTER_KEY, AbortSignal.timeout(18000));
+            if (reply) return NextResponse.json({ reply }, { headers: rateCheck.headers });
+          } catch (err) {
+            console.error(`[copilot] ${model} error:`, err);
+          }
         }
       }
 
