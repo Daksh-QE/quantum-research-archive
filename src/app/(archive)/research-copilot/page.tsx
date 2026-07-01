@@ -5,7 +5,7 @@ import { Search, Sparkles, BookOpen, Lightbulb, ChevronRight, ArrowRight, Messag
 import { glossaryTerms } from "@/data/glossary";
 import { curriculum } from "@/data/curriculum";
 import { resources } from "@/data/resources";
-import { answerFromPaper } from "@/lib/paperAnswer";
+import { answerFromPaper, paperSummary } from "@/lib/paperAnswer";
 
 /* ── Interfaces ── */
 interface PaperData {
@@ -232,29 +232,43 @@ function hashSeed(str: string): number {
   return (h >>> 0) % 2147483647 || 1;
 }
 
-/* ── Generate quiz questions based on paper content (deterministic per paper) ── */
-function generateQuiz(paper: PaperData, selectedTerms: string[]): QuizQuestion[] {
+/* Trim a sentence to a uniform length so option length never leaks the answer. */
+function clip(s: string): string {
+  const t = s.trim().replace(/\s+/g, " ");
+  return t.length > 90 ? t.slice(0, 88).trim() + "…" : t;
+}
+
+/* ── Generate quiz questions based on paper content (deterministic per paper) ──
+   The "main claim" question uses a real sentence from THIS paper as the answer
+   and real sentences from OTHER papers as distractors — plausible quantum
+   statements, so the learner must actually know this paper's content. */
+function generateQuiz(paper: PaperData, selectedTerms: string[], otherPapers: PaperData[]): QuizQuestion[] {
   const questions: QuizQuestion[] = [];
   let qi = 0;
   const seed = hashSeed(paper.id);
 
-  // Paper content question
-  const sentences = paper.abstract.split(".").filter((s) => s.trim().length > 20);
-  if (sentences.length > 2) {
-    // Deterministic sentence pick (no Math.random inside useMemo).
-    const q = sentences[seed % sentences.length].trim();
-    const rawOptions = [
-      q.substring(0, Math.min(q.length, 80)) + "...",
-      "This claim is not supported by the paper.",
-      "The paper argues the opposite.",
-    ];
+  const sentences = paper.abstract.split(/(?<=[.!?])\s+/).map((s) => s.trim()).filter((s) => s.length > 25);
+  if (sentences.length >= 1) {
+    const correctSentence = clip(sentences[seed % sentences.length]);
+    // Distractors: real sentences pulled from other papers' abstracts.
+    const pool: string[] = [];
+    const shuffledOthers = shuffleArray(otherPapers.filter((p) => p.id !== paper.id && p.abstract), seed + 5);
+    for (const op of shuffledOthers) {
+      const opSents = op.abstract.split(/(?<=[.!?])\s+/).map((s) => s.trim()).filter((s) => s.length > 25);
+      if (opSents.length) {
+        const cand = clip(opSents[(seed + pool.length * 13) % opSents.length]);
+        if (cand !== correctSentence && !pool.includes(cand)) pool.push(cand);
+      }
+      if (pool.length >= 2) break;
+    }
+    const rawOptions = pool.length >= 2
+      ? [correctSentence, pool[0], pool[1]]
+      : [correctSentence, "This claim is not made in the paper.", "The paper argues the opposite."];
     const shuffledOptions = shuffleArray([...rawOptions], seed + qi * 7 + 42);
-    const correctAnswer = rawOptions[0];
-    const newCorrect = shuffledOptions.indexOf(correctAnswer);
     questions.push({
-      question: `According to the paper, which of the following is true?`,
+      question: `Which statement is actually made in this paper?`,
       options: shuffledOptions,
-      correct: newCorrect,
+      correct: shuffledOptions.indexOf(rawOptions[0]),
     });
     qi++;
   }
@@ -300,24 +314,29 @@ function generateQuiz(paper: PaperData, selectedTerms: string[]): QuizQuestion[]
   return questions;
 }
 
-/* ── Prerequisite concepts from curriculum ── */
+/* ── Prerequisite concepts from curriculum ──
+   Score each lesson by how strongly its title matches the paper text, and keep
+   only confident matches (a distinctive ≥6-letter word, or ≥2 shorter words),
+   ranked by score. This avoids tangential hits like every "algorithm" lesson. */
+const PREREQ_STOP = new Set(["quantum", "computing", "computer", "introduction", "the", "and", "for", "with", "from", "into", "using", "your", "their", "what", "how", "why"]);
 function findPrereqs(paper: PaperData) {
-  const matches: { module: string; lesson: string; url: string }[] = [];
-  const lower = paper.abstract.toLowerCase();
+  const haystack = `${paper.abstract} ${paper.title} ${(paper.categories || []).join(" ")}`.toLowerCase();
+  const scored: { module: string; lesson: string; url: string; score: number }[] = [];
   for (const mod of curriculum) {
     for (const lesson of mod.lessons) {
-      const words = lesson.title.toLowerCase().split(" ");
-      for (const word of words) {
-        if (word.length > 4 && lower.includes(word)) {
-          matches.push({ module: mod.title.replace(/^\d+\.\s*/, ""), lesson: lesson.title, url: lesson.url });
-          break;
-        }
+      const words = lesson.title.toLowerCase().replace(/[^a-z0-9\s-]/g, " ").split(/\s+/)
+        .filter((w) => w.length > 4 && !PREREQ_STOP.has(w));
+      let score = 0, strong = false;
+      for (const w of words) {
+        if (haystack.includes(w)) { score += 1; if (w.length >= 6) strong = true; }
       }
-      if (matches.length >= 4) break;
+      // Confident only: a distinctive long word, or at least two matching words.
+      if (strong || score >= 2) {
+        scored.push({ module: mod.title.replace(/^\d+\.\s*/, ""), lesson: lesson.title, url: lesson.url, score });
+      }
     }
-    if (matches.length >= 4) break;
   }
-  return matches.slice(0, 4);
+  return scored.sort((a, b) => b.score - a.score).slice(0, 4);
 }
 
 /* ── Component ── */
@@ -374,8 +393,8 @@ export default function ResearchCopilotPage() {
   );
 
   const quiz = useMemo(
-    () => (selectedPaper ? generateQuiz(selectedPaper, highlightedTerms) : []),
-    [selectedPaper, highlightedTerms]
+    () => (selectedPaper ? generateQuiz(selectedPaper, highlightedTerms, allPapers) : []),
+    [selectedPaper, highlightedTerms, allPapers]
   );
 
   const quizScore = useMemo(() => {
@@ -622,20 +641,28 @@ export default function ResearchCopilotPage() {
                   <Lightbulb className="w-4 h-4" />
                   <h3 className="text-sm font-semibold">Summary</h3>
                 </div>
-                <div className="bg-violet-50 rounded-xl p-4 text-sm text-slate-700 leading-relaxed space-y-3">
-                  <div>
-                    <p className="font-semibold text-violet-800 text-xs uppercase tracking-wider mb-1">What this paper achieves</p>
-                    <p>{selectedPaper.title}, published by {selectedPaper.authors} in {selectedPaper.year}, addresses a fundamental challenge in quantum computing. {selectedPaper.abstract.split(". ").slice(0, 2).join(". ")}.</p>
-                  </div>
-                  <div>
-                    <p className="font-semibold text-violet-800 text-xs uppercase tracking-wider mb-1">The key technique</p>
-                    <p>The paper introduces a novel approach that leverages quantum mechanical properties — specifically {selectedPaper.categories?.includes("ALGORITHMS") ? "superposition and entanglement" : selectedPaper.categories?.includes("HARDWARE") ? "quantum coherence and gate operations" : "quantum mechanical phenomena"} — to achieve results that are not possible with classical methods. {selectedPaper.abstract.split(". ").slice(2, 4).join(". ") || "The methodology builds on established principles in quantum information science."}</p>
-                  </div>
-                  <div>
-                    <p className="font-semibold text-violet-800 text-xs uppercase tracking-wider mb-1">Why it matters</p>
-                    <p>This work has significant implications for the field: it {selectedPaper.categories?.includes("CRYPTOGRAPHY") ? "impacts the security of modern cryptographic systems" : selectedPaper.categories?.includes("NISQ") ? "provides a framework for understanding near-term quantum devices" : selectedPaper.categories?.includes("PIONEER") ? "laid the conceptual foundation for the entire field of quantum computing" : "advances our understanding of what quantum computers can achieve"}. Understanding this paper is essential for anyone working in quantum {selectedPaper.categories?.[0]?.toLowerCase() || "computing"}.</p>
-                  </div>
-                </div>
+                {(() => {
+                  const s = paperSummary(selectedPaper);
+                  return (
+                    <div className="bg-violet-50 rounded-xl p-4 text-sm text-slate-700 leading-relaxed space-y-3">
+                      <div>
+                        <p className="font-semibold text-violet-800 text-xs uppercase tracking-wider mb-1">In brief</p>
+                        <p>{s.brief}</p>
+                      </div>
+                      {s.detail && (
+                        <div>
+                          <p className="font-semibold text-violet-800 text-xs uppercase tracking-wider mb-1">In more detail</p>
+                          <p>{s.detail}</p>
+                        </div>
+                      )}
+                      <div>
+                        <p className="font-semibold text-violet-800 text-xs uppercase tracking-wider mb-1">Why it matters</p>
+                        <p>{s.matters}</p>
+                      </div>
+                      <p className="text-[10px] text-slate-400 pt-1">Drawn from the paper&apos;s abstract; the &ldquo;why it matters&rdquo; note is general context for the paper&apos;s area.</p>
+                    </div>
+                  );
+                })()}
                 {highlightedTerms.length > 0 && (
                   <div>
                     <p className="text-xs font-medium text-slate-500 mb-2">Key terms in this paper:</p>

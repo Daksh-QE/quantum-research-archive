@@ -56,6 +56,27 @@ function mostRelevantSentences(question: string, abstract: string, n = 2): strin
   return hits.slice(0, n).map((x) => x.s);
 }
 
+/** Category-based significance line (an interpretation, not a claim about the
+    paper's specific content). Shared by the chat answerer and the summary. */
+export function significance(categories: string[] = []): string {
+  const cats = categories.map((c) => c.toLowerCase());
+  if (cats.includes("cryptography")) return "It bears on the security of modern cryptography — quantum methods can break some schemes and enable provably-secure ones.";
+  if (cats.includes("qec") || cats.includes("surface code")) return "It's a step toward fault-tolerant quantum computers, which need error correction to run long algorithms.";
+  if (cats.includes("nisq")) return "It frames what today's noisy, pre-error-correction devices can and can't usefully do.";
+  if (cats.includes("pioneer") || cats.includes("foundations")) return "It laid conceptual groundwork the whole field still builds on.";
+  if (cats.includes("variational") || cats.includes("qml") || cats.includes("chemistry")) return "It underpins near-term applications like chemistry, optimization, and quantum machine learning.";
+  if (cats.includes("optimization")) return "It targets optimization problems that are hard for classical computers.";
+  return "It expands what quantum computers are known to be able to do.";
+}
+
+/** Extractive, non-fabricated summary built from the actual abstract. */
+export function paperSummary(paper: AnswerablePaper): { brief: string; detail: string; matters: string } {
+  const sents = sentences(paper.abstract || "");
+  const brief = sents.slice(0, 2).join(" ") || paper.title;
+  const detail = sents.slice(2, 5).join(" ");
+  return { brief, detail, matters: significance(paper.categories) };
+}
+
 export function answerFromPaper(
   question: string,
   paper: AnswerablePaper,
@@ -97,12 +118,7 @@ export function answerFromPaper(
   }
 
   if (has("why", "matter", "important", "significan", "impact", "useful", "so what", "point of")) {
-    let why = "";
-    if (cats.includes("cryptography")) why = "It bears on the security of modern cryptography — quantum methods can break or protect it.";
-    else if (cats.includes("qec") || cats.includes("surface code")) why = "It's a step toward fault-tolerant quantum computers, which need error correction to run long algorithms.";
-    else if (cats.includes("nisq")) why = "It frames what today's noisy, pre-error-correction devices can and can't usefully do.";
-    else if (cats.includes("pioneer") || cats.includes("foundations")) why = "It laid conceptual groundwork the whole field still builds on.";
-    else why = "It expands what quantum computers are known to be able to do.";
+    const why = significance(paper.categories);
     const rel = mostRelevantSentences(question, abstract, 1);
     return `${why}${rel.length ? ` From the paper: ${rel[0]}` : ""}`;
   }
