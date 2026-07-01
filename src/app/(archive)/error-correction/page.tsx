@@ -215,6 +215,37 @@ export default function QECDashboard() {
   const clearErrors = () => { setErrors(new Set()); setDecoded(null); };
   const runDecoder = useCallback(() => { setDecoded(decode(errors, lat, decoderKind)); }, [errors, lat, decoderKind]);
 
+  const download = (name: string, text: string, type = "text/plain") => {
+    const blob = new Blob([text], { type }); const url = URL.createObjectURL(blob);
+    const a = document.createElement("a"); a.href = url; a.download = name; a.click();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  };
+  const exportJSON = () => {
+    const data = {
+      code: "rotated surface code (single error type)", distance, decoder: decoderKind,
+      dataQubits: lat.edges.map((e) => e.id),
+      errors: [...errors],
+      syndromes: syndrome.map((v) => ({ detector: v.r * distance + v.c, r: v.r, c: v.c })),
+      correction: decoded ? [...decoded.correction] : null,
+      matchWeight: decoded ? decoded.match.weight : null,
+      logicalError: decoded ? decoded.logicalError : null,
+    };
+    download(`surface-d${distance}.json`, JSON.stringify(data, null, 2), "application/json");
+  };
+  const exportDEM = () => {
+    // Stim-style detector error model: the decoding graph PyMatching consumes.
+    const det = (r: number, c: number) => `D${r * distance + c}`;
+    const p = errorRate.toFixed(4);
+    let s = `# Stim-style detector error model — rotated surface code (one error type)\n`;
+    s += `# distance=${distance}, per-edge error probability p=${p}\n`;
+    s += `# D0..D${distance * distance - 1} are stabilizers; L0 is the logical observable\n`;
+    for (const e of lat.edges) {
+      const dets = edgeVertices(e).map(([r, c]) => det(r, c)).join(" ");
+      s += `error(${p}) ${dets}${e.type === "bl" ? " L0" : ""}\n`;
+    }
+    download(`surface-d${distance}.dem`, s);
+  };
+
   const runMonteCarlo = useCallback(() => {
     setMcRunning(true);
     // Defer a frame so the "Running…" state paints before the (synchronous) sweep.
@@ -445,6 +476,16 @@ export default function QECDashboard() {
           <div className="bg-gradient-to-br from-indigo-50 to-violet-50 rounded-xl border border-indigo-100 p-4 text-xs text-slate-600 leading-relaxed">
             <p className="font-semibold text-slate-800 mb-1">Why this matters</p>
             <p>Physical qubits fail ~1 in 100–1000 operations. To run a real algorithm you need a logical error rate near 10⁻¹⁵ — which means wrapping <strong>thousands</strong> of physical qubits around each logical one. Estimates put factoring RSA-2048 at roughly <strong>20 million</strong> physical qubits. That gap is why error correction, not just more qubits, is the central challenge.</p>
+          </div>
+
+          {/* Export (#9) */}
+          <div className="bg-white rounded-xl border border-slate-200 p-4">
+            <h3 className="text-xs font-semibold text-slate-900 uppercase tracking-wider mb-2">Export</h3>
+            <div className="flex flex-col gap-2">
+              <button onClick={exportJSON} className="py-2 rounded-lg bg-slate-100 text-slate-700 text-xs font-medium hover:bg-slate-200 transition-colors">Download instance (JSON)</button>
+              <button onClick={exportDEM} className="py-2 rounded-lg bg-slate-100 text-slate-700 text-xs font-medium hover:bg-slate-200 transition-colors">Download Stim DEM (.dem)</button>
+            </div>
+            <p className="text-[10px] text-slate-400 mt-2">JSON captures your errors, syndromes, correction, and verdict. The .dem is the decoding graph — feed it straight to PyMatching / Stim.</p>
           </div>
         </div>
 
