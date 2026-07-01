@@ -16,7 +16,7 @@ interface ChatMessage {
 }
 
 /** OpenRouter model (only used when OPENROUTER_API_KEY is configured). */
-const MODEL = process.env.OPENROUTER_MODEL || "meta-llama/llama-3.3-70b-instruct:free";
+const MODEL = process.env.OPENROUTER_MODEL || "deepseek/deepseek-v4-flash";
 const OPENROUTER_KEY = process.env.OPENROUTER_API_KEY || null;
 
 const SITE_URL = process.env.SITE_URL || "https://quantum-research-archive.vercel.app";
