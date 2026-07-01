@@ -147,15 +147,29 @@ function decode(errors: Set<string>, lat: Lattice, kind: "mwpm" | "greedy"): Dec
   return { correction, match, verts, logicalError: blParity === 1 };
 }
 
-/* Toy analytic logical-error rate for the threshold curve (replaced by real
-   Monte-Carlo sampling in a later step). */
+/* Toy analytic logical-error rate — only used before a Monte-Carlo run exists. */
 function logicalRate(phys: number, d: number): number {
-  const threshold = 0.1; // per-edge error rate threshold for this simplified graph
+  const threshold = 0.1;
   if (phys >= 0.5) return 0.5;
   const ratio = phys / threshold;
   if (ratio >= 1) return Math.min(0.5, phys);
   return 0.5 * Math.pow(ratio, (d + 1) / 2);
 }
+
+/* Real Monte-Carlo: sample independent per-edge errors at rate p, decode with
+   MWPM, and measure the empirical logical-error rate. Repeated across a sweep of
+   p for several distances, the curves cross at the code's true threshold. */
+function monteCarlo(d: number, p: number, trials: number, rng: () => number): number {
+  const lat = buildLattice(d);
+  let fails = 0;
+  for (let t = 0; t < trials; t++) {
+    const errors = new Set<string>();
+    for (const e of lat.edges) if (rng() < p) errors.add(e.id);
+    if (decode(errors, lat, "mwpm").logicalError) fails++;
+  }
+  return fails / trials;
+}
+interface MCSeries { d: number; points: { p: number; rate: number }[]; }
 
 /* ── Render geometry ── */
 const SIZE = 500;
@@ -176,6 +190,9 @@ export default function QECDashboard() {
   const [decoded, setDecoded] = useState<Decoded | null>(null);
   const [showCurve, setShowCurve] = useState(true);
   const [targetLogError, setTargetLogError] = useState(1e-6);
+  const [mcData, setMcData] = useState<MCSeries[] | null>(null);
+  const [mcRunning, setMcRunning] = useState(false);
+  const mcSeedRef = useRef(777);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const curveRef = useRef<HTMLCanvasElement>(null);
 
@@ -197,6 +214,20 @@ export default function QECDashboard() {
 
   const clearErrors = () => { setErrors(new Set()); setDecoded(null); };
   const runDecoder = useCallback(() => { setDecoded(decode(errors, lat, decoderKind)); }, [errors, lat, decoderKind]);
+
+  const runMonteCarlo = useCallback(() => {
+    setMcRunning(true);
+    // Defer a frame so the "Running…" state paints before the (synchronous) sweep.
+    requestAnimationFrame(() => {
+      let s = (mcSeedRef.current = (mcSeedRef.current * 16807 + 13) % 2147483647) || 1;
+      const rng = () => { s = (s * 16807) % 2147483647; return (s & 0x7fffffff) / 0x7fffffff; };
+      const ps: number[] = [];
+      for (let p = 0.02; p <= 0.2001; p += 0.018) ps.push(Math.round(p * 1000) / 1000);
+      const series: MCSeries[] = [3, 5, 7].map((d) => ({ d, points: ps.map((p) => ({ p, rate: monteCarlo(d, p, 400, rng) })) }));
+      setMcData(series);
+      setMcRunning(false);
+    });
+  }, []);
 
   const toPx = (r: number, c: number) => {
     const cell = SIZE / (distance + 1);
@@ -285,18 +316,33 @@ export default function QECDashboard() {
     const w = canvas.width, h = canvas.height; ctx.clearRect(0, 0, w, h);
     ctx.fillStyle = "#f8fafc"; ctx.fillRect(0, 0, w, h);
     const ml = 46, mr = 16, mt = 16, mb = 26, pw = w - ml - mr, ph = h - mt - mb;
+    const xMax = mcData ? 0.21 : 0.4;
     ctx.strokeStyle = "#cbd5e1"; ctx.beginPath(); ctx.moveTo(ml, mt); ctx.lineTo(ml, h - mb); ctx.lineTo(w - mr, h - mb); ctx.stroke();
     const yOf = (v: number) => mt + ph - (Math.log10(Math.max(v * 100, 0.001)) + 3) / 3 * ph;
+    const xOf = (p: number) => ml + (p / xMax) * pw;
     const colors = ["#3b82f6", "#22c55e", "#ef4444"];
-    [3, 5, 7].forEach((d, di) => {
-      ctx.strokeStyle = colors[di]; ctx.lineWidth = 2; ctx.beginPath();
-      for (let px = 0; px <= pw; px++) { const phys = (px / pw) * 0.4; const y = yOf(logicalRate(phys, d)); px === 0 ? ctx.moveTo(ml + px, y) : ctx.lineTo(ml + px, y); }
-      ctx.stroke(); ctx.fillStyle = colors[di]; ctx.font = "10px sans-serif"; ctx.fillText(`d=${d}`, ml + pw * 0.8, yOf(logicalRate(0.32, d)) - 3);
-    });
-    const tx = ml + (0.1 / 0.4) * pw; ctx.strokeStyle = "#000"; ctx.setLineDash([4, 4]); ctx.beginPath(); ctx.moveTo(tx, mt); ctx.lineTo(tx, h - mb); ctx.stroke(); ctx.setLineDash([]);
-    ctx.fillStyle = "#000"; ctx.font = "9px sans-serif"; ctx.textAlign = "center"; ctx.fillText("threshold", tx, mt - 3);
-    ctx.fillStyle = "#94a3b8"; ctx.fillText("physical error rate", ml + pw / 2, h - 2);
-  }, [showCurve]);
+    // y gridlines (decades)
+    ctx.fillStyle = "#94a3b8"; ctx.font = "9px sans-serif"; ctx.textAlign = "right";
+    for (const v of [0.001, 0.01, 0.1, 1]) { const y = yOf(v); ctx.fillText(`${v * 100}%`, ml - 4, y + 3); }
+    ctx.textAlign = "left";
+    if (mcData) {
+      mcData.forEach((s, di) => {
+        ctx.strokeStyle = colors[di]; ctx.fillStyle = colors[di]; ctx.lineWidth = 2; ctx.beginPath();
+        s.points.forEach((pt, i) => { const x = xOf(pt.p), y = yOf(pt.rate); i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y); });
+        ctx.stroke();
+        for (const pt of s.points) { const x = xOf(pt.p), y = yOf(pt.rate); ctx.beginPath(); ctx.arc(x, y, 2.5, 0, Math.PI * 2); ctx.fill(); }
+        const last = s.points[s.points.length - 1]; ctx.fillText(`d=${s.d}`, xOf(last.p) - 4, yOf(last.rate) - 5);
+      });
+    } else {
+      [3, 5, 7].forEach((d, di) => {
+        ctx.strokeStyle = colors[di]; ctx.lineWidth = 2; ctx.beginPath();
+        for (let px = 0; px <= pw; px++) { const phys = (px / pw) * xMax; const y = yOf(logicalRate(phys, d)); px === 0 ? ctx.moveTo(ml + px, y) : ctx.lineTo(ml + px, y); }
+        ctx.stroke(); ctx.fillStyle = colors[di]; ctx.fillText(`d=${d}`, ml + pw * 0.8, yOf(logicalRate(0.32, d)) - 3);
+      });
+    }
+    ctx.fillStyle = "#94a3b8"; ctx.textAlign = "center"; ctx.fillText("physical error rate", ml + pw / 2, h - 2);
+    if (mcData) { ctx.fillStyle = "#334155"; ctx.font = "9px sans-serif"; ctx.fillText("empirical (sampled) — curves cross at the threshold", ml + pw / 2, mt - 4); }
+  }, [showCurve, mcData]);
 
   const onCanvasClick = (ev: React.MouseEvent) => {
     const rect = canvasRef.current!.getBoundingClientRect();
@@ -435,12 +481,22 @@ export default function QECDashboard() {
 
           {/* Threshold curve */}
           <div className="bg-white rounded-xl border border-slate-200 p-4">
-            <label className="flex items-center gap-2 text-xs text-slate-500 cursor-pointer mb-2">
-              <input type="checkbox" checked={showCurve} onChange={(e) => setShowCurve(e.target.checked)} className="accent-indigo-600 rounded" />
-              Show threshold curve
-            </label>
+            <div className="flex items-center justify-between mb-2 flex-wrap gap-2">
+              <label className="flex items-center gap-2 text-xs text-slate-500 cursor-pointer">
+                <input type="checkbox" checked={showCurve} onChange={(e) => setShowCurve(e.target.checked)} className="accent-indigo-600 rounded" />
+                Threshold curve {mcData ? "(real Monte-Carlo data)" : "(illustrative)"}
+              </label>
+              <button onClick={runMonteCarlo} disabled={mcRunning}
+                className="px-3 py-1.5 rounded-lg bg-indigo-600 text-white text-xs font-semibold hover:bg-indigo-500 disabled:opacity-60 transition-colors">
+                {mcRunning ? "Sampling…" : "Run Monte-Carlo (real threshold)"}
+              </button>
+            </div>
             {showCurve && <canvas ref={curveRef} width={440} height={220} className="w-full max-w-[440px] mx-auto border border-slate-200 rounded-lg" />}
-            <p className="text-xs text-slate-400 mt-2">Below the threshold, a bigger code (higher d) gives a <em>lower</em> logical error rate — that&apos;s what makes scaling worthwhile.</p>
+            <p className="text-xs text-slate-400 mt-2">
+              {mcData
+                ? "Each point is 400 sampled rounds decoded with MWPM. Below the threshold (where the curves cross), a bigger code gives a lower logical error rate — above it, a bigger code is worse."
+                : "Illustrative curves. Click “Run Monte-Carlo” to sample real errors, decode them, and plot the empirical logical error rate — the curves will cross at the code's true threshold."}
+            </p>
           </div>
         </div>
       </div>
