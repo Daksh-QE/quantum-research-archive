@@ -21,20 +21,25 @@ import React, { useState, useRef, useEffect, useCallback, useMemo } from "react"
    ════════════════════════════════════════════════════════════════════ */
 
 type EdgeType = "h" | "v" | "bl" | "br";
+type Family = "surface" | "repetition";
 interface Edge { id: string; type: EdgeType; r: number; c: number; }
-interface Lattice { d: number; edges: Edge[]; byId: Map<string, Edge>; }
+interface Lattice { rows: number; cols: number; edges: Edge[]; byId: Map<string, Edge>; }
 
-function buildLattice(d: number): Lattice {
+// rows×cols stabilizer grid. Surface code: rows=cols=d. Repetition code: rows=1
+// (a single chain of d stabilizers with two boundaries — corrects bit-flips only).
+function buildLattice(rows: number, cols: number): Lattice {
   const edges: Edge[] = [];
-  for (let r = 0; r < d; r++) {
-    for (let c = 0; c < d - 1; c++) edges.push({ id: `h:${r}:${c}`, type: "h", r, c });     // (r,c)-(r,c+1)
+  for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < cols - 1; c++) edges.push({ id: `h:${r}:${c}`, type: "h", r, c });   // (r,c)-(r,c+1)
     edges.push({ id: `bl:${r}`, type: "bl", r, c: 0 });                                       // LB-(r,0)
-    edges.push({ id: `br:${r}`, type: "br", r, c: d - 1 });                                   // (r,d-1)-RB
+    edges.push({ id: `br:${r}`, type: "br", r, c: cols - 1 });                                // (r,cols-1)-RB
   }
-  for (let r = 0; r < d - 1; r++)
-    for (let c = 0; c < d; c++) edges.push({ id: `v:${r}:${c}`, type: "v", r, c });           // (r,c)-(r+1,c)
-  const byId = new Map(edges.map((e) => [e.id, e]));
-  return { d, edges, byId };
+  for (let r = 0; r < rows - 1; r++)
+    for (let c = 0; c < cols; c++) edges.push({ id: `v:${r}:${c}`, type: "v", r, c });         // (r,c)-(r+1,c)
+  return { rows, cols, edges, byId: new Map(edges.map((e) => [e.id, e])) };
+}
+function latticeFor(family: Family, d: number): Lattice {
+  return family === "surface" ? buildLattice(d, d) : buildLattice(1, d);
 }
 
 // The interior stabilizer vertices an edge touches (boundary node excluded).
@@ -134,11 +139,11 @@ interface Decoded { correction: Set<string>; match: Match; verts: { r: number; c
 
 function decode(errors: Set<string>, lat: Lattice, kind: "mwpm" | "greedy"): Decoded {
   const verts = syndromeOf(errors, lat);
-  const match = kind === "mwpm" ? mwpm(verts, lat.d) : greedy(verts, lat.d);
+  const match = kind === "mwpm" ? mwpm(verts, lat.cols) : greedy(verts, lat.cols);
   const correction = new Set<string>();
   const toggle = (id: string) => (correction.has(id) ? correction.delete(id) : correction.add(id));
   for (const [i, j] of match.pairs) for (const id of pathEdges(verts[i], verts[j])) toggle(id);
-  for (const i of match.boundary) for (const id of boundaryPathEdges(verts[i], lat.d)) toggle(id);
+  for (const i of match.boundary) for (const id of boundaryPathEdges(verts[i], lat.cols)) toggle(id);
   // Residual = error XOR correction; logical error = odd # of left-boundary edges.
   const residual = new Set<string>(errors);
   for (const id of correction) residual.has(id) ? residual.delete(id) : residual.add(id);
@@ -159,8 +164,8 @@ function logicalRate(phys: number, d: number): number {
 /* Real Monte-Carlo: sample independent per-edge errors at rate p, decode with
    MWPM, and measure the empirical logical-error rate. Repeated across a sweep of
    p for several distances, the curves cross at the code's true threshold. */
-function monteCarlo(d: number, p: number, trials: number, rng: () => number): number {
-  const lat = buildLattice(d);
+function monteCarlo(family: Family, d: number, p: number, trials: number, rng: () => number): number {
+  const lat = latticeFor(family, d);
   let fails = 0;
   for (let t = 0; t < trials; t++) {
     const errors = new Set<string>();
@@ -184,6 +189,7 @@ function edgeMid(e: Edge): { r: number; c: number } {
 
 export default function QECDashboard() {
   const [distance, setDistance] = useState(3);
+  const [family, setFamily] = useState<Family>("surface");
   const [errors, setErrors] = useState<Set<string>>(new Set());
   const [errorRate, setErrorRate] = useState(0.1);
   const [decoderKind, setDecoderKind] = useState<"mwpm" | "greedy">("mwpm");
@@ -196,12 +202,12 @@ export default function QECDashboard() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const curveRef = useRef<HTMLCanvasElement>(null);
 
-  const lat = useMemo(() => buildLattice(distance), [distance]);
+  const lat = useMemo(() => latticeFor(family, distance), [family, distance]);
   const seedRef = useRef(12345);
   const rand = () => { seedRef.current = (seedRef.current * 16807) % 2147483647; return (seedRef.current & 0x7fffffff) / 0x7fffffff; };
 
-  // Reset when distance changes.
-  useEffect(() => { setErrors(new Set()); setDecoded(null); }, [distance]);
+  // Reset when the code changes.
+  useEffect(() => { setErrors(new Set()); setDecoded(null); }, [distance, family]);
 
   const syndrome = useMemo(() => syndromeOf(errors, lat), [errors, lat]);
 
@@ -234,11 +240,11 @@ export default function QECDashboard() {
   };
   const exportDEM = () => {
     // Stim-style detector error model: the decoding graph PyMatching consumes.
-    const det = (r: number, c: number) => `D${r * distance + c}`;
+    const det = (r: number, c: number) => `D${r * lat.cols + c}`;
     const p = errorRate.toFixed(4);
-    let s = `# Stim-style detector error model — rotated surface code (one error type)\n`;
+    let s = `# Stim-style detector error model — ${family} code (one error type)\n`;
     s += `# distance=${distance}, per-edge error probability p=${p}\n`;
-    s += `# D0..D${distance * distance - 1} are stabilizers; L0 is the logical observable\n`;
+    s += `# D0..D${lat.rows * lat.cols - 1} are stabilizers; L0 is the logical observable\n`;
     for (const e of lat.edges) {
       const dets = edgeVertices(e).map(([r, c]) => det(r, c)).join(" ");
       s += `error(${p}) ${dets}${e.type === "bl" ? " L0" : ""}\n`;
@@ -254,15 +260,15 @@ export default function QECDashboard() {
       const rng = () => { s = (s * 16807) % 2147483647; return (s & 0x7fffffff) / 0x7fffffff; };
       const ps: number[] = [];
       for (let p = 0.02; p <= 0.2001; p += 0.018) ps.push(Math.round(p * 1000) / 1000);
-      const series: MCSeries[] = [3, 5, 7].map((d) => ({ d, points: ps.map((p) => ({ p, rate: monteCarlo(d, p, 400, rng) })) }));
+      const series: MCSeries[] = [3, 5, 7].map((d) => ({ d, points: ps.map((p) => ({ p, rate: monteCarlo(family, d, p, 400, rng) })) }));
       setMcData(series);
       setMcRunning(false);
     });
-  }, []);
+  }, [family]);
 
   const toPx = (r: number, c: number) => {
-    const cell = SIZE / (distance + 1);
-    return { x: (c + 1) * cell, y: (r + 1) * cell };
+    const cellX = SIZE / (lat.cols + 1), cellY = SIZE / (lat.rows + 1);
+    return { x: (c + 1) * cellX, y: (r + 1) * cellY };
   };
 
   // Draw the lattice.
@@ -271,7 +277,8 @@ export default function QECDashboard() {
     const ctx = canvas.getContext("2d"); if (!ctx) return;
     ctx.clearRect(0, 0, SIZE, SIZE);
     ctx.fillStyle = "#f8fafc"; ctx.fillRect(0, 0, SIZE, SIZE);
-    const cell = SIZE / (distance + 1);
+    const cellX = SIZE / (lat.cols + 1), cellY = SIZE / (lat.rows + 1);
+    const cell = Math.min(cellX, cellY);
     const lit = new Set(syndrome.map((v) => vkey(v.r, v.c)));
 
     // rough boundary bars (left/right)
@@ -285,7 +292,7 @@ export default function QECDashboard() {
       const m = edgeMid(e);
       const vs = edgeVertices(e).map(([r, c]) => toPx(r, c));
       if (e.type === "bl") { const p = toPx(e.r, 0); ctx.beginPath(); ctx.moveTo(cell * 0.28, p.y); ctx.lineTo(p.x, p.y); ctx.stroke(); }
-      else if (e.type === "br") { const p = toPx(e.r, distance - 1); ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(SIZE - cell * 0.28, p.y); ctx.stroke(); }
+      else if (e.type === "br") { const p = toPx(e.r, lat.cols - 1); ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(SIZE - cell * 0.28, p.y); ctx.stroke(); }
       else { ctx.beginPath(); ctx.moveTo(vs[0].x, vs[0].y); ctx.lineTo(vs[1].x, vs[1].y); ctx.stroke(); }
       void m;
     }
@@ -296,7 +303,7 @@ export default function QECDashboard() {
       for (const id of decoded.correction) {
         const e = lat.byId.get(id)!; const vs = edgeVertices(e).map(([r, c]) => toPx(r, c));
         if (e.type === "bl") { const p = toPx(e.r, 0); ctx.beginPath(); ctx.moveTo(cell * 0.28, p.y); ctx.lineTo(p.x, p.y); ctx.stroke(); }
-        else if (e.type === "br") { const p = toPx(e.r, distance - 1); ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(SIZE - cell * 0.28, p.y); ctx.stroke(); }
+        else if (e.type === "br") { const p = toPx(e.r, lat.cols - 1); ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(SIZE - cell * 0.28, p.y); ctx.stroke(); }
         else { ctx.beginPath(); ctx.moveTo(vs[0].x, vs[0].y); ctx.lineTo(vs[1].x, vs[1].y); ctx.stroke(); }
       }
     }
@@ -311,7 +318,7 @@ export default function QECDashboard() {
     }
 
     // stabilizer vertices (squares), lit if in syndrome
-    for (let r = 0; r < distance; r++) for (let c = 0; c < distance; c++) {
+    for (let r = 0; r < lat.rows; r++) for (let c = 0; c < lat.cols; c++) {
       const p = toPx(r, c); const on = lit.has(vkey(r, c)); const s = cell * 0.26;
       ctx.fillStyle = on ? "#6366f1" : "#fff";
       ctx.strokeStyle = on ? "#4338ca" : "#94a3b8"; ctx.lineWidth = on ? 2 : 1;
@@ -327,7 +334,7 @@ export default function QECDashboard() {
         ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
       }
       for (const i of decoded.match.boundary) {
-        const v = decoded.verts[i]; const { side } = boundaryDist(v, distance); const a = toPx(v.r, v.c);
+        const v = decoded.verts[i]; const { side } = boundaryDist(v, lat.cols); const a = toPx(v.r, v.c);
         const bx = side === "L" ? cell * 0.28 : SIZE - cell * 0.28;
         ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(bx, a.y); ctx.stroke();
       }
@@ -381,7 +388,7 @@ export default function QECDashboard() {
     const mx = (ev.clientX - rect.left) * scale, my = (ev.clientY - rect.top) * scale;
     let best: string | null = null, bestD = Infinity;
     for (const e of lat.edges) { const m = edgeMid(e); const p = toPx(m.r, m.c); const dd = Math.hypot(mx - p.x, my - p.y); if (dd < bestD) { bestD = dd; best = e.id; } }
-    const cell = SIZE / (distance + 1);
+    const cell = Math.min(SIZE / (lat.cols + 1), SIZE / (lat.rows + 1));
     if (best && bestD < cell * 0.45) {
       setErrors((prev) => { const n = new Set(prev); n.has(best!) ? n.delete(best!) : n.add(best!); return n; });
       setDecoded(null);
@@ -414,6 +421,16 @@ export default function QECDashboard() {
         {/* Controls */}
         <div className="space-y-4">
           <div className="bg-white rounded-xl border border-slate-200 p-4 space-y-4">
+            <div>
+              <label className="text-xs font-semibold text-slate-900 uppercase tracking-wider">Code Family</label>
+              <div className="flex gap-2 mt-2">
+                {([["surface", "Surface (2D)"], ["repetition", "Repetition (1D)"]] as const).map(([f, label]) => (
+                  <button key={f} onClick={() => setFamily(f)}
+                    title={f === "surface" ? "2D code; corrects both bit- and phase-flips" : "1D chain; corrects bit-flips only — a distance-d code needs d qubits in a line"}
+                    className={`flex-1 px-2 py-1.5 rounded-lg text-[11px] font-medium transition-colors ${family === f ? "bg-indigo-600 text-white" : "bg-slate-100 text-slate-600 hover:bg-slate-200"}`}>{label}</button>
+                ))}
+              </div>
+            </div>
             <div>
               <label className="text-xs font-semibold text-slate-900 uppercase tracking-wider">Code Distance</label>
               <div className="flex gap-2 mt-2">
