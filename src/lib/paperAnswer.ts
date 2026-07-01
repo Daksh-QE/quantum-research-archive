@@ -103,8 +103,9 @@ export function answerFromPaper(
   // 2) Intent handlers.
   const has = (...ws: string[]) => ws.some((w) => q.includes(w));
 
-  if (has("summar", "overview", "tldr", "tl;dr", "gist", "about", "what is this", "what's this")) {
-    if (sents.length) return `Here's the gist of "${paper.title}": ${sents.slice(0, 3).join(" ")}`;
+  if (has("summar", "overview", "tldr", "tl;dr", "gist", "about", "what is this", "what's this",
+          "explain", "eli5", "simpl", "beginner", "new to", "like i'm", "like im", "in plain", "plain english")) {
+    if (sents.length) return `In plain terms — "${paper.title}"${paper.authors ? ` (${paper.authors})` : ""}: ${sents.slice(0, 3).join(" ")}`;
   }
 
   if (has("main result", "key result", "the result", "finding", "achiev", "contribut", "conclusion", "prove", "proves", "demonstrat", "show that")) {
