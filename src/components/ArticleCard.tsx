@@ -2,6 +2,7 @@ import React from "react";
 import Link from "next/link";
 import { Article } from "@/data/types";
 import TagBadge from "./TagBadge";
+import BookmarkButton from "./BookmarkButton";
 
 interface ArticleCardProps {
   article: Article;
@@ -10,14 +11,17 @@ interface ArticleCardProps {
 export default function ArticleCard({ article }: ArticleCardProps) {
   return (
     <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-6 hover:shadow-md transition-shadow">
-      <Link
-        href={article.url}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="text-lg font-semibold text-slate-900 hover:text-blue-600 transition-colors"
-      >
-        {article.title}
-      </Link>
+      <div className="flex items-start justify-between gap-2">
+        <Link
+          href={article.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-lg font-semibold text-slate-900 hover:text-blue-600 transition-colors"
+        >
+          {article.title}
+        </Link>
+        <BookmarkButton type="article" id={article.id} title={article.title} url={article.url} />
+      </div>
       <p className="text-sm text-slate-500 mt-0.5">{article.author}</p>
       <p className="mt-2 text-sm text-slate-600 leading-relaxed">
         {article.description}

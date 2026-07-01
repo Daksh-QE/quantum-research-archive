@@ -2,6 +2,7 @@ import React from "react";
 import Link from "next/link";
 import { Tool } from "@/data/types";
 import TagBadge from "./TagBadge";
+import BookmarkButton from "./BookmarkButton";
 
 interface ToolCardProps {
   tool: Tool;
@@ -19,9 +20,12 @@ export default function ToolCard({ tool }: ToolCardProps) {
         >
           {tool.title}
         </Link>
-        <span className="shrink-0 text-xs font-medium text-slate-500 bg-slate-100 px-2 py-0.5 rounded">
-          {tool.category}
-        </span>
+        <div className="flex items-center gap-1 shrink-0">
+          <span className="text-xs font-medium text-slate-500 bg-slate-100 px-2 py-0.5 rounded">
+            {tool.category}
+          </span>
+          <BookmarkButton type="tool" id={tool.id} title={tool.title} url={tool.url} />
+        </div>
       </div>
       <p className="mt-2 text-sm text-slate-600 leading-relaxed">
         {tool.description}

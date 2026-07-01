@@ -20,6 +20,12 @@ import {
   Sparkles,
   Bot,
   Sigma,
+  Calendar,
+  GitCompare,
+  Code,
+  Bookmark,
+  Heart,
+  Info,
 } from "lucide-react";
 import { curriculum } from "@/data/curriculum";
 
@@ -32,16 +38,27 @@ const toolItems = [
 const archiveItems = [
   { label: "Overview", href: "/overview", icon: LayoutDashboard },
   { label: "Resources", href: "/resources", icon: BookOpen },
+  { label: "News", href: "/news", icon: Newspaper },
+  { label: "Events", href: "/events", icon: Calendar },
   { label: "Community", href: "/community", icon: Users },
   { label: "Hubs", href: "/hubs", icon: Users },
   { label: "Articles", href: "/articles", icon: Newspaper },
   { label: "Roadmap", href: "/roadmap", icon: Map },
   { label: "Tools & Practice", href: "/tools", icon: Wrench },
+  { label: "Compare SDKs", href: "/compare", icon: GitCompare },
+  { label: "Code Snippets", href: "/snippets", icon: Code },
   { label: "Research Papers", href: "/papers", icon: FileText },
   { label: "Challenges", href: "/challenges", icon: FileText },
   { label: "Jobs", href: "/jobs", icon: Wrench },
   { label: "Glossary", href: "/glossary", icon: BookMarked },
   { label: "Newsletters", href: "/newsletters", icon: Mail },
+];
+
+const moreItems = [
+  { label: "Saved", href: "/saved", icon: Bookmark },
+  { label: "Get Into Quantum", href: "/contribute", icon: Heart },
+  { label: "Weekly Digest", href: "/digest", icon: Mail },
+  { label: "About", href: "/about", icon: Info },
 ];
 
 const lessonTypeColor = (type: string) => {
@@ -111,6 +128,14 @@ export default function Sidebar() {
           <h3 className="text-xs font-semibold uppercase tracking-wider text-slate-500">Archive</h3>
         </div>
         {archiveItems.map((item) => (
+          <NavLink key={item.href} item={item} />
+        ))}
+
+        {/* ===== More ===== */}
+        <div className="pt-3 px-4 pb-1.5">
+          <h3 className="text-xs font-semibold uppercase tracking-wider text-slate-500">You &amp; Community</h3>
+        </div>
+        {moreItems.map((item) => (
           <NavLink key={item.href} item={item} />
         ))}
 

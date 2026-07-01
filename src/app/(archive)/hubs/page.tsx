@@ -35,6 +35,27 @@ export default function CommunityHubsPage() {
         <p className="text-slate-600 mt-1">Discord servers, Reddit communities, X/Twitter profiles, and forums worth following in quantum computing.</p>
       </div>
 
+      {/* Where to ask — intent-based routing */}
+      <div className="bg-white rounded-xl border border-slate-200 p-5">
+        <h2 className="text-sm font-semibold text-slate-900 mb-1">Have a question? Ask in the right place</h2>
+        <p className="text-xs text-slate-500 mb-3">Quantum has no single Q&amp;A site — the best answer depends on what you&apos;re asking.</p>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
+          {[
+            { q: "Conceptual / theory question", where: "Quantum Computing Stack Exchange", url: "https://quantumcomputing.stackexchange.com/" },
+            { q: "Qiskit code / errors", where: "Qiskit Slack (#help)", url: "https://qisk.it/join-slack" },
+            { q: "PennyLane / QML", where: "PennyLane Discussion Forum", url: "https://discuss.pennylane.ai/" },
+            { q: "Beginner / “where do I start?”", where: "r/QuantumComputing", url: "https://www.reddit.com/r/QuantumComputing/" },
+            { q: "Open-source / contributing", where: "Unitary Fund Discord", url: "https://discord.gg/unitaryfund" },
+            { q: "Physics fundamentals", where: "r/QuantumPhysics", url: "https://www.reddit.com/r/QuantumPhysics/" },
+          ].map((r) => (
+            <a key={r.q} href={r.url} target="_blank" rel="noopener noreferrer" className="flex items-center justify-between gap-3 rounded-lg border border-slate-100 hover:border-blue-200 hover:bg-blue-50/50 px-3 py-2 transition-colors">
+              <span className="text-slate-600">{r.q}</span>
+              <span className="text-blue-600 font-medium shrink-0 text-xs">{r.where} →</span>
+            </a>
+          ))}
+        </div>
+      </div>
+
       <div className="flex flex-wrap gap-2">
         {platforms.map((p) => (
           <button

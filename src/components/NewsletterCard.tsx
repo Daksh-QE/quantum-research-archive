@@ -2,6 +2,7 @@ import React from "react";
 import Link from "next/link";
 import { Newsletter } from "@/data/types";
 import TagBadge from "./TagBadge";
+import BookmarkButton from "./BookmarkButton";
 
 interface NewsletterCardProps {
   newsletter: Newsletter;
@@ -19,9 +20,12 @@ export default function NewsletterCard({ newsletter }: NewsletterCardProps) {
         >
           {newsletter.name}
         </Link>
-        <span className="shrink-0 text-xs font-medium text-slate-500 bg-slate-100 px-2 py-0.5 rounded">
-          {newsletter.frequency}
-        </span>
+        <div className="flex items-center gap-1 shrink-0">
+          <span className="text-xs font-medium text-slate-500 bg-slate-100 px-2 py-0.5 rounded">
+            {newsletter.frequency}
+          </span>
+          <BookmarkButton type="newsletter" id={newsletter.id} title={newsletter.name} url={newsletter.url} />
+        </div>
       </div>
       <p className="mt-2 text-sm text-slate-600 leading-relaxed">
         {newsletter.description}

@@ -605,6 +605,37 @@ export default function QuantumSandbox() {
   const clearAll = () => { setOps([]); setSelected(null); setArmed(null); };
   const selOp = ops.find((o) => o.uid === selected) || null;
 
+  /* Load a circuit shared via ?circuit=... (e.g. from the Code Snippets page).
+     Format: gates joined by "-", each "TYPE<a>[,<b>]" — e.g. "H0-CX0,1-CX1,2".
+     For controlled gates a=control, b=target; for SWAP/RXX/RZZ a,b are targets. */
+  useEffect(() => {
+    const raw = new URLSearchParams(window.location.search).get("circuit");
+    if (!raw) return;
+    const loaded: Op[] = [];
+    let maxWire = 0;
+    raw.split("-").forEach((tok, i) => {
+      const m = tok.match(/^([A-Za-z]+)(\d+)(?:,(\d+))?$/);
+      if (!m) return;
+      const type = m[1].toUpperCase() === "CNOT" ? "CX" : m[1];
+      const def = DEF[type];
+      if (!def) return;
+      const a = parseInt(m[2], 10);
+      const b = m[3] !== undefined ? parseInt(m[3], 10) : undefined;
+      let targets: number[], controls: number[] = [];
+      if (def.ctrls > 0 && b !== undefined) { controls = [a]; targets = [b]; }
+      else if (def.tgts === 2 && b !== undefined) { targets = [a, b]; }
+      else { targets = [a]; }
+      maxWire = Math.max(maxWire, a, b ?? 0);
+      loaded.push({ uid: uid(), type, col: i, targets, controls, params: def.params.map((p) => p.def) });
+    });
+    if (loaded.length) {
+      setNumQubits(Math.min(Math.max(maxWire + 1, 1), 8));
+      setOps(loaded);
+    }
+    // run once on mount
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   /* ── Tutorial Mode logic ── */
   const activeLesson = lessonIdx != null ? LESSONS[lessonIdx] : null;
   const step: LessonStep | null = activeLesson ? activeLesson.steps[stepIdx] : null;
