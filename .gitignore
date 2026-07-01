@@ -46,3 +46,6 @@ next-env.d.ts
 
 # private
 PRD.md
+
+# ...but do track the placeholder template
+!.env.example
