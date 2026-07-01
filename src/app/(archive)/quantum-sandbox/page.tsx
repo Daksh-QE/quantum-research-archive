@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useRef, useEffect, useCallback, useMemo } from "react";
-import { ChevronDown, ChevronRight, Info, Plus, Minus, Trash2, Copy, RotateCcw, Play, Pause, Film } from "lucide-react";
+import { ChevronDown, ChevronRight, Info, Plus, Minus, Trash2, Copy, RotateCcw, Play, Pause, Film, GraduationCap, Lock, Check, ArrowRight, ArrowLeft } from "lucide-react";
 
 /* ════════════════════════════════════════════════════════════════════
    Complex-number quantum circuit simulator (Qiskit little-endian).
@@ -162,6 +162,12 @@ function applyOpFractional(state: C[], op: Op, f: number): C[] {
 function applyOp(state: C[], op: Op): C[] { return applyOpFractional(state, op, 1); }
 
 function labelOf(i: number, n: number): string { let s = ""; for (let q = n - 1; q >= 0; q--) s += ((i >> q) & 1); return s; }
+function measureSample(state: C[]): { outcome: number } {
+  const probs = state.map(cabs2); const total = probs.reduce((s, p) => s + p, 0) || 1;
+  const r = Math.random() * total; let cum = 0;
+  for (let i = 0; i < state.length; i++) { cum += probs[i]; if (r < cum) return { outcome: i }; }
+  return { outcome: state.length - 1 };
+}
 
 /* ════════ Entanglement math (validated: product C=0, Bell C=1, GHZ pairwise C=0) ════════ */
 function reduced1(state: C[], q: number): C[][] {
@@ -308,6 +314,86 @@ const PALETTE: GateDef[] = [
 ];
 const DEF: Record<string, GateDef> = Object.fromEntries(PALETTE.map((g) => [g.type, g]));
 
+/* ════════ Tutorial Mode: gate explanation stack (single source of truth) ════════
+   Each gate's words describe the SAME rotation the engine applies, so the
+   explanation cannot drift from what the simulator actually does. */
+interface GateInfo { slogan: string; mechanism: string; whyResult?: string; purpose: string; job: string; breaksModel: boolean; unlock: number; }
+const GATE_INFO: Record<string, GateInfo> = {
+  X: { slogan: "Sets a qubit to 1 — a bit flip.", mechanism: "A half-turn (180°) about the X-axis: it points the arrow from straight-up to straight-down.", whyResult: "Straight-up (definite 0) becomes straight-down (definite 1), so the probability bar moves fully onto 1.", purpose: "Prepares known inputs and flips bits — the quantum NOT, the setup step of most circuits.", job: "Prepare the starting state", breaksModel: false, unlock: 2 },
+  H: { slogan: "Creates superposition — a definite 0 becomes a 50/50 maybe.", mechanism: "A half-turn about the diagonal axis (halfway between vertical and left–right); it swaps the up/down lean with the front/back lean.", whyResult: "A straight-up arrow gets tipped onto the equator, and an equator arrow is 50/50 by the height rule — so the bars split evenly.", purpose: "Opens up quantum parallelism; the first move of almost every algorithm. It also converts hidden phase into measurable outcomes (the H…Z…H trick).", job: "Create superposition", breaksModel: false, unlock: 3 },
+  Z: { slogan: "Flips a state's hidden phase (the sign of |1⟩).", mechanism: "A half-turn about the vertical Z-axis — it spins the arrow halfway around the equator.", whyResult: "The odds don't change (the bars stay put); only the phase flips, which is invisible to a direct measurement until later interference.", purpose: "How an algorithm secretly 'marks' an answer; the heart of interference-based search and the QFT.", job: "Write and mark phase", breaksModel: false, unlock: 4 },
+  CX: { slogan: "A controlled flip — flips the target only when the control is 1.", mechanism: "Rotates the target's arrow 180° about the left–right axis, but only in the part of the situation where the control qubit is 1.", whyResult: "When the control is itself in superposition, this ties the two qubits together so neither has its own arrow anymore — their individual arrows collapse to the centre. That is entanglement.", purpose: "Entanglement is the resource classical computers can't cheaply fake. CX plus single-qubit gates is universal, and it's the core of Bell/GHZ states, teleportation, the QFT, and error correction.", job: "Entangle and interact", breaksModel: true, unlock: 5 },
+  Measure: { slogan: "Reads the qubit — forces it to 0 or 1.", mechanism: "Not a rotation: the arrow snaps to a pole, with the odds set by how far up or down it was leaning.", whyResult: "The superposition collapses to one definite outcome and the in-between information is gone — the only irreversible move.", purpose: "Produces the classical answer; because it can happen mid-circuit it also enables feedback and the syndrome checks error correction depends on.", job: "Read the answer", breaksModel: false, unlock: 1 },
+  Y: { slogan: "A combined bit-and-phase flip.", mechanism: "A half-turn (180°) about the Y-axis.", purpose: "Acts like X and Z together; appears in noise models and rotations.", job: "Write and mark phase", breaksModel: false, unlock: 6 },
+  S: { slogan: "A quarter phase turn.", mechanism: "90° about the Z-axis (√Z).", purpose: "A precise, small phase for setting up interference.", job: "Write and mark phase", breaksModel: false, unlock: 6 },
+  Sdg: { slogan: "An inverse quarter phase turn.", mechanism: "−90° about the Z-axis.", purpose: "Undoes S; precise phase control.", job: "Write and mark phase", breaksModel: false, unlock: 6 },
+  T: { slogan: "An eighth phase turn.", mechanism: "45° about the Z-axis.", purpose: "The 'expensive' gate: H, S and CX alone can be imitated classically — T is the ingredient that gives a quantum computer its genuine edge, so it's the costly gate in fault-tolerant hardware.", job: "Write and mark phase", breaksModel: false, unlock: 6 },
+  Tdg: { slogan: "An inverse eighth phase turn.", mechanism: "−45° about the Z-axis.", purpose: "Undoes T.", job: "Write and mark phase", breaksModel: false, unlock: 6 },
+  SX: { slogan: "Half of an X flip — hardware-native on IBM chips.", mechanism: "90° about the X-axis (√X).", purpose: "A native building block on real hardware; two √X make an X.", job: "Create superposition", breaksModel: false, unlock: 6 },
+  SXdg: { slogan: "The inverse half-X.", mechanism: "−90° about the X-axis.", purpose: "Undoes √X.", job: "Create superposition", breaksModel: false, unlock: 6 },
+  ID: { slogan: "Do nothing — a deliberate wait.", mechanism: "No rotation at all.", purpose: "Used for timing and to model idle decay on real hardware.", job: "Prepare the starting state", breaksModel: false, unlock: 6 },
+  P: { slogan: "The general phase dial.", mechanism: "Rotates by an angle λ you choose about the Z-axis.", purpose: "Sets any phase; generalises Z, S and T.", job: "Write and mark phase", breaksModel: false, unlock: 6 },
+  RX: { slogan: "A tunable rotation about the X-axis.", mechanism: "Turns the arrow by an angle θ you choose about X.", purpose: "A trainable knob for VQE, QAOA and quantum ML — angles are parameters you optimise, like network weights.", job: "Tunable rotations", breaksModel: false, unlock: 6 },
+  RY: { slogan: "A tunable rotation about the Y-axis.", mechanism: "Turns the arrow by an angle θ about Y (stays real-valued).", purpose: "A trainable knob for variational circuits.", job: "Tunable rotations", breaksModel: false, unlock: 6 },
+  RZ: { slogan: "A tunable phase rotation about the Z-axis.", mechanism: "Turns the arrow by θ around the equator.", purpose: "A trainable phase knob for variational circuits.", job: "Tunable rotations", breaksModel: false, unlock: 6 },
+  U: { slogan: "The fully general single-qubit rotation.", mechanism: "Any rotation, set by three angles (θ, φ, λ).", purpose: "Can produce any single-qubit gate; the universal single-qubit building block.", job: "Tunable rotations", breaksModel: false, unlock: 6 },
+  CY: { slogan: "Controlled-Y — a Y flip only when the control is 1.", mechanism: "Applies Y to the target in the part of the state where the control is 1.", purpose: "A conditional bit-and-phase flip; an entangler.", job: "Entangle and interact", breaksModel: true, unlock: 6 },
+  CZ: { slogan: "Controlled-Z — entangles via phase.", mechanism: "Flips the sign of |11⟩ only.", purpose: "Symmetric entangler; underpins cluster states for measurement-based computing.", job: "Entangle and interact", breaksModel: true, unlock: 6 },
+  CH: { slogan: "Controlled-H — superposition only when the control is 1.", mechanism: "Applies H to the target where the control is 1.", purpose: "A conditional superposition; an entangler.", job: "Entangle and interact", breaksModel: true, unlock: 6 },
+  CP: { slogan: "Controlled phase (λ).", mechanism: "Adds phase λ only when both qubits are 1.", purpose: "The key entangling gate inside the Quantum Fourier Transform.", job: "Entangle and interact", breaksModel: true, unlock: 6 },
+  CRX: { slogan: "Controlled X-rotation (θ).", mechanism: "Turns the target by θ about X only when the control is 1.", purpose: "A tunable conditional rotation for variational circuits.", job: "Entangle and interact", breaksModel: true, unlock: 6 },
+  CRZ: { slogan: "Controlled Z-rotation (θ).", mechanism: "Turns the target by θ about Z only when the control is 1.", purpose: "A tunable conditional phase for variational circuits.", job: "Entangle and interact", breaksModel: true, unlock: 6 },
+  RXX: { slogan: "Dials up a real XX interaction (θ).", mechanism: "Rotates the two qubits together in the X⊗X direction.", purpose: "Native on trapped-ion hardware; the natural way to simulate real molecules.", job: "Entangle and interact", breaksModel: true, unlock: 6 },
+  RZZ: { slogan: "Dials up a real ZZ interaction (θ).", mechanism: "Adds a joint phase depending on whether the two qubits agree.", purpose: "Native two-qubit interaction; used in molecular simulation and QAOA.", job: "Entangle and interact", breaksModel: true, unlock: 6 },
+  CCX: { slogan: "Toffoli — the reversible AND.", mechanism: "Flips the target only when both controls are 1.", purpose: "Rebuilds ordinary logic reversibly; the oracle inside Grover's search, and quantum adders.", job: "Reversible classical logic", breaksModel: true, unlock: 6 },
+  CSWAP: { slogan: "Fredkin — a controlled swap.", mechanism: "Swaps two qubits only when the control is 1.", purpose: "Reversible logic; the swap test in quantum machine learning.", job: "Reversible classical logic", breaksModel: true, unlock: 6 },
+  SWAP: { slogan: "Exchanges two qubits.", mechanism: "Moves the state of one wire onto the other and vice-versa.", purpose: "Routes states across a real chip where the qubits that must interact aren't physically adjacent (the QFT ends in swaps).", job: "Move information", breaksModel: false, unlock: 6 },
+  Reset: { slogan: "Forces a qubit back to |0⟩.", mechanism: "A non-unitary reset to the top of the sphere.", purpose: "Re-prepares a qubit mid-circuit for reuse.", job: "Prepare the starting state", breaksModel: false, unlock: 6 },
+};
+
+/* ── Lessons as data (steps validate against the real circuit) ── */
+interface LessonStep { concept: string; action: string; highlight?: string; shots?: boolean; validate: any; explain?: string; }
+interface Lesson { id: string; title: string; qubits: number; steps: LessonStep[]; }
+const LESSONS: Lesson[] = [
+  {
+    id: "meet-a-qubit", title: "Meet a qubit", qubits: 1, steps: [
+      { concept: "A qubit is an arrow pointing out of a ball (the Bloch sphere). Straight up = a definite 0. It starts here, just like an ordinary bit.", action: "Look at q0 below — its arrow points straight up. Press Next.", validate: null },
+      { concept: "Measuring reads the arrow: it snaps to a pole (0 or 1), with odds set by how far up or down it leaned.", action: "Press “Measure 100×” and watch every shot.", shots: true, validate: { ranShots: true }, explain: "Every shot came out 0 — a fresh qubit always measures 0. Measurement forced the arrow to the top pole each time." },
+    ],
+  },
+  {
+    id: "the-flip", title: "The flip (X)", qubits: 1, steps: [
+      { concept: "Every single-qubit gate just rotates the arrow. X is a half-turn that flips straight-up (0) to straight-down (1).", action: "Drag the highlighted X gate onto the q0 wire.", highlight: "X", validate: { gateOnWire: { gate: "X", qubit: 0 } }, explain: "The arrow flipped to straight-down — q0 is now a definite 1. The probability bar moved fully onto |1⟩." },
+      { concept: "Let's confirm by measuring.", action: "Press “Measure 100×”.", shots: true, validate: { ranShots: true }, explain: "Every shot is 1 now. A half-turn about X is exactly the classical NOT." },
+    ],
+  },
+  {
+    id: "superposition", title: "Superposition (H)", qubits: 1, steps: [
+      { concept: "H tips the arrow onto the equator — a true 50/50 “maybe 0, maybe 1” at the same time.", action: "Drag the highlighted H gate onto q0.", highlight: "H", validate: { gateOnWire: { gate: "H", qubit: 0 } }, explain: "q0 is now 50% likely 0 and 50% likely 1 — both at once, until you measure. The arrow sits on the equator." },
+      { concept: "Superposition gives random samples — not clean, exact halves.", action: "Press “Measure 100×” and watch the histogram.", shots: true, validate: { ranShots: true }, explain: "Roughly half 0 and half 1 — but almost never exactly 50/50. The randomness is real; only over many shots does the pattern settle." },
+    ],
+  },
+  {
+    id: "phase", title: "The hidden dimension: phase (Z)", qubits: 1, steps: [
+      { concept: "Phase is which way the arrow points around the equator. Z flips the hidden phase without changing the odds.", action: "First make a superposition: drag H onto q0.", highlight: "H", validate: { gateOnWire: { gate: "H", qubit: 0 } }, explain: "q0 is on the equator (50/50)." },
+      { concept: "Now add Z. Watch the probability bars — they won't move at all.", action: "Drag Z onto q0 (in the next column).", highlight: "Z", validate: { gateOnWire: { gate: "Z", qubit: 0 } }, explain: "The bars didn't budge — Z only spun the arrow around the equator. Phase is invisible to a direct measurement…" },
+      { concept: "…but a second H turns that hidden phase into a real, measurable flip. That is interference.", action: "Add another H on q0 (a third gate).", highlight: "H", validate: { gateCount: { gate: "H", count: 2 } }, explain: "H…Z…H turned a 0 into a definite 1 — the invisible phase became a visible outcome. This interference is where quantum speedups come from." },
+    ],
+  },
+  {
+    id: "entanglement", title: "Two qubits & entanglement (CX)", qubits: 2, steps: [
+      { concept: "Now two qubits. Put q0 into superposition first.", action: "Drag H onto q0.", highlight: "H", validate: { gateOnWire: { gate: "H", qubit: 0 } }, explain: "q0 is 50/50." },
+      { concept: "CX links q1 to q0. Watch each qubit's arrow shrink to the centre and a bond appear.", action: "Drag CX so q0 is the control and q1 the target — place it in the column to the right of H.", highlight: "CX", validate: { controlledOn: { gate: "CX", control: 0, target: 1 } }, explain: "Both arrows collapsed to the centre and a pink bond lit up. This is entanglement: neither qubit has its own arrow anymore — that's the model's honest breaking point. The Q-sphere shows only |00⟩ and |11⟩." },
+    ],
+  },
+  {
+    id: "first-algorithm", title: "Your first algorithm", qubits: 1, steps: [
+      { concept: "A quantum coin-flip: superposition, then read it. Start with H.", action: "Drag H onto q0.", highlight: "H", validate: { gateOnWire: { gate: "H", qubit: 0 } }, explain: "The coin is spinning — a genuine 50/50 superposition." },
+      { concept: "Flip the coin by measuring.", action: "Press “Measure 100×”.", shots: true, validate: { ranShots: true }, explain: "A fair, truly-random coin — about half heads, half tails, unpredictable shot to shot. You've built and run your first quantum program. Turn Tutorial Mode off any time to build freely." },
+    ],
+  },
+];
+
 function fmtPi(r: number): string {
   if (Math.abs(r) < 1e-9) return "0";
   for (const den of [1, 2, 3, 4, 6, 8, 12]) {
@@ -402,6 +488,15 @@ export default function QuantumSandbox() {
   const [recording, setRecording] = useState(false);
   const rafRef = useRef(0);
   const lastTsRef = useRef(0);
+
+  // tutorial mode
+  const [tutorial, setTutorial] = useState(false);
+  const [lessonIdx, setLessonIdx] = useState<number | null>(null);
+  const [stepIdx, setStepIdx] = useState(0);
+  const [completed, setCompleted] = useState<number[]>([]);
+  const [shotsResult, setShotsResult] = useState<Record<string, number> | null>(null);
+  const [hoverGate, setHoverGate] = useState<string | null>(null);
+  const [deeper, setDeeper] = useState(false);
 
   const maxCol = ops.reduce((m, o) => Math.max(m, o.col), -1);
   const numCols = Math.max(10, maxCol + 3);
@@ -509,6 +604,44 @@ export default function QuantumSandbox() {
   const removeQubit = () => { if (numQubits <= 1) return; const top = numQubits - 1; setOps((prev) => prev.filter((o) => !involved(o).includes(top))); setNumQubits((n) => n - 1); };
   const clearAll = () => { setOps([]); setSelected(null); setArmed(null); };
   const selOp = ops.find((o) => o.uid === selected) || null;
+
+  /* ── Tutorial Mode logic ── */
+  const activeLesson = lessonIdx != null ? LESSONS[lessonIdx] : null;
+  const step: LessonStep | null = activeLesson ? activeLesson.steps[stepIdx] : null;
+
+  const checkValidate = useCallback((v: any): boolean => {
+    if (!v) return true;
+    if (v.all) return v.all.every((x: any) => checkValidate(x));
+    if (v.ranShots) return shotsResult != null;
+    if (v.measured) return ops.some((o) => o.type === "Measure" && o.targets.includes(v.measured.qubit));
+    if (v.gateOnWire) return ops.some((o) => o.type === v.gateOnWire.gate && o.targets.includes(v.gateOnWire.qubit));
+    if (v.controlledOn) return ops.some((o) => o.type === v.controlledOn.gate && o.controls.includes(v.controlledOn.control) && o.targets.includes(v.controlledOn.target));
+    if (v.gateCount) return ops.filter((o) => o.type === v.gateCount.gate).length >= v.gateCount.count;
+    return false;
+  }, [ops, shotsResult]);
+  const stepDone = step ? checkValidate(step.validate) : false;
+
+  const runTutorialShots = useCallback(() => {
+    const res: Record<string, number> = {};
+    for (let s = 0; s < 100; s++) { const { outcome } = measureSample(displayState); const lab = labelOf(outcome, numQubits); res[lab] = (res[lab] || 0) + 1; }
+    setShotsResult(res);
+  }, [displayState, numQubits]);
+
+  const startLesson = (i: number) => { setTutorial(true); setLessonIdx(i); setStepIdx(0); setShotsResult(null); setDeeper(false); setNumQubits(LESSONS[i].qubits); setOps([]); setSelected(null); };
+  const nextStep = () => {
+    if (!activeLesson) return;
+    if (stepIdx < activeLesson.steps.length - 1) { setStepIdx((s) => s + 1); setShotsResult(null); }
+    else { setCompleted((c) => (c.includes(lessonIdx!) ? c : [...c, lessonIdx!])); setLessonIdx(null); setStepIdx(0); }
+  };
+  const prevStep = () => { if (stepIdx > 0) { setStepIdx((s) => s - 1); setShotsResult(null); } };
+  const exitTutorial = () => { setTutorial(false); setLessonIdx(null); setStepIdx(0); };
+  // clear shot samples whenever the circuit changes
+  useEffect(() => { setShotsResult(null); }, [ops]);
+
+  // which gate to explain in the tutorial side panel
+  const explainType = hoverGate || (selOp ? selOp.type : null) || (step?.highlight ?? null);
+  const gi = explainType ? GATE_INFO[explainType] : null;
+  const unlockThrough = activeLesson ? lessonIdx! + 1 : (completed.length ? Math.max(...completed) + 2 : 5);
 
   /* ---- Q-sphere drawing (shared) ---- */
   const drawQSphere = useCallback((ctx: CanvasRenderingContext2D, ox: number, oy: number, R: number, st: C[], n: number) => {
@@ -664,11 +797,115 @@ export default function QuantumSandbox() {
     <div className="space-y-6 pb-10">
       <div className="flex items-center gap-3">
         <div className="w-10 h-10 rounded-xl bg-indigo-100 flex items-center justify-center text-indigo-600 font-bold text-lg">⚛</div>
-        <div>
+        <div className="flex-1">
           <h1 className="text-2xl font-bold text-slate-900">Quantum Sandbox</h1>
           <p className="text-sm text-slate-500">Drag-and-drop circuits with gate-by-gate animation, entanglement meters, a Q-sphere, and live Qiskit code.</p>
         </div>
+        <button onClick={() => (tutorial ? exitTutorial() : setTutorial(true))}
+          className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold transition-colors ${tutorial ? "bg-indigo-600 text-white hover:bg-indigo-500" : "bg-slate-100 text-slate-700 hover:bg-slate-200"}`}>
+          <GraduationCap className="w-4 h-4" /> Tutorial Mode: {tutorial ? "On" : "Off"}
+        </button>
       </div>
+
+      {/* ── Tutorial: lesson picker ── */}
+      {tutorial && !activeLesson && (
+        <div className="bg-white rounded-xl border border-indigo-200 p-4">
+          <div className="flex items-center gap-2 mb-1"><GraduationCap className="w-4 h-4 text-indigo-500" /><h2 className="text-sm font-bold text-slate-900">Guided lessons</h2></div>
+          <p className="text-xs text-slate-500 mb-3">One idea per lesson. Do the real action, see what changes, read why — in plain English. Turn Tutorial Mode off any time to build freely.</p>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-2">
+            {LESSONS.map((l, i) => {
+              const done = completed.includes(i);
+              const locked = i > 0 && !completed.includes(i - 1) && !done;
+              return (
+                <button key={l.id} disabled={locked} onClick={() => startLesson(i)}
+                  className={`text-left p-3 rounded-xl border transition-colors ${locked ? "border-slate-100 bg-slate-50 opacity-60 cursor-not-allowed" : "border-slate-200 hover:border-indigo-300 hover:bg-indigo-50"}`}>
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-[10px] font-semibold text-slate-400">Lesson {i + 1}</span>
+                    {done ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : locked ? <Lock className="w-3.5 h-3.5 text-slate-300" /> : <ArrowRight className="w-3.5 h-3.5 text-indigo-400" />}
+                  </div>
+                  <p className="text-xs font-semibold text-slate-800">{l.title}</p>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* ── Tutorial: active lesson rail + gate explainer ── */}
+      {tutorial && activeLesson && step && (
+        <div className="grid md:grid-cols-[1fr_300px] gap-4">
+          <div className="bg-white rounded-xl border border-indigo-200 p-4">
+            <div className="flex items-center justify-between mb-2">
+              <div>
+                <p className="text-[10px] font-semibold text-indigo-500 uppercase tracking-wider">Lesson {lessonIdx! + 1} of {LESSONS.length}</p>
+                <h2 className="text-sm font-bold text-slate-900">{activeLesson.title}</h2>
+              </div>
+              <button onClick={exitTutorial} className="text-[11px] text-slate-400 hover:text-slate-600">Exit to sandbox</button>
+            </div>
+            <div className="flex gap-1 mb-3">
+              {activeLesson.steps.map((_, si) => <div key={si} className={`h-1.5 flex-1 rounded-full ${si < stepIdx ? "bg-indigo-500" : si === stepIdx ? "bg-indigo-300" : "bg-slate-200"}`} />)}
+            </div>
+            <p className="text-sm text-slate-700 mb-2">{step.concept}</p>
+            <div className="rounded-lg bg-amber-50 border border-amber-200 px-3 py-2 text-xs text-amber-800 mb-3">
+              <span className="font-semibold">Do this: </span>{step.action}
+            </div>
+            {step.shots && (
+              <div className="mb-3">
+                <button onClick={runTutorialShots} className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-indigo-600 text-white text-xs font-semibold hover:bg-indigo-500"><Play className="w-3 h-3" /> Measure 100×</button>
+                {shotsResult && (
+                  <div className="mt-2 space-y-1">
+                    {Object.entries(shotsResult).sort(([a], [b]) => parseInt(a, 2) - parseInt(b, 2)).map(([lab, cnt]) => (
+                      <div key={lab} className="flex items-center gap-2 text-[11px]">
+                        <span className="font-mono text-slate-600 w-14">|{lab}⟩</span>
+                        <div className="flex-1 bg-slate-100 rounded-full h-2.5 overflow-hidden"><div className="h-full bg-indigo-500" style={{ width: `${cnt}%` }} /></div>
+                        <span className="font-mono text-slate-500 w-12 text-right">{cnt}%</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+            {stepDone && step.explain && (
+              <div className="rounded-lg bg-emerald-50 border border-emerald-200 px-3 py-2 text-xs text-emerald-800 mb-3 flex gap-2">
+                <Check className="w-4 h-4 shrink-0 mt-0.5" /><span>{step.explain}</span>
+              </div>
+            )}
+            <div className="flex items-center gap-2">
+              <button onClick={prevStep} disabled={stepIdx === 0} className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-slate-100 text-slate-600 text-xs font-medium hover:bg-slate-200 disabled:opacity-40"><ArrowLeft className="w-3 h-3" /> Back</button>
+              <button onClick={nextStep} disabled={!stepDone}
+                className={`inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${stepDone ? "bg-indigo-600 text-white hover:bg-indigo-500" : "bg-slate-100 text-slate-400 cursor-not-allowed"}`}>
+                {stepIdx === activeLesson.steps.length - 1 ? "Finish lesson" : "Next"} <ArrowRight className="w-3 h-3" />
+              </button>
+              {!stepDone && step.validate && <span className="text-[10px] text-slate-400">complete the action to continue</span>}
+            </div>
+          </div>
+
+          {/* four-layer gate explainer */}
+          <div className="bg-white rounded-xl border border-slate-200 p-4">
+            {gi ? (
+              <>
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="px-2 h-7 inline-flex items-center rounded-md text-xs font-bold text-white" style={{ backgroundColor: DEF[explainType!]?.color || "#6366f1" }}>{DEF[explainType!]?.label}</span>
+                  <span className="text-xs font-semibold text-slate-700">{gi.slogan}</span>
+                </div>
+                <dl className="space-y-2 text-xs">
+                  <div><dt className="font-semibold text-slate-500">What it does to the arrow</dt><dd className="text-slate-600">{gi.mechanism}</dd></div>
+                  {gi.whyResult && <div><dt className="font-semibold text-slate-500">Why the screen changes</dt><dd className="text-slate-600">{gi.whyResult}</dd></div>}
+                  <div><dt className="font-semibold text-slate-500">Why it exists</dt><dd className="text-slate-600">{gi.purpose}</dd></div>
+                  {gi.breaksModel && <div className="rounded bg-rose-50 border border-rose-200 px-2 py-1 text-rose-700">Honest note: with this gate the single-arrow picture breaks — the qubits share one state and lose their individual arrows. That&apos;s entanglement.</div>}
+                </dl>
+                <button onClick={() => setDeeper((d) => !d)} className="mt-2 text-[11px] text-indigo-600 hover:underline">{deeper ? "Hide the math" : "Go deeper (the math)"}</button>
+                {deeper && (() => {
+                  const M = baseMatrix(explainType!, DEF[explainType!]?.params.map((p) => p.def) || []);
+                  if (!M) return <p className="text-[11px] text-slate-400 mt-1">Non-unitary / structural operation — no 2×2 matrix.</p>;
+                  const fmt = (c: C) => `${c.re.toFixed(2)}${c.im >= 0 ? "+" : "−"}${Math.abs(c.im).toFixed(2)}i`;
+                  return <pre className="mt-1 text-[10px] font-mono text-slate-500 bg-slate-50 rounded p-2 overflow-x-auto">{`[ ${fmt(M[0][0])}  ${fmt(M[0][1])} ]\n[ ${fmt(M[1][0])}  ${fmt(M[1][1])} ]`}</pre>;
+                })()}
+              </>
+            ) : <p className="text-xs text-slate-400">Hover a gate in the palette to see what it does, in plain English and in math.</p>}
+          </div>
+        </div>
+      )}
 
       {/* intro */}
       <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
@@ -690,20 +927,30 @@ export default function QuantumSandbox() {
         {/* palette */}
         <div className="bg-white rounded-xl border border-slate-200 p-3 h-fit">
           <h3 className="text-xs font-semibold text-slate-900 uppercase tracking-wider mb-2">Operations <span className="text-slate-400 font-normal">({PALETTE.length})</span></h3>
-          {cats.map((cat) => (
-            <div key={cat} className="mb-3">
-              <p className="text-[10px] font-semibold text-slate-400 uppercase mb-1">{cat}</p>
-              <div className="flex flex-wrap gap-1.5">
-                {PALETTE.filter((g) => g.cat === cat).map((g) => (
-                  <button key={g.type} draggable
-                    onDragStart={(e) => e.dataTransfer.setData("text/plain", JSON.stringify({ newGate: g.type }))}
-                    onClick={() => setArmed(armed === g.type ? null : g.type)} title={g.label}
-                    className={`px-2 h-8 min-w-[34px] rounded-md text-[11px] font-bold text-white cursor-grab active:cursor-grabbing transition-all hover:brightness-110 ${armed === g.type ? "ring-2 ring-offset-1 ring-slate-900" : ""}`}
-                    style={{ backgroundColor: g.color }}>{g.label}</button>
-                ))}
+          {cats.map((cat) => {
+            const gates = PALETTE.filter((g) => g.cat === cat && (!tutorial || GATE_INFO[g.type].unlock <= unlockThrough));
+            if (gates.length === 0) return null;
+            return (
+              <div key={cat} className="mb-3">
+                <p className="text-[10px] font-semibold text-slate-400 uppercase mb-1">{cat}</p>
+                <div className="flex flex-wrap gap-1.5">
+                  {gates.map((g) => {
+                    const isTut = tutorial && step?.highlight === g.type;
+                    return (
+                      <button key={g.type} draggable
+                        onDragStart={(e) => e.dataTransfer.setData("text/plain", JSON.stringify({ newGate: g.type }))}
+                        onClick={() => setArmed(armed === g.type ? null : g.type)}
+                        onMouseEnter={() => tutorial && setHoverGate(g.type)} onMouseLeave={() => setHoverGate(null)}
+                        title={g.label}
+                        className={`px-2 h-8 min-w-[34px] rounded-md text-[11px] font-bold text-white cursor-grab active:cursor-grabbing transition-all hover:brightness-110 ${armed === g.type ? "ring-2 ring-offset-1 ring-slate-900" : ""} ${isTut ? "ring-2 ring-offset-1 ring-amber-400 animate-pulse" : ""}`}
+                        style={{ backgroundColor: g.color }}>{g.label}</button>
+                    );
+                  })}
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
+          {tutorial && (() => { const hidden = PALETTE.filter((g) => GATE_INFO[g.type].unlock > unlockThrough).length; return hidden > 0 ? <p className="text-[10px] text-slate-400 mt-1 px-1 py-1 rounded bg-slate-50">+ {hidden} more — unlock by completing lessons (or turn Tutorial Mode off to use them all).</p> : null; })()}
           {armed && <p className="text-[10px] text-indigo-600 mt-1">Click a cell to place <b>{DEF[armed].label}</b> · click again to cancel</p>}
         </div>
 
