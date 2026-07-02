@@ -94,4 +94,4 @@ git push
 
 ## License
 
-n/a for now
+[MIT](LICENSE)
