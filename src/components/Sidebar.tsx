@@ -26,6 +26,7 @@ import {
   Bookmark,
   Heart,
   Info,
+  X,
 } from "lucide-react";
 import { curriculum } from "@/data/curriculum";
 
@@ -78,7 +79,7 @@ const lessonTypeColor = (type: string) => {
   }
 };
 
-export default function Sidebar() {
+export default function Sidebar({ open = false, onClose }: { open?: boolean; onClose?: () => void }) {
   const pathname = usePathname();
   const [expandedModule, setExpandedModule] = useState<string | null>(null);
 
@@ -92,7 +93,7 @@ export default function Sidebar() {
     return (
       <Link
         href={item.href}
-        className={`flex items-center gap-3 px-4 py-1.5 text-sm transition-colors ${
+        className={`flex items-center gap-3 px-4 py-2.5 lg:py-1.5 text-sm transition-colors ${
           isActive
             ? "text-white bg-slate-800 border-r-2 border-blue-400"
             : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/50"
@@ -105,13 +106,24 @@ export default function Sidebar() {
   };
 
   return (
-    <aside className="fixed left-0 top-0 h-screen w-56 bg-slate-900 z-30 flex flex-col overflow-y-auto">
+    <aside
+      className={`fixed left-0 top-0 h-screen w-56 bg-slate-900 z-50 lg:z-30 flex flex-col overflow-y-auto transition-transform duration-200 lg:translate-x-0 ${
+        open ? "translate-x-0" : "-translate-x-full"
+      }`}
+    >
       {/* Brand */}
       <div className="flex items-center gap-2 px-4 h-14 border-b border-slate-700/50 shrink-0">
         <Atom className="w-5 h-5 text-blue-400" />
         <span className="text-sm font-semibold text-white leading-tight">
           Quantum Research Archive
         </span>
+        <button
+          onClick={onClose}
+          className="ml-auto lg:hidden text-slate-400 hover:text-white p-1 -mr-1"
+          aria-label="Close menu"
+        >
+          <X className="w-5 h-5" />
+        </button>
       </div>
 
       <nav className="flex-1 py-2 space-y-0.5 overflow-y-auto">

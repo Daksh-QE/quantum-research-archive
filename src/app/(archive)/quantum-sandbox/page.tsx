@@ -988,7 +988,7 @@ export default function QuantumSandbox() {
             <button onClick={removeQubit} disabled={numQubits <= 1} className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-100 text-slate-700 text-xs font-medium hover:bg-slate-200 disabled:opacity-40"><Minus className="w-3 h-3" /> Remove</button>
             <button onClick={clearAll} className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-rose-50 text-rose-600 text-xs font-medium hover:bg-rose-100"><RotateCcw className="w-3 h-3" /> Clear</button>
             <div onDragOver={(e) => e.preventDefault()} onDrop={(e) => { e.preventDefault(); try { const pl = JSON.parse(e.dataTransfer.getData("text/plain")); if (pl.move) deleteOp(pl.move); } catch { } }}
-              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg border border-dashed border-slate-300 text-slate-400 text-xs ml-auto"><Trash2 className="w-3 h-3" /> drag here to delete</div>
+              className="hidden lg:inline-flex items-center gap-1 px-2.5 py-1 rounded-lg border border-dashed border-slate-300 text-slate-400 text-xs ml-auto"><Trash2 className="w-3 h-3" /> drag here to delete</div>
           </div>
 
           {/* circuit grid */}

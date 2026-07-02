@@ -2,17 +2,24 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import { Atom, Search } from "lucide-react";
+import { Atom, Search, Menu } from "lucide-react";
 import SearchPalette from "@/components/SearchPalette";
 
-export default function Header() {
+export default function Header({ onMenuClick }: { onMenuClick?: () => void }) {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
 
   return (
     <>
-      <header className="fixed top-0 left-56 right-0 h-14 bg-white border-b border-slate-200 z-20 flex items-center justify-between px-6">
-        {/* Left: Brand */}
+      <header className="fixed top-0 left-0 lg:left-56 right-0 h-14 bg-white border-b border-slate-200 z-20 flex items-center justify-between px-4 sm:px-6">
+        {/* Left: menu (mobile) + Brand */}
         <div className="flex items-center gap-2">
+          <button
+            onClick={onMenuClick}
+            className="lg:hidden text-slate-600 hover:text-slate-900 p-1 -ml-1"
+            aria-label="Open menu"
+          >
+            <Menu className="w-5 h-5" />
+          </button>
           <Atom className="w-5 h-5 text-blue-600" />
           <span className="text-sm font-semibold text-slate-900 hidden sm:inline">
             Quantum Research Archive

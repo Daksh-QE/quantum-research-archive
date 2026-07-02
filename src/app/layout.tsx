@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Analytics } from "@vercel/analytics/react";
 import "./globals.css";
@@ -17,6 +17,11 @@ export const metadata: Metadata = {
   title: "Quantum Research Archive",
   description:
     "A curated research archive for quantum computing and quantum mechanics — resources, curriculum, tools, and community.",
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
 };
 
 export default function RootLayout({
