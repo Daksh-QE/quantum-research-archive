@@ -49,3 +49,10 @@ PRD.md
 
 # ...but do track the placeholder template
 !.env.example
+
+# internal orchestration / planning / build artifacts (not for public repo)
+.stratum/
+/docs/
+/plan.md
+/codebase.md
+.github/test.txt

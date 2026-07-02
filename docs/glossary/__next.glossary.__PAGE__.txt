@@ -1,9 +1,0 @@
-1:"$Sreact.fragment"
-2:I[46373,["/quantum-research-archive/_next/static/chunks/01yowrouf0wxv.js","/quantum-research-archive/_next/static/chunks/2se9q2pt5qakz.js","/quantum-research-archive/_next/static/chunks/24dn8gr7ivn1l.js"],"ClientPageRoot"]
-3:I[59684,["/quantum-research-archive/_next/static/chunks/01yowrouf0wxv.js","/quantum-research-archive/_next/static/chunks/2se9q2pt5qakz.js","/quantum-research-archive/_next/static/chunks/24dn8gr7ivn1l.js","/quantum-research-archive/_next/static/chunks/20yajf3-oi5bq.js"],"default"]
-6:I[35137,["/quantum-research-archive/_next/static/chunks/01yowrouf0wxv.js","/quantum-research-archive/_next/static/chunks/2se9q2pt5qakz.js","/quantum-research-archive/_next/static/chunks/24dn8gr7ivn1l.js"],"OutletBoundary"]
-7:"$Sreact.suspense"
-0:{"rsc":["$","$1","c",{"children":[["$","$L2",null,{"Component":"$3","serverProvidedParams":{"searchParams":{},"params":{},"promises":["$@4","$@5"]}}],[["$","script","script-0",{"src":"/quantum-research-archive/_next/static/chunks/20yajf3-oi5bq.js","async":true}]],["$","$L6",null,{"children":["$","$7",null,{"name":"Next.MetadataOutlet","children":"$@8"}]}]]}],"isPartial":false,"staleTime":300,"varyParams":null,"buildId":"gHvnBg_5TRD9Y1rj5iEpt"}
-4:{}
-5:"$0:rsc:props:children:0:props:serverProvidedParams:params"
-8:null

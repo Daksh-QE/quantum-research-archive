@@ -1,4 +1,0 @@
-/usr/local/bin/node
-v24.15.0
-/usr/local/bin/npm
-11.12.1
