@@ -4,7 +4,7 @@ import React, { useMemo, useRef, useEffect, useState } from "react";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 
-/* ── helpers ── */
+/* helpers */
 function shuffle<T>(arr: T[], seed: number): T[] {
   const r = [...arr];
   for (let i = r.length - 1; i > 0; i--) {
@@ -15,7 +15,7 @@ function shuffle<T>(arr: T[], seed: number): T[] {
   return r;
 }
 
-/* ── size tiers (height px) ── */
+/* size tiers (height px) */
 const H = {
   BOOK: 180, YT: 120, REPO: 110, PAPER: 78,
   PERSON: 62, COMPANY: 50, COURSE: 50, TOOL: 50,
@@ -24,16 +24,14 @@ const H = {
 
 interface Tile { uid: string; url: string; html: string; h: number; }
 
-/* ═══════════════════════════════════════════════════════════
-   TILE DATA — all verified, working URLs
-   ═══════════════════════════════════════════════════════════ */
+// tile data (checked URLs)
 
 function buildTiles(): Tile[] {
   const T: Tile[] = [];
   let u = 0;
   const add = (html: string, url: string, h: number) => T.push({ uid: `t${u++}`, url, html, h });
 
-  /* ── 3Blue1Brown quantum videos (only videos on canvas) ── */
+  /* 3Blue1Brown quantum videos (only videos on canvas) */
   const YT = [
     ["https://i.ytimg.com/vi/fNk_zzaMoSs/mqdefault.jpg", "Some light quantum mechanics | 3Blue1Brown", "https://www.youtube.com/watch?v=fNk_zzaMoSs"],
     ["https://i.ytimg.com/vi/k7RM-ot2NWY/mqdefault.jpg", "Quantum mechanics and the Schrödinger equation", "https://www.youtube.com/watch?v=k7RM-ot2NWY"],
@@ -42,7 +40,7 @@ function buildTiles(): Tile[] {
   for (const [thumb, , url] of YT)
     add(`<div class="lc lc-yt"><img class="lc-yt-img" src="${thumb}" alt="" loading="lazy" onerror="this.parentElement.style.display='none'" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover"/><div class="lc-play"><svg width="24" height="24" viewBox="0 0 24 24" fill="white"><path d="M8 5v14l11-7z"/></svg></div></div>`, url, H.YT);
 
-  /* ── Book covers (large) ── */
+  /* Book covers (large) */
   const BOOKS: [string, string, string][] = [
     ["Quantum Computation and Quantum Information", "https://covers.openlibrary.org/b/id/14614256-L.jpg", "https://www.cambridge.org/9781107002173"],
     ["Principles of Quantum Mechanics", "https://covers.openlibrary.org/b/id/258369-L.jpg", "https://www.springer.com/9780306447907"],
@@ -55,7 +53,7 @@ function buildTiles(): Tile[] {
   for (const [, img, url] of BOOKS)
     add(`<div class="lc lc-book"><img src="${img}" alt="" loading="lazy" style="display:block;width:100%;height:100%;object-fit:contain" onerror="this.parentElement.style.display='none'"/></div>`, url, H.BOOK);
 
-  /* ── GitHub repos ── */
+  /* GitHub repos */
   const REPS: [string, string, string][] = [
     ["qiskit/qiskit", "#000", "https://opengraph.githubassets.com/1/qiskit/qiskit"],
     ["quantumlib/Stim", "#000", "https://opengraph.githubassets.com/1/quantumlib/Stim"],
@@ -69,7 +67,7 @@ function buildTiles(): Tile[] {
   for (const [repo, , og] of REPS)
     add(`<div class="lc" style="background:#0d1117;border:none;border-radius:5px;overflow:hidden;position:relative"><img src="${og}" alt="" loading="lazy" style="width:100%;height:100%;object-fit:cover;display:block" onerror="this.parentElement.style.display='none'"/><div style="position:absolute;bottom:4px;left:6px;display:flex;align-items:center;gap:4px"><svg width="10" height="10" viewBox="0 0 24 24" fill="white"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg><span style="color:white;font-size:9px;font-weight:500;overflow:hidden;text-overflow:ellipsis">${repo}</span></div></div>`, `https://github.com/${repo}`, H.REPO);
 
-  /* ── Quantum labs / companies (branded) ── */
+  /* Quantum labs / companies (branded) */
   const LABS: [string, string, string][] = [
     ["IBM Quantum", "#6366f1", "https://www.ibm.com/quantum"],
     ["Google Quantum AI", "#4285F4", "https://quantumai.google/"],
@@ -87,7 +85,7 @@ function buildTiles(): Tile[] {
   for (const [name, color, url] of LABS)
     add(`<div class="lc" style="display:flex;align-items:center;gap:6px;padding:0 10px;background:${color}10;height:100%;box-sizing:border-box;border-left:2px solid ${color}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="1.5" style="flex-shrink:0"><circle cx="12" cy="12" r="1"/><path d="M20.2 20.2c2.04-2.03.02-7.36-4.5-11.9-4.54-4.52-9.87-6.54-11.9-4.5-2.04 2.03-.02 7.36 4.5 11.9 4.54 4.52 9.87 6.54 11.9 4.5Z"/><path d="M15.7 15.7c4.52-4.54 6.54-9.87 4.5-11.9-2.03-2.04-7.36-.02-11.9 4.5-4.52 4.54-6.54 9.87-4.5 11.9 2.03 2.04 7.36.02 11.9-4.5Z"/></svg><span class="lc-name" style="font-size:11px;font-weight:500">${name}</span></div>`, url, H.COMPANY);
 
-  /* ── University courses ── */
+  /* University courses */
   const COURSES: [string, string][] = [
     ["MIT 8.04 — Quantum Physics I", "https://ocw.mit.edu/courses/8-04-quantum-physics-i-spring-2016/"],
     ["MIT 8.05 — Quantum Physics II", "https://ocw.mit.edu/courses/8-05-quantum-physics-ii-fall-2013/"],
@@ -104,7 +102,7 @@ function buildTiles(): Tile[] {
     add(`<div class="lc" style="display:flex;align-items:center;gap:6px;padding:0 10px;background:#fefce8;height:100%;box-sizing:border-box"><img src="https://www.google.com/s2/favicons?domain=${d}&sz=32" alt="" style="width:16px;height:16px;border-radius:3px;flex-shrink:0" onerror="this.style.display='none'"/><span class="lc-name" style="font-size:11px">${name}</span></div>`, url, H.COURSE);
   }
 
-  /* ── People / researchers ── */
+  /* People / researchers */
   const PEOPLE: [string, string, string, string][] = [
     ["Peter Shor", "PS", "RES", "https://math.mit.edu/~shor/"],
     ["John Preskill", "JP", "RES", "https://en.wikipedia.org/wiki/John_Preskill"],
@@ -121,7 +119,7 @@ function buildTiles(): Tile[] {
   for (const [name, init, role, url] of PEOPLE)
     add(`<div class="lc" style="display:flex;align-items:center;gap:8px;padding:7px 10px;background:#f8f8ff;height:100%;box-sizing:border-box"><div style="width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;color:white;flex-shrink:0;background:${PC[role]||"#6366f1"}">${init}</div><div style="min-width:0"><div class="lc-name" style="font-size:11px">${name}</div><div class="lc-sub" style="font-size:8px">${role}</div></div></div>`, url, H.PERSON);
 
-  /* ── Papers ── */
+  /* Papers */
   const PAPERS: [string, string, string][] = [
     ["Quantum theory, the Church–Turing principle", "Deutsch", "https://royalsocietypublishing.org/doi/10.1098/rspa.1985.0070"],
     ["A fast quantum mechanical algorithm for database search", "Grover", "https://arxiv.org/abs/quant-ph/9605043"],
@@ -136,7 +134,7 @@ function buildTiles(): Tile[] {
   for (const [t, a, u] of PAPERS)
     add(`<div class="lc" style="padding:8px 10px;display:flex;align-items:flex-start;gap:6px;background:#fafaff;height:100%;box-sizing:border-box"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="1.5" style="flex-shrink:0;margin-top:2px"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg><div style="min-width:0"><div class="lc-title" style="font-size:11px">${t}</div><div class="lc-sub" style="font-size:9px">${a}</div></div></div>`, u, H.PAPER);
 
-  /* ── Jobs with company brand icons ── */
+  /* Jobs with company brand icons */
   const JOBS: [string, string, string, string][] = [
     ["Quantum Research Scientist", "IBM Quantum", "#6366f1", "https://www.ibm.com/quantum"],
     ["Quantum ML Researcher", "Google AI", "#4285F4", "https://quantumai.google/"],
@@ -157,7 +155,7 @@ function buildTiles(): Tile[] {
   for (const [title, company, color, url] of JOBS)
     add(`<div class="lc" style="padding:8px 10px;display:flex;align-items:center;gap:8px;background:${color}08;height:100%;box-sizing:border-box;border-left:2px solid ${color}"><div style="width:20px;height:20px;border-radius:4px;display:flex;align-items:center;justify-content:center;background:${color};flex-shrink:0;color:white;font-size:9px;font-weight:700">${company.charAt(0)}</div><div style="min-width:0"><div class="lc-title" style="font-size:10px">${title}</div><div class="lc-sub" style="font-size:8px;color:${color};font-weight:500">${company}</div></div></div>`, url, H.JOB);
 
-  /* ── Tools (with proper icons) ── */
+  /* Tools (with proper icons) */
   const TOOLS: [string, string, string][] = [
     ["Qiskit", "#6366f1", "https://qiskit.org/"],
     ["Cirq", "#4285F4", "https://quantumai.google/cirq"],
@@ -181,7 +179,7 @@ function buildTiles(): Tile[] {
   for (const [name, color, url] of TOOLS)
     add(`<div class="lc" style="display:flex;align-items:center;gap:6px;padding:0 10px;background:${color}10;height:100%;box-sizing:border-box;border-left:2px solid ${color}"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="1.5" style="flex-shrink:0"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg><span class="lc-name" style="font-size:11px;font-weight:500">${name}</span></div>`, url, H.TOOL);
 
-  /* ── Articles ── */
+  /* Articles */
   const ARTICLES: [string, string, string][] = [
     ["Quantum Computing for the Very Curious", "Matuschak & Nielsen", "https://quantum.country/qcvc"],
     ["Quantum Computing in the NISQ era", "John Preskill", "https://arxiv.org/abs/1801.00862"],
@@ -195,7 +193,7 @@ function buildTiles(): Tile[] {
   for (const [t, a, u] of ARTICLES)
     add(`<div class="lc" style="padding:8px 10px;display:flex;flex-direction:column;gap:2px;background:#fffdf8;height:100%;box-sizing:border-box"><div class="lc-title" style="font-size:11px">${t}</div><div class="lc-sub" style="font-size:9px">${a}</div></div>`, u, H.ARTICLE);
 
-  /* ── Challenges ── */
+  /* Challenges */
   const CHALLENGES: [string, string, string, string][] = [
     ["Visualize a Qubit on the Bloch Sphere", "beginner", "#22c55e", "https://quantum.ibm.com/composer"],
     ["Create a Bell State Circuit", "beginner", "#22c55e", "https://learning.quantum.ibm.com/"],
@@ -213,7 +211,7 @@ function buildTiles(): Tile[] {
   for (const [t, d, c, u] of CHALLENGES)
     add(`<div class="lc" style="padding:8px 10px;display:flex;align-items:flex-start;gap:6px;background:#faf8f0;height:100%;box-sizing:border-box"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="${c}" stroke-width="1.5" style="flex-shrink:0;margin-top:2px"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg><div style="min-width:0"><div class="lc-title" style="font-size:11px">${t}</div><div class="lc-sub" style="font-size:8px;color:${c};font-weight:600;text-transform:uppercase">${d}</div></div></div>`, u, H.CHALLENGE);
 
-  /* ── Community hubs (Discord / Reddit / X) ── */
+  /* Community hubs (Discord / Reddit / X) */
   const HUBS: [string, string, string, string][] = [
     ["Qiskit Slack", "#4A154B", "slack", "https://qisk.it/join-slack"],
     ["Quantum Computing SE", "#6366f1", "forum", "https://quantumcomputing.stackexchange.com/"],
@@ -231,9 +229,7 @@ function buildTiles(): Tile[] {
   return shuffle(T, 7);
 }
 
-/* ═══════════════════════════════════════════════════════════
-   COMPONENT
-   ═══════════════════════════════════════════════════════════ */
+// component
 
 export default function LandingPage() {
   const tiles = useMemo(() => buildTiles(), []);
@@ -355,7 +351,7 @@ export default function LandingPage() {
       `}</style>
       <div className="landing-vp" ref={vpRef}><div className="landing-grid-canvas" ref={canvasRef} /></div>
       <div className="fixed inset-0 z-10 flex flex-col items-center justify-center pointer-events-none">
-        {/* ── Quantum news ticker (marquee) ── */}
+        {/* Quantum news ticker (marquee) */}
         <div className="absolute top-4 left-0 right-0 z-20 overflow-hidden pointer-events-none">
           <div className="pointer-events-auto bg-white/90 backdrop-blur-sm rounded-full py-2 border border-slate-200 shadow-sm mx-4 overflow-hidden">
             <div className="flex whitespace-nowrap animate-[scroll_30s_linear_infinite]">

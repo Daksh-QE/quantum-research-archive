@@ -2,23 +2,10 @@
 
 import React, { useState, useRef, useEffect, useCallback, useMemo } from "react";
 
-/* ════════════════════════════════════════════════════════════════════
-   Surface-code decoding lab.
-
-   We model the planar surface code's matching graph for ONE error type
-   (bit-flip / X errors detected by Z-stabilizers). Phase-flip decoding is
-   identical by symmetry. This is the graph real MWPM decoders operate on:
-
-     • Vertices  = stabilizers, on a d×d grid, indexed (r, c).
-     • Data qubits = edges: horizontal (r,c)-(r,c+1), vertical (r,c)-(r+1,c),
-       and rough-boundary edges on the left/right connecting a vertex to a
-       virtual boundary node.
-     • An error on an edge flips the syndrome at its interior endpoint(s).
-     • A logical X operator is any chain connecting the left rough boundary to
-       the right one. A residual (error XOR correction) causes a LOGICAL ERROR
-       iff it connects the two boundaries an odd number of times — which we
-       read off as the parity of residual left-boundary edges.
-   ════════════════════════════════════════════════════════════════════ */
+// surface-code matching graph, one error type (X errors / Z-stabilizers;
+// phase-flip is symmetric). vertices = stabilizers on a dxd grid, data qubits =
+// edges, rough boundaries left/right. logical error = residual chain links the
+// two boundaries (odd parity of left-boundary edges).
 
 type EdgeType = "h" | "v" | "bl" | "br";
 type Family = "surface" | "repetition";
@@ -176,8 +163,7 @@ function monteCarlo(family: Family, d: number, p: number, trials: number, rng: (
 }
 interface MCSeries { d: number; points: { p: number; rate: number }[]; }
 
-/* ── #1/#2 Measurement errors + multi-round space-time decoding ──
-   A measurement error makes a stabilizer report the wrong value in one round.
+/* #1/#2 Measurement errors + multi-round space-time decoding    A measurement error makes a stabilizer report the wrong value in one round.
    A naive "single-shot" decoder trusts a single round and mistakes measurement
    errors for data errors. A space-time decoder repeats the measurement R times
    (+ one perfect final round) and matches DETECTION EVENTS — differences between
@@ -253,7 +239,7 @@ function measurementStudy(family: Family, d: number, R: number, pData: number, t
   return pts;
 }
 
-/* ── Render geometry ── */
+/* Render geometry */
 const SIZE = 500;
 function edgeMid(e: Edge): { r: number; c: number } {
   switch (e.type) {

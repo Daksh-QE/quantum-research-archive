@@ -15,18 +15,20 @@ interface ChatMessage {
   content: string;
 }
 
-/** OpenRouter models, tried in order (only used when OPENROUTER_API_KEY is set):
-    primary → backup → local answerer. Overridable via env. */
+// models tried in order (needs OPENROUTER_API_KEY): primary -> backup -> local. env-overridable.
 const MODELS = [
   process.env.OPENROUTER_MODEL || "nvidia/nemotron-3-ultra-550b-a55b:free",
   process.env.OPENROUTER_MODEL_BACKUP || "nvidia/nemotron-3-super-120b-a12b:free",
 ];
-const OPENROUTER_KEY = process.env.OPENROUTER_API_KEY || null;
+const OPENROUTER_KEY =
+  process.env.OPENROUTER_API_KEY ||
+  process.env.OPEN_ROUTER_API_KEY ||
+  null;
 
 const SITE_URL = process.env.SITE_URL || "https://quantum-research-archive.vercel.app";
 const SITE_TITLE = "Quantum Research Archive";
 
-/** Make an OpenRouter chat-completion call. Returns the reply text or null. */
+// one OpenRouter chat call; returns reply text or null
 async function callOpenRouter(
   model: string,
   messages: ChatMessage[],
@@ -42,7 +44,7 @@ async function callOpenRouter(
   if (apiKey) {
     headers["Authorization"] = `Bearer ${apiKey}`;
   } else {
-    // Free tier models may need no key or a specific header
+    // free-tier can go keyless
     headers["Authorization"] = "Bearer ";
   }
 
@@ -74,7 +76,7 @@ async function callOpenRouter(
 
 export async function POST(request: Request) {
   try {
-    // ── Layer 1: Origin validation ──
+    // origin check
     const originCheck = checkOrigin(request);
     if (!originCheck.passed) {
       return NextResponse.json(originCheck.body, {
@@ -85,7 +87,7 @@ export async function POST(request: Request) {
     const body = await request.json();
     const { messages, paperTitle, paperAuthors, paperAbstract } = body;
 
-    // ── Layer 2: Payload validation ──
+    // payload check
     const payloadCheck = checkPayload(messages);
     if (!payloadCheck.passed) {
       return NextResponse.json(payloadCheck.body, {
@@ -93,7 +95,7 @@ export async function POST(request: Request) {
       });
     }
 
-    // ── Layer 3: Rate limit + token budget ──
+    // rate limit + token budget
     const estimatedTokens = estimateTokens(JSON.stringify(body));
     const rateCheck = checkRateLimits(request, estimatedTokens);
     if (!rateCheck.passed) {
@@ -102,7 +104,7 @@ export async function POST(request: Request) {
       });
     }
 
-    // ── Layer 4: Concurrent request throttle ──
+    // concurrency throttle
     const conCheck = tryAcquireConcurrent();
     if (!conCheck.passed) {
       return NextResponse.json(conCheck.body, {
@@ -111,7 +113,7 @@ export async function POST(request: Request) {
     }
 
     try {
-      // Build system prompt with paper context
+      // system prompt w/ paper context
       const systemPrompt = `You are a Research Copilot — an AI assistant that helps people understand quantum computing research papers. You explain concepts clearly and simply, assuming the user is a student or researcher who wants to understand the paper.
 
 CURRENT PAPER CONTEXT:
@@ -131,7 +133,7 @@ Guidelines:
         ...messages.slice(-10),
       ];
 
-      // ── Attempt 1: hosted models in order (primary → backup) ──
+      // try hosted models in order
       if (OPENROUTER_KEY) {
         for (const model of MODELS) {
           try {
@@ -143,7 +145,7 @@ Guidelines:
         }
       }
 
-      // ── Attempt 2: local, paper-grounded answerer (glossary + retrieval) ──
+      // else fall back to the local answerer
       const lastQuestion = messages.length > 0 ? messages[messages.length - 1].content : "";
       const reply = answerFromPaper(
         lastQuestion,

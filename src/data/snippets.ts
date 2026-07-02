@@ -8,9 +8,7 @@ export interface Snippet {
   sandbox?: string;    // optional ?circuit=... deep-link into the Quantum Sandbox
 }
 
-/* Short, self-contained example programs. Written in-house; standard textbook
-   circuits. Where a circuit is expressible in the visual Sandbox, a deep-link
-   lets you open and run it there. */
+// short standard example circuits. sandbox field is a ?circuit= deep-link where one applies.
 export const snippets: Snippet[] = [
   {
     id: "snip-super",

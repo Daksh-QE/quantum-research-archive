@@ -7,7 +7,7 @@ import { curriculum } from "@/data/curriculum";
 import { resources } from "@/data/resources";
 import { answerFromPaper, paperSummary } from "@/lib/paperAnswer";
 
-/* ── Interfaces ── */
+/* Interfaces */
 interface PaperData {
   id: string;
   title: string;
@@ -29,7 +29,7 @@ interface CopilotMessage {
   content: string;
 }
 
-/* ── Pre-loaded quantum papers (from our existing data) ── */
+/* Pre-loaded quantum papers (from our existing data) */
 const PRESET_PAPERS: PaperData[] = [
   {
     id: "shor-1997",
@@ -134,7 +134,7 @@ const PRESET_PAPERS: PaperData[] = [
   },
 ];
 
-/* ── Extract highlighted terms from text (case-insensitive substring match) ── */
+/* Extract highlighted terms from text (case-insensitive substring match) */
 function findTerms(text: string): string[] {
   const found = new Set<string>();
   const lower = text.toLowerCase();
@@ -146,7 +146,7 @@ function findTerms(text: string): string[] {
   return Array.from(found).slice(0, 8);
 }
 
-/* ── Escape a string for safe use inside a RegExp ── */
+/* Escape a string for safe use inside a RegExp */
 function escapeRegExp(s: string): string {
   return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
@@ -197,7 +197,7 @@ function renderHighlightedAbstract(
   return out;
 }
 
-/* ── Simple markdown renderer ── */
+/* Simple markdown renderer */
 function renderMarkdown(text: string): React.ReactNode {
   const parts = text.split(/(\*\*[^*]+\*\*|\*[^*]+\*)/g);
   return parts.map((part, i) => {
@@ -211,7 +211,7 @@ function renderMarkdown(text: string): React.ReactNode {
   });
 }
 
-/* ── Seeded shuffle for quiz option randomization ── */
+/* Seeded shuffle for quiz option randomization */
 function shuffleArray<T>(arr: T[], seed: number): T[] {
   const r = [...arr];
   for (let i = r.length - 1; i > 0; i--) {
@@ -222,7 +222,7 @@ function shuffleArray<T>(arr: T[], seed: number): T[] {
   return r;
 }
 
-/* ── Deterministic string hash → seed (so quiz is stable per paper) ── */
+/* Deterministic string hash → seed (so quiz is stable per paper) */
 function hashSeed(str: string): number {
   let h = 2166136261;
   for (let i = 0; i < str.length; i++) {
@@ -238,8 +238,7 @@ function clip(s: string): string {
   return t.length > 90 ? t.slice(0, 88).trim() + "…" : t;
 }
 
-/* ── Generate quiz questions based on paper content (deterministic per paper) ──
-   The "main claim" question uses a real sentence from THIS paper as the answer
+/* Generate quiz questions based on paper content (deterministic per paper)   The "main claim" question uses a real sentence from THIS paper as the answer
    and real sentences from OTHER papers as distractors — plausible quantum
    statements, so the learner must actually know this paper's content. */
 function generateQuiz(paper: PaperData, selectedTerms: string[], otherPapers: PaperData[]): QuizQuestion[] {
@@ -314,8 +313,7 @@ function generateQuiz(paper: PaperData, selectedTerms: string[], otherPapers: Pa
   return questions;
 }
 
-/* ── Prerequisite concepts from curriculum ──
-   Score each lesson by how strongly its title matches the paper text, and keep
+/* Prerequisite concepts from curriculum   Score each lesson by how strongly its title matches the paper text, and keep
    only confident matches (a distinctive ≥6-letter word, or ≥2 shorter words),
    ranked by score. This avoids tangential hits like every "algorithm" lesson. */
 const PREREQ_STOP = new Set(["quantum", "computing", "computer", "introduction", "the", "and", "for", "with", "from", "into", "using", "your", "their", "what", "how", "why"]);
@@ -339,7 +337,7 @@ function findPrereqs(paper: PaperData) {
   return scored.sort((a, b) => b.score - a.score).slice(0, 4);
 }
 
-/* ── Component ── */
+/* Component */
 export default function ResearchCopilotPage() {
   const [paperId, setPaperId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
@@ -509,7 +507,7 @@ export default function ResearchCopilotPage() {
 
   return (
     <div className="space-y-6 pb-8">
-      {/* ── Header ── */}
+      {/* Header */}
       <div className="flex items-center gap-3">
         <div className="w-10 h-10 rounded-xl bg-violet-100 flex items-center justify-center">
           <Sparkles className="w-5 h-5 text-violet-600" />
@@ -529,7 +527,7 @@ export default function ResearchCopilotPage() {
       </div>
 
       {!selectedPaper ? (
-        /* ── Paper Browser ── */
+        /* Paper Browser */
         <div className="space-y-4">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
@@ -580,7 +578,7 @@ export default function ResearchCopilotPage() {
           </div>
         </div>
       ) : (
-        /* ── Paper Reader ── */
+        /* Paper Reader */
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Main content */}
           <div className="lg:col-span-2 space-y-4">

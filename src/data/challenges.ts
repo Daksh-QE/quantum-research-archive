@@ -1,7 +1,7 @@
 import { Challenge } from "./types";
 
 export const challenges: Challenge[] = [
-  // ── IBM Quantum Challenges (official) ──
+  // IBM Quantum Challenges (official)
   {
     id: "ibm-qc-2025-spring",
     title: "IBM Quantum Challenge — Spring 2025",
@@ -42,7 +42,7 @@ export const challenges: Challenge[] = [
     url: "https://github.com/qiskit-community/ibm-quantum-challenge-2021",
     tags: ["IBM", "QISKIT", "FOUNDATIONS"],
   },
-  // ── Non-IBM challenges ──
+  // Non-IBM challenges
   {
     id: "qhak-2025",
     title: "QHack — Xanadu's Annual Quantum ML Hackathon",
@@ -91,7 +91,7 @@ export const challenges: Challenge[] = [
     url: "https://qosf.org/mentorship/",
     tags: ["QOSF", "MENTORSHIP", "ADVANCED", "OPEN SOURCE"],
   },
-  // ── IBM Learning Labs ──
+  // IBM Learning Labs
   {
     id: "ibm-learning-labs-intro",
     title: "IBM Quantum Learning — Introduction",

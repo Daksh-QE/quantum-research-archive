@@ -9,7 +9,7 @@ export interface SDKRow {
   url: string;
 }
 
-/* Vendor-neutral side-by-side of the major quantum SDKs. */
+// side-by-side of the major quantum SDKs.
 export const sdkCompare: SDKRow[] = [
   { id: "qiskit", name: "Qiskit", vendor: "IBM", language: "Python", hardware: "IBM Quantum (superconducting)", openSource: true, bestFor: "General-purpose circuits, the largest ecosystem and learning material, real IBM hardware access.", url: "https://www.ibm.com/quantum/qiskit" },
   { id: "cirq", name: "Cirq", vendor: "Google", language: "Python", hardware: "Google (research) + simulators", openSource: true, bestFor: "Fine-grained control over gates, timing, and noise; NISQ experiments.", url: "https://quantumai.google/cirq" },

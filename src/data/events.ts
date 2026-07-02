@@ -10,8 +10,7 @@ export interface QEvent {
   summary: string;
 }
 
-/* Recurring quantum events. Dates shift year to year, so we list the typical
-   timeframe and link to the official page for exact dates/registration. */
+// recurring events — dates move yearly, so we give the typical window and link out.
 export const events: QEvent[] = [
   { id: "ev-qhack", name: "QHack", type: "hackathon", when: "Typically Feb", month: 2, location: "Online (global)", url: "https://qhack.ai/", recurring: true, summary: "Xanadu's flagship quantum machine-learning hackathon — coding challenges, talks, and open project tracks. Beginner-friendly." },
   { id: "ev-iquhack", name: "MIT iQuHACK", type: "hackathon", when: "Typically Jan/Feb", month: 1, location: "MIT + Online", url: "https://www.iquise.mit.edu/iQuHACK", recurring: true, summary: "MIT's annual quantum hackathon with in-person and remote tracks, sponsored challenges from hardware providers." },

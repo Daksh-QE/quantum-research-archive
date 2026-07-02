@@ -8,8 +8,7 @@ export interface NewsItem {
   summary: string;
 }
 
-/* Curated milestones and developments. Summaries are written in-house; each
-   links to a primary source. Keep newest first. */
+// curated milestones, newest first. summaries in-house, links go to the source.
 export const news: NewsItem[] = [
   {
     id: "news-willow",

@@ -1,13 +1,5 @@
-/*
- * Local, LLM-free paper answerer. Produces genuinely useful, paper-grounded
- * answers by combining (a) glossary definitions for any recognised term, (b)
- * intent detection (summary / result / how / why), and (c) a retrieval step
- * that returns the abstract sentence(s) most relevant to the question.
- *
- * Used both server-side (as the /api/copilot fallback when no model key is
- * configured) and client-side (when the API is unreachable), so the chat always
- * responds with something on-topic instead of a canned line.
- */
+// no-LLM fallback answerer: glossary lookup -> intent match -> sentence
+// retrieval from the abstract. used by the api route and the client both.
 export interface AnswerablePaper {
   title: string;
   authors?: string;
@@ -40,7 +32,7 @@ function keywords(q: string): string[] {
     .filter((w) => w.length > 2 && !STOP.has(w));
 }
 
-/** Rank abstract sentences by keyword overlap with the question. */
+// rank abstract sentences by keyword overlap with the question
 function mostRelevantSentences(question: string, abstract: string, n = 2): string[] {
   const kws = keywords(question);
   const sents = sentences(abstract);
@@ -56,8 +48,7 @@ function mostRelevantSentences(question: string, abstract: string, n = 2): strin
   return hits.slice(0, n).map((x) => x.s);
 }
 
-/** Category-based significance line (an interpretation, not a claim about the
-    paper's specific content). Shared by the chat answerer and the summary. */
+// "why it matters" line keyed off the paper's category tags (not the content itself).
 export function significance(categories: string[] = []): string {
   const cats = categories.map((c) => c.toLowerCase());
   if (cats.includes("cryptography")) return "It bears on the security of modern cryptography — quantum methods can break some schemes and enable provably-secure ones.";
@@ -69,7 +60,7 @@ export function significance(categories: string[] = []): string {
   return "It expands what quantum computers are known to be able to do.";
 }
 
-/** Extractive, non-fabricated summary built from the actual abstract. */
+// summary straight from the abstract — no invented claims.
 export function paperSummary(paper: AnswerablePaper): { brief: string; detail: string; matters: string } {
   const sents = sentences(paper.abstract || "");
   const brief = sents.slice(0, 2).join(" ") || paper.title;
@@ -87,7 +78,7 @@ export function answerFromPaper(
   const sents = sentences(abstract);
   const cats = (paper.categories || []).map((c) => c.toLowerCase());
 
-  // 1) Glossary terms mentioned in the question (longest first, up to 2).
+  // glossary terms named in the question (longest first)
   const matched = glossary
     .filter((t) => q.includes(t.term.toLowerCase()))
     .sort((a, b) => b.term.length - a.term.length)
@@ -100,7 +91,7 @@ export function answerFromPaper(
     return parts.join("\n\n");
   }
 
-  // 2) Intent handlers.
+  // intents
   const has = (...ws: string[]) => ws.some((w) => q.includes(w));
 
   if (has("summar", "overview", "tldr", "tl;dr", "gist", "about", "what is this", "what's this",
@@ -128,11 +119,11 @@ export function answerFromPaper(
     return `To follow "${paper.title}", it helps to know the concepts named in the abstract. Open the Prerequisites tab for curriculum lessons matched to this paper.`;
   }
 
-  // 3) Retrieval fallback: answer with the most relevant abstract sentence(s).
+  // fallback: most relevant abstract sentence(s)
   const rel = mostRelevantSentences(question, abstract, 2);
   if (rel.length) return `From the paper: ${rel.join(" ")}`;
 
-  // 4) Nothing matched — offer a grounded prompt.
+  // nothing matched
   const firstSentence = sents[0] || paper.title;
   return `That isn't spelled out in the abstract, which focuses on: ${firstSentence} Try asking about a specific term, "summarize this," "what's the main result?", or "how does it work?"`;
 }

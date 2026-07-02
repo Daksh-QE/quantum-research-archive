@@ -3,11 +3,7 @@
 import React, { useState, useRef, useEffect, useCallback, useMemo } from "react";
 import { ChevronDown, ChevronRight, Info, Plus, Minus, Trash2, Copy, RotateCcw, Play, Pause, Film, GraduationCap, Lock, Check, ArrowRight, ArrowLeft } from "lucide-react";
 
-/* ════════════════════════════════════════════════════════════════════
-   Complex-number quantum circuit simulator (Qiskit little-endian).
-   Qubit 0 is the least-significant bit; basis labels are written
-   q[n-1] … q[0] left→right, matching IBM Quantum Composer.
-   ════════════════════════════════════════════════════════════════════ */
+// complex statevector sim, qiskit little-endian (q0 = LSB; labels q[n-1]..q[0]).
 type C = { re: number; im: number };
 const cx = (re: number, im = 0): C => ({ re, im });
 const cadd = (a: C, b: C): C => ({ re: a.re + b.re, im: a.im + b.im });
@@ -28,7 +24,7 @@ function csqrt(z: C): C {
   return { re, im };
 }
 
-/* ── Single-qubit gate matrices ── */
+/* Single-qubit gate matrices */
 const SQ = 1 / Math.SQRT2;
 function baseMatrix(type: string, p: number[]): C[][] | null {
   const th = p[0] ?? 0, ph = p[1] ?? 0, lam = p[2] ?? 0;
@@ -169,7 +165,7 @@ function measureSample(state: C[]): { outcome: number } {
   return { outcome: state.length - 1 };
 }
 
-/* ════════ Entanglement math (validated: product C=0, Bell C=1, GHZ pairwise C=0) ════════ */
+// entanglement math (checked: product C=0, Bell C=1, GHZ pairwise C=0)
 function reduced1(state: C[], q: number): C[][] {
   const rho = [[cx(0), cx(0)], [cx(0), cx(0)]];
   const mask = ~(1 << q);
@@ -277,7 +273,7 @@ function analyzeEntanglement(state: C[], n: number): EntData {
   return { blochs, conc, label };
 }
 
-/* ── Palette ── */
+/* Palette */
 interface GateDef { type: string; label: string; cat: string; color: string; ctrls: number; tgts: number; params: { name: string; def: number }[]; }
 const PI = Math.PI;
 const PALETTE: GateDef[] = [
@@ -314,9 +310,8 @@ const PALETTE: GateDef[] = [
 ];
 const DEF: Record<string, GateDef> = Object.fromEntries(PALETTE.map((g) => [g.type, g]));
 
-/* ════════ Tutorial Mode: gate explanation stack (single source of truth) ════════
-   Each gate's words describe the SAME rotation the engine applies, so the
-   explanation cannot drift from what the simulator actually does. */
+// tutorial gate explanations — same rotation the engine applies, so the words
+// can't drift from the sim.
 interface GateInfo { slogan: string; mechanism: string; whyResult?: string; purpose: string; job: string; breaksModel: boolean; unlock: number; }
 const GATE_INFO: Record<string, GateInfo> = {
   X: { slogan: "Sets a qubit to 1 — a bit flip.", mechanism: "A half-turn (180°) about the X-axis: it points the arrow from straight-up to straight-down.", whyResult: "Straight-up (definite 0) becomes straight-down (definite 1), so the probability bar moves fully onto 1.", purpose: "Prepares known inputs and flips bits — the quantum NOT, the setup step of most circuits.", job: "Prepare the starting state", breaksModel: false, unlock: 2 },
@@ -351,7 +346,7 @@ const GATE_INFO: Record<string, GateInfo> = {
   Reset: { slogan: "Forces a qubit back to |0⟩.", mechanism: "A non-unitary reset to the top of the sphere.", purpose: "Re-prepares a qubit mid-circuit for reuse.", job: "Prepare the starting state", breaksModel: false, unlock: 6 },
 };
 
-/* ── Lessons as data (steps validate against the real circuit) ── */
+/* Lessons as data (steps validate against the real circuit) */
 interface LessonStep { concept: string; action: string; highlight?: string; shots?: boolean; validate: any; explain?: string; }
 interface Lesson { id: string; title: string; qubits: number; steps: LessonStep[]; }
 const LESSONS: Lesson[] = [
@@ -469,7 +464,7 @@ const colX = (col: number) => LEFT + col * CELL + CELL / 2;
 let UIDC = 0; const uid = () => `op${UIDC++}`;
 const phaseHue = (ph: number) => ((ph + Math.PI) / (2 * Math.PI)) * 360;
 
-/* ════════════════════════════════════════════════════════════════════ */
+// component
 export default function QuantumSandbox() {
   const [introOpen, setIntroOpen] = useState(true);
   const [numQubits, setNumQubits] = useState(3);
@@ -636,7 +631,7 @@ export default function QuantumSandbox() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  /* ── Tutorial Mode logic ── */
+  /* Tutorial Mode logic */
   const activeLesson = lessonIdx != null ? LESSONS[lessonIdx] : null;
   const step: LessonStep | null = activeLesson ? activeLesson.steps[stepIdx] : null;
 
@@ -838,7 +833,7 @@ export default function QuantumSandbox() {
         </button>
       </div>
 
-      {/* ── Tutorial: lesson picker ── */}
+      {/* Tutorial: lesson picker */}
       {tutorial && !activeLesson && (
         <div className="bg-white rounded-xl border border-indigo-200 p-4">
           <div className="flex items-center gap-2 mb-1"><GraduationCap className="w-4 h-4 text-indigo-500" /><h2 className="text-sm font-bold text-slate-900">Guided lessons</h2></div>
@@ -862,7 +857,7 @@ export default function QuantumSandbox() {
         </div>
       )}
 
-      {/* ── Tutorial: active lesson rail + gate explainer ── */}
+      {/* Tutorial: active lesson rail + gate explainer */}
       {tutorial && activeLesson && step && (
         <div className="grid md:grid-cols-[1fr_300px] gap-4">
           <div className="bg-white rounded-xl border border-indigo-200 p-4">

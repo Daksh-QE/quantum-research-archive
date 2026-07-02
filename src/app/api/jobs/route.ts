@@ -12,7 +12,7 @@ export interface JobItem {
   source: "curated" | "remoteok" | "github" | "linkedin";
 }
 
-/* ── Curated quantum jobs (verified working links) ── */
+/* Curated quantum jobs (verified working links) */
 const CURATED: JobItem[] = [
   { id: "cur-1", title: "Quantum Research Scientist", company: "IBM Quantum", location: "Yorktown Heights, NY", description: "Foundational research in quantum error correction, algorithms, and superconducting qubit architecture.", url: "https://www.ibm.com/quantum", tags: ["RESEARCH", "QEC", "SUPERCONDUCTING"], source: "curated" },
   { id: "cur-2", title: "Quantum ML Researcher", company: "Google Quantum AI", location: "Santa Barbara, CA", description: "Develop novel quantum machine learning algorithms and explore quantum advantage in ML tasks.", url: "https://quantumai.google/", tags: ["QML", "RESEARCH", "ALGORITHMS"], source: "curated" },
@@ -36,7 +36,7 @@ const CURATED: JobItem[] = [
   { id: "cur-20", title: "Theoretical Quantum Physicist", company: "Caltech IQIM", location: "Pasadena, CA", description: "Conduct theoretical research in quantum information and quantum many-body physics.", url: "https://iqim.caltech.edu/", tags: ["THEORY", "QUANTUM INFO", "ACADEMIA"], source: "curated" },
 ];
 
-/* ── Helpers ── */
+/* Helpers */
 
 /** Check if a job title/description seems quantum-related */
 function isQuantumRelated(title: string, desc: string): boolean {
@@ -69,7 +69,7 @@ function cleanDesc(html: string): string {
     .slice(0, 250);
 }
 
-/* ── Fetch from RemoteOK ── */
+/* Fetch from RemoteOK */
 async function fetchRemoteOK(): Promise<JobItem[]> {
   const jobs: JobItem[] = [];
   try {
@@ -102,7 +102,7 @@ async function fetchRemoteOK(): Promise<JobItem[]> {
   return jobs;
 }
 
-/* ── Fetch from GitHub Jobs via Search API ── */
+/* Fetch from GitHub Jobs via Search API */
 async function fetchGitHubJobs(): Promise<JobItem[]> {
   const jobs: JobItem[] = [];
   const searchTerms = ["quantum+computing", "quantum+engineer", "quantum+developer"];
@@ -140,7 +140,7 @@ async function fetchGitHubJobs(): Promise<JobItem[]> {
   return jobs;
 }
 
-/* ── Main handler ── */
+/* Main handler */
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const query = searchParams.get("q")?.toLowerCase() || "";

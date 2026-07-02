@@ -1,18 +1,9 @@
 import { NextResponse } from "next/server";
 
-/*
- * Server-side arXiv metadata proxy.
- *
- * The browser can't call arXiv directly (no CORS), and arXiv's own export API
- * (export.arxiv.org) is slow/often throttled from cloud IPs — which made loads
- * time out. So we race THREE independent sources in parallel and use whichever
- * answers first:
- *   1. Semantic Scholar Graph API   (clean JSON, reliable from cloud)
- *   2. arxiv.org/abs/<id> HTML       (citation_* meta tags + abstract block)
- *   3. export.arxiv.org Atom feed    (original source, as a fallback)
- * Each has a short timeout so the whole route stays well under the platform's
- * function limit.
- */
+// arXiv metadata proxy (browser can't hit arXiv directly — no CORS).
+// export.arxiv.org is flaky from cloud IPs, so race 3 sources and take the
+// first complete answer: Semantic Scholar JSON, arxiv.org HTML meta tags,
+// export.arxiv.org Atom. short per-source timeouts to stay under the fn limit.
 export const runtime = "nodejs";
 export const maxDuration = 20;
 
@@ -89,7 +80,7 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: "Invalid arXiv id." }, { status: 400 });
   }
   try {
-    // Whichever source answers first (and completely) wins.
+    // first source to answer completely wins
     const paper = await Promise.any([fromSemanticScholar(id), fromArxivHtml(id), fromExportApi(id)]);
     return NextResponse.json(paper, { headers: { "Cache-Control": "public, max-age=86400" } });
   } catch {

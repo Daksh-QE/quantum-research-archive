@@ -1,9 +1,7 @@
 import { Module } from "./types";
 
 export const curriculum: Module[] = [
-  // ─────────────────────────────────────────────────────────────────────────
   // MODULE 0 — QUANTUM IN 10 MINUTES (zero prerequisites)
-  // ─────────────────────────────────────────────────────────────────────────
   {
     id: "00-quantum-in-10-minutes",
     title: "00. Quantum in a Nutshell — A Gentle Introduction",
@@ -36,9 +34,7 @@ export const curriculum: Module[] = [
       },
     ],
   },
-  // ─────────────────────────────────────────────────────────────────────────
   // PHASE 1 — FOUNDATIONS (6 modules, ~48 lessons)
-  // ─────────────────────────────────────────────────────────────────────────
   {
     id: "01-mathematical-foundations-i",
     title: "01. Mathematical Foundations I — Linear Algebra & Complex Numbers",
@@ -375,9 +371,7 @@ export const curriculum: Module[] = [
       },
     ],
   },
-  // ─────────────────────────────────────────────────────────────────────────
   // PHASE 2 — CORE QUANTUM COMPUTING (5 modules, ~42 lessons)
-  // ─────────────────────────────────────────────────────────────────────────
   {
     id: "07-qubits-gates",
     title: "07. Qubits & Quantum Gates",
@@ -670,9 +664,7 @@ export const curriculum: Module[] = [
       },
     ],
   },
-  // ─────────────────────────────────────────────────────────────────────────
   // PHASE 3 — ADVANCED TOPICS (5 modules, ~38 lessons)
-  // ─────────────────────────────────────────────────────────────────────────
   {
     id: "12-quantum-error-correction-i",
     title: "12. Quantum Error Correction I — Codes & Stabilizers",
@@ -941,9 +933,7 @@ export const curriculum: Module[] = [
       },
     ],
   },
-  // ─────────────────────────────────────────────────────────────────────────
   // PHASE 4 — PHYSICAL IMPLEMENTATION (4 modules, ~26 lessons)
-  // ─────────────────────────────────────────────────────────────────────────
   {
     id: "17-superconducting-qubits",
     title: "17. Superconducting Qubits & Circuit QED",
@@ -1132,9 +1122,7 @@ export const curriculum: Module[] = [
       },
     ],
   },
-  // ─────────────────────────────────────────────────────────────────────────
   // PHASE 5 — APPLIED & SPECIALIZED (4 modules, ~24 lessons)
-  // ─────────────────────────────────────────────────────────────────────────
   {
     id: "21-quantum-chemistry",
     title: "21. Quantum Simulation & Quantum Chemistry",

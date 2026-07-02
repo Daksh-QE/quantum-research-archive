@@ -2,8 +2,8 @@
 
 import { useState, useEffect, useCallback } from "react";
 
-/* Client-side "save for later" store, persisted in localStorage and synced
-   across components (and browser tabs) via a custom event. No backend. */
+// save-for-later store in localStorage, synced across components/tabs via a
+// custom event. no backend.
 export interface Bookmark {
   type: string; // "resource" | "article" | "tool" | "paper" | "news" | "event" | ...
   id: string;

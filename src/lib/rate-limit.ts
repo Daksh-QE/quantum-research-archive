@@ -5,7 +5,7 @@
  * and scraping without needing Vercel KV or an external Redis.
  */
 
-/* ── Types ── */
+/* Types */
 
 interface RateLimitEntry {
   count: number;
@@ -17,13 +17,13 @@ interface TokenBudgetEntry {
   resetAt: number; // epoch ms (end of the day)
 }
 
-/* ── In-memory stores ── */
+/* In-memory stores */
 
 const ipRateMap = new Map<string, RateLimitEntry>();
 const tokenBudget = { usedTokens: 0, resetAt: 0 };
 let concurrentRequests = 0;
 
-/* ── Configuration ── */
+/* Configuration */
 
 const CONFIG = {
   /** Max requests per IP per window */
@@ -40,7 +40,7 @@ const CONFIG = {
   maxMessageLength: 2000,
 } as const;
 
-/* ── Helpers ── */
+/* Helpers */
 
 function getClientIp(request: Request): string {
   // Vercel sets x-forwarded-for; fall back to a synthetic ID
@@ -106,7 +106,7 @@ export function estimateTokens(text: string): number {
   return Math.ceil(text.length / 4);
 }
 
-/* ── Public API ── */
+/* Public API */
 
 export interface AbuseCheckResult {
   /** Overall pass/fail */
