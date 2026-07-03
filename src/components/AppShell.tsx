@@ -27,7 +27,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
         />
       )}
       <Header onMenuClick={() => setNavOpen(true)} />
-      <main className="ml-0 lg:ml-56 pt-14 p-4 sm:p-6 lg:p-8 min-h-screen bg-slate-50">
+      <main className="ml-0 lg:ml-56 px-4 sm:px-6 lg:px-8 pt-14 pb-4 sm:pb-6 lg:pb-8 min-h-screen bg-slate-50">
         <div className="mx-auto" style={{ maxWidth: "1400px" }}>
           {children}
         </div>
