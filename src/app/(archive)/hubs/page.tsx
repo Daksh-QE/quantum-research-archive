@@ -3,6 +3,7 @@
 import React, { useState, useMemo } from "react";
 import { communityHubs } from "@/data/communityHubs";
 import TagBadge from "@/components/TagBadge";
+import FreshnessNote from "@/components/FreshnessNote";
 
 const platformColors: Record<string, string> = {
   discord: "bg-indigo-100 text-indigo-700",
@@ -33,6 +34,7 @@ export default function CommunityHubsPage() {
       <div>
         <h1 className="text-3xl font-bold text-slate-900">Community Hubs</h1>
         <p className="text-slate-600 mt-1">Discord servers, Reddit communities, X/Twitter profiles, and forums worth following in quantum computing.</p>
+        <FreshnessNote />
       </div>
 
       {/* Where to ask — intent-based routing */}

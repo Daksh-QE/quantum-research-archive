@@ -10,7 +10,7 @@ export default function StartPage() {
       <p className="text-slate-600">In plain English: quantum computing uses the strange properties of particles like atoms and photons to solve certain problems exponentially faster than classical computers. Instead of bits (0 or 1), quantum computers use qubits that can be both 0 and 1 at the same time.</p>
       <div className="bg-gradient-to-br from-indigo-50 to-violet-50 rounded-2xl p-6 border border-indigo-100">
         <p className="text-sm text-slate-700 font-medium mb-2">🎥 First, watch this quick 7-minute introduction:</p>
-        <a href="https://www.youtube.com/watch?v=p9pPjASnnxw" target="_blank" rel="noopener noreferrer" className="text-indigo-600 hover:text-indigo-500 text-sm font-medium flex items-center gap-1">3Blue1Brown: Some light quantum mechanics →</a>
+        <a href="https://www.youtube.com/watch?v=p9pPjASnnxw" target="_blank" rel="noopener noreferrer" className="text-indigo-600 hover:text-indigo-500 text-sm font-medium flex items-center gap-1">Some light quantum mechanics →</a>
       </div>
       <h2 className="text-xl font-bold text-slate-900">Choose your path:</h2>
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">

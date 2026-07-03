@@ -4,6 +4,7 @@ import React, { useState, useMemo } from "react";
 import { resources } from "@/data/resources";
 import ResourceCard from "@/components/ResourceCard";
 import FilterBar from "@/components/FilterBar";
+import FreshnessNote from "@/components/FreshnessNote";
 
 export default function ResourcesPage() {
   const [activeCategory, setActiveCategory] = useState("All");
@@ -28,6 +29,7 @@ export default function ResourcesPage() {
           Books, courses, videos, and platforms for quantum computing and
           mechanics
         </p>
+        <FreshnessNote />
       </div>
 
       <div>

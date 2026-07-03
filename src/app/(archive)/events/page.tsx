@@ -6,6 +6,7 @@ import { ExternalLink, Calendar } from "lucide-react";
 import { events } from "@/data/events";
 import FilterBar from "@/components/FilterBar";
 import BookmarkButton from "@/components/BookmarkButton";
+import FreshnessNote from "@/components/FreshnessNote";
 
 const typeColor: Record<string, string> = {
   conference: "bg-blue-100 text-blue-700",
@@ -31,6 +32,7 @@ export default function EventsPage() {
         <p className="text-slate-600 mt-1">
           Conferences, hackathons, summer schools, and competitions across the quantum year. Dates shift annually — follow each link for the current schedule.
         </p>
+        <FreshnessNote />
       </div>
 
       <FilterBar categories={categories} activeCategory={activeType} onCategoryChange={setActiveType} />

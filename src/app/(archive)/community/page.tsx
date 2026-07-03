@@ -4,6 +4,7 @@ import React, { useState, useMemo } from "react";
 import { communityMembers } from "@/data/community";
 import CommunityCard from "@/components/CommunityCard";
 import FilterBar from "@/components/FilterBar";
+import FreshnessNote from "@/components/FreshnessNote";
 
 const roleLabels: Record<string, string> = {
   RES: "Researchers",
@@ -39,6 +40,7 @@ export default function CommunityPage() {
         <p className="text-slate-600 mt-1">
           Key researchers, educators, builders, and institutes in quantum
         </p>
+        <FreshnessNote />
       </div>
 
       <div>
