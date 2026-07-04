@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
 import Link from "next/link";
-import { ArrowRight, Rocket, BookOpen, Code, Heart } from "lucide-react";
+import { ArrowRight, Rocket, BookOpen, Code, Heart, Video } from "lucide-react";
 
 export default function StartPage() {
   return (
@@ -9,7 +9,7 @@ export default function StartPage() {
       <h1 className="text-3xl font-bold text-slate-900">Welcome to Quantum Computing</h1>
       <p className="text-slate-600">In plain English: quantum computing uses the strange properties of particles like atoms and photons to solve certain problems exponentially faster than classical computers. Instead of bits (0 or 1), quantum computers use qubits that can be both 0 and 1 at the same time.</p>
       <div className="bg-gradient-to-br from-indigo-50 to-violet-50 rounded-2xl p-6 border border-indigo-100">
-        <p className="text-sm text-slate-700 font-medium mb-2">🎥 First, watch this quick 7-minute introduction:</p>
+        <p className="text-sm text-slate-700 font-medium mb-2 flex items-center gap-1.5"><Video className="w-4 h-4 text-indigo-600" /> First, watch this quick 7-minute introduction:</p>
         <a href="https://www.youtube.com/watch?v=p9pPjASnnxw" target="_blank" rel="noopener noreferrer" className="text-indigo-600 hover:text-indigo-500 text-sm font-medium flex items-center gap-1">Some light quantum mechanics →</a>
       </div>
       <h2 className="text-xl font-bold text-slate-900">Choose your path:</h2>

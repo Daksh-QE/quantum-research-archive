@@ -82,6 +82,7 @@ const lessonTypeColor = (type: string) => {
 export default function Sidebar({ open = false, onClose }: { open?: boolean; onClose?: () => void }) {
   const pathname = usePathname();
   const [expandedModule, setExpandedModule] = useState<string | null>(null);
+  const [showCurriculum, setShowCurriculum] = useState(false);
 
   const toggleModule = (id: string) => {
     setExpandedModule(expandedModule === id ? null : id);
@@ -95,7 +96,7 @@ export default function Sidebar({ open = false, onClose }: { open?: boolean; onC
         href={item.href}
         className={`flex items-center gap-3 px-4 py-2.5 lg:py-1.5 text-sm transition-colors ${
           isActive
-            ? "text-white bg-slate-800 border-r-2 border-blue-400"
+            ? "text-white bg-slate-800 border-r-2 border-indigo-400"
             : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/50"
         }`}
       >
@@ -107,16 +108,18 @@ export default function Sidebar({ open = false, onClose }: { open?: boolean; onC
 
   return (
     <aside
-      className={`fixed left-0 top-0 h-screen w-56 bg-slate-900 z-50 lg:z-30 flex flex-col overflow-y-auto transition-transform duration-200 lg:translate-x-0 ${
+      className={`fixed left-0 top-0 h-screen w-56 bg-slate-900 z-50 lg:z-30 flex flex-col overflow-y-auto no-scrollbar transition-transform duration-200 lg:translate-x-0 ${
         open ? "translate-x-0" : "-translate-x-full"
       }`}
     >
       {/* Brand */}
       <div className="flex items-center gap-2 px-4 h-14 border-b border-slate-700/50 shrink-0">
-        <Atom className="w-5 h-5 text-blue-400" />
-        <span className="text-sm font-semibold text-white leading-tight">
-          Quantum Research Archive
-        </span>
+        <Link href="/overview" onClick={onClose} className="flex items-center gap-2 min-w-0">
+          <Atom className="w-5 h-5 text-indigo-400 shrink-0" />
+          <span className="text-sm font-semibold text-white leading-tight">
+            Quantum Research Archive
+          </span>
+        </Link>
         <button
           onClick={onClose}
           className="ml-auto lg:hidden text-slate-400 hover:text-white p-1 -mr-1"
@@ -126,7 +129,7 @@ export default function Sidebar({ open = false, onClose }: { open?: boolean; onC
         </button>
       </div>
 
-      <nav className="flex-1 py-2 space-y-0.5 overflow-y-auto">
+      <nav className="flex-1 py-2 space-y-0.5 overflow-y-auto no-scrollbar">
         {/* ===== Key Tools ===== */}
         <div className="px-4 py-1.5">
           <h3 className="text-xs font-semibold uppercase tracking-wider text-slate-500">Key Tools</h3>
@@ -151,11 +154,16 @@ export default function Sidebar({ open = false, onClose }: { open?: boolean; onC
           <NavLink key={item.href} item={item} />
         ))}
 
-        {/* ===== Curriculum ===== */}
-        <div className="pt-3 px-4 pb-1">
-          <h3 className="text-xs font-semibold uppercase tracking-wider text-slate-500">Curriculum</h3>
-        </div>
-        {curriculum.map((mod) => (
+        {/* ===== Curriculum (collapsible) ===== */}
+        <button
+          onClick={() => setShowCurriculum((v) => !v)}
+          className="w-full flex items-center gap-1.5 pt-3 px-4 pb-1 text-xs font-semibold uppercase tracking-wider text-slate-500 hover:text-slate-300 transition-colors"
+        >
+          {showCurriculum ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronRight className="w-3.5 h-3.5" />}
+          Curriculum
+          <span className="ml-auto normal-case tracking-normal text-slate-600 font-normal">{curriculum.length}</span>
+        </button>
+        {showCurriculum && curriculum.map((mod) => (
           <div key={mod.id}>
             <button
               onClick={() => toggleModule(mod.id)}

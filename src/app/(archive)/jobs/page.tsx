@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Briefcase, ExternalLink, Search } from "lucide-react";
+import { Briefcase, ExternalLink, Search, Lightbulb } from "lucide-react";
 
 const JOB_BOARDS = [
   {
@@ -98,7 +98,7 @@ export default function JobsPage() {
       </div>
 
       <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 text-sm text-amber-800">
-        <p className="font-medium mb-1">💡 Tip</p>
+        <p className="font-medium mb-1 flex items-center gap-1.5"><Lightbulb className="w-4 h-4" /> Tip</p>
         <p>Bookmark these job boards and check them regularly. Many quantum companies also post on LinkedIn — set up a saved search for &quot;quantum computing&quot; to get notified of new openings.</p>
       </div>
     </div>

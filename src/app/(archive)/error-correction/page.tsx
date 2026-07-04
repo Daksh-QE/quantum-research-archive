@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useRef, useEffect, useCallback, useMemo } from "react";
+import { Check, X } from "lucide-react";
 
 // surface-code matching graph, one error type (X errors / Z-stabilizers;
 // phase-flip is symmetric). vertices = stabilizers on a dxd grid, data qubits =
@@ -583,7 +584,7 @@ export default function QECDashboard() {
               {[3, 5, 7].map((d) => {
                 const logErr = logicalRate(errorRate, d);
                 const phys = 2 * d * d - 1; // rotated surface code: d² data + (d²−1) ancilla
-                return <div key={d} className="flex justify-between text-slate-600"><span>Distance {d}:</span><span className="font-medium">{logErr < targetLogError ? "✅" : "❌"} {phys} qubits</span></div>;
+                return <div key={d} className="flex justify-between text-slate-600"><span>Distance {d}:</span><span className="font-medium inline-flex items-center gap-1">{logErr < targetLogError ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <X className="w-3.5 h-3.5 text-red-500" />} {phys} qubits</span></div>;
               })}
             </div>
             <p className="text-[10px] text-slate-400 mt-1">A distance-d rotated surface code uses d² data + (d²−1) ancilla = 2d²−1 physical qubits.</p>
@@ -636,7 +637,7 @@ export default function QECDashboard() {
           {decoded && (
             <div className={`rounded-xl border p-4 ${decoded.logicalError ? "bg-red-50 border-red-200" : "bg-emerald-50 border-emerald-200"}`}>
               <div className="flex items-center gap-2 mb-1">
-                <span className="text-lg">{decoded.logicalError ? "❌" : "✅"}</span>
+                <span>{decoded.logicalError ? <X className="w-5 h-5 text-red-500" /> : <Check className="w-5 h-5 text-emerald-600" />}</span>
                 <h3 className={`text-sm font-bold ${decoded.logicalError ? "text-red-700" : "text-emerald-700"}`}>
                   {decoded.logicalError ? "Logical error — the data was corrupted" : "Success — the logical qubit survived"}
                 </h3>

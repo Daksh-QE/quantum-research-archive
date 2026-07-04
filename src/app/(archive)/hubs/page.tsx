@@ -1,9 +1,12 @@
 "use client";
 
 import React, { useState, useMemo } from "react";
+import { MessageCircle, MessageSquare, Hash, AtSign, MessagesSquare } from "lucide-react";
 import { communityHubs } from "@/data/communityHubs";
 import TagBadge from "@/components/TagBadge";
 import FreshnessNote from "@/components/FreshnessNote";
+
+type IconType = React.ComponentType<{ className?: string }>;
 
 const platformColors: Record<string, string> = {
   discord: "bg-indigo-100 text-indigo-700",
@@ -13,12 +16,12 @@ const platformColors: Record<string, string> = {
   forum: "bg-blue-100 text-blue-700",
 };
 
-const platformIcons: Record<string, string> = {
-  discord: "💬",
-  reddit: "🤖",
-  slack: "🔷",
-  x: "🐦",
-  forum: "📋",
+const platformIcon: Record<string, IconType> = {
+  discord: MessageCircle,
+  reddit: MessageSquare,
+  slack: Hash,
+  x: AtSign,
+  forum: MessagesSquare,
 };
 
 export default function CommunityHubsPage() {
@@ -67,7 +70,7 @@ export default function CommunityHubsPage() {
               filter === p ? "bg-slate-900 text-white" : "bg-white text-slate-600 border border-slate-300 hover:bg-slate-100"
             }`}
           >
-            {p === "All" ? "All" : `${platformIcons[p] || ""} ${p.charAt(0).toUpperCase() + p.slice(1)}`}
+            {p === "All" ? "All" : (() => { const Ic = platformIcon[p]; return <span className="inline-flex items-center gap-1.5">{Ic && <Ic className="w-3.5 h-3.5" />}{p.charAt(0).toUpperCase() + p.slice(1)}</span>; })()}
           </button>
         ))}
       </div>

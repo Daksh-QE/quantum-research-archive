@@ -52,6 +52,10 @@ body {
   font-family: var(--font-sans, Arial, Helvetica, sans-serif);
 }
 
+/* Hide scrollbar (element still scrolls) */
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+.no-scrollbar::-webkit-scrollbar { display: none; }
+
 /* Tag badge colors */
 .tag-video { background: #dbeafe; color: #1d4ed8; }
 .tag-paper { background: #f3e8ff; color: #7c3aed; }

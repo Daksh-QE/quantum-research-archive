@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useRef, useEffect, useCallback, useMemo } from "react";
-import { ChevronDown, ChevronRight, Info, Plus, Minus, Trash2, Copy, RotateCcw, Play, Pause, Film, GraduationCap, Lock, Check, ArrowRight, ArrowLeft } from "lucide-react";
+import { ChevronDown, ChevronRight, Info, Plus, Minus, Trash2, Copy, RotateCcw, Play, Pause, Film, GraduationCap, Lock, Check, ArrowRight, ArrowLeft, Atom } from "lucide-react";
 
 // complex statevector sim, qiskit little-endian (q0 = LSB; labels q[n-1]..q[0]).
 type C = { re: number; im: number };
@@ -822,7 +822,7 @@ export default function QuantumSandbox() {
   return (
     <div className="space-y-6 pb-10">
       <div className="flex items-center gap-3">
-        <div className="w-10 h-10 rounded-xl bg-indigo-100 flex items-center justify-center text-indigo-600 font-bold text-lg">⚛</div>
+        <div className="w-10 h-10 rounded-xl bg-indigo-100 flex items-center justify-center text-indigo-600"><Atom className="w-5 h-5" /></div>
         <div className="flex-1">
           <h1 className="text-2xl font-bold text-slate-900">Quantum Sandbox</h1>
           <p className="text-sm text-slate-500">Drag-and-drop circuits with gate-by-gate animation, entanglement meters, a Q-sphere, and live Qiskit code.</p>

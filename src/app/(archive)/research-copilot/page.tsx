@@ -740,9 +740,9 @@ export default function ResearchCopilotPage() {
                 {quizSubmitted && (
                   <div className="text-center">
                     <p className={`text-sm font-semibold ${quizScore === quiz.length ? "text-emerald-600" : quizScore >= quiz.length / 2 ? "text-amber-600" : "text-red-600"}`}>
-                      {quizScore === quiz.length ? "🎉 Perfect! You've mastered this paper." :
-                       quizScore >= quiz.length / 2 ? "👍 Good job! Review the ones you missed." :
-                       "📖 Review the paper and try again."}
+                      {quizScore === quiz.length ? "Perfect! You've mastered this paper." :
+                       quizScore >= quiz.length / 2 ? "Good job! Review the ones you missed." :
+                       "Review the paper and try again."}
                     </p>
                   </div>
                 )}

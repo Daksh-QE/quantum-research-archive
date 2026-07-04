@@ -20,10 +20,12 @@ export default function Header({ onMenuClick }: { onMenuClick?: () => void }) {
           >
             <Menu className="w-5 h-5" />
           </button>
-          <Atom className="w-5 h-5 text-blue-600" />
-          <span className="text-sm font-semibold text-slate-900 hidden sm:inline">
-            Quantum Research Archive
-          </span>
+          <Link href="/overview" className="flex items-center gap-2">
+            <Atom className="w-5 h-5 text-indigo-600" />
+            <span className="text-sm font-semibold text-slate-900 hidden sm:inline">
+              Quantum Research Archive
+            </span>
+          </Link>
         </div>
 
         {/* Center: Search trigger */}
