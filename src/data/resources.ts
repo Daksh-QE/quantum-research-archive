@@ -69,17 +69,6 @@ export const resources: Resource[] = [
     domain: "Quantum Computing",
   },
   {
-    id: "book-preskill-notes",
-    title: "Lecture Notes on Quantum Information (Ph 219)",
-    description:
-      "John Preskill's famous Caltech Ph 219 lecture notes covering quantum entanglement, quantum Shannon theory, and quantum error correction.",
-    url: "http://theory.caltech.edu/~preskill/ph229/",
-    tags: ["BOOK", "NOTES", "GUIDE"],
-    category: "Book",
-    author: "John Preskill",
-    domain: "Both",
-  },
-  {
     id: "book-yanofsky-mannucci",
     title: "Quantum Computing for Computer Scientists",
     description:
@@ -291,12 +280,12 @@ export const resources: Resource[] = [
     id: "course-caltech-quantum-mechanics",
     title: "Caltech Ph 219: Quantum Computation",
     description:
-      "Caltech's graduate-level quantum information and computation course taught by John Preskill. Covers quantum error correction, entanglement, and quantum Shannon theory.",
+      "Caltech's graduate-level quantum information and computation course taught by John Preskill, including his famous lecture notes covering quantum entanglement, quantum Shannon theory, and quantum error correction.",
     url: "https://preskill.caltech.edu/ph219/ph219_2021-22.html",
-    tags: ["COURSE", "NOTES", "VIDEO"],
+    tags: ["COURSE", "NOTES", "VIDEO", "GUIDE"],
     category: "Course",
     author: "John Preskill",
-    domain: "Quantum Mechanics",
+    domain: "Both",
   },
   {
     id: "course-quantum-computing-ucsd",
