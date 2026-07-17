@@ -95,7 +95,7 @@ export const resources: Resource[] = [
     title: "Quantum Information Theory",
     description:
       "A comprehensive treatment of quantum information theory, including entropy, channel capacity, and quantum error correction.",
-    url: "https://www.cambridge.org/9781316809976",
+    url: "https://www.cambridge.org/core_title/gb/439636",
     tags: ["BOOK", "GUIDE"],
     category: "Book",
     author: "Mark M. Wilde",
@@ -292,7 +292,7 @@ export const resources: Resource[] = [
     title: "Caltech Ph 219: Quantum Computation",
     description:
       "Caltech's graduate-level quantum information and computation course taught by John Preskill. Covers quantum error correction, entanglement, and quantum Shannon theory.",
-    url: "http://theory.caltech.edu/~preskill/ph229/",
+    url: "https://preskill.caltech.edu/ph219/ph219_2021-22.html",
     tags: ["COURSE", "NOTES", "VIDEO"],
     category: "Course",
     author: "John Preskill",
